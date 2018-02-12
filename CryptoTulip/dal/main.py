@@ -1,5 +1,5 @@
-import redis
+import block.py
 
 def main():
-    asdf = 'l'
-    asdf + 'l'
+    x = 1
+    x += 1
