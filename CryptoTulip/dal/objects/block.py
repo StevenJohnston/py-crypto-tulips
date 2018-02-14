@@ -1,5 +1,5 @@
 # Stored in database with key -> value
-#       block:id:actual_hash_here -> block_data
+#       block:actual_hash_here -> block_data
 
 class Block:
     __block_hash = ''
@@ -10,4 +10,4 @@ class Block:
         self.block_data = block_data
 
     def to_string(self):
-        return self.block_hash + "|" + self.block_data
+        return str(self.block_hash) + "|" + str(self.block_data)
