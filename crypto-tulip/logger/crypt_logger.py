@@ -103,10 +103,13 @@ class Logger:
         logger = Logger.setup_logger(logging_level)
         function_call = inspect.stack()
         if logging_level == LoggingLevel.DEBUG:
-            logger.debug('debug message %s: ', message + " The Issue Level is: " + str(issue_level), extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
+            logger.debug('debug message %s: ', message + " The Issue Level is: " + str(issue_level) \
+            , extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
         elif logging_level == LoggingLevel.INFO:
             logger.info(message)
         elif logging_level == LoggingLevel.ERROR:
-            logger.error('Error Message %s: ', message + " The Issue Level is: " + str(issue_level), extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
+            logger.error('Error Message %s: ', message + " The Issue Level is: " + str(issue_level) \
+            , extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
         elif logging_level == LoggingLevel.CRITICAL:
-            logger.critical('Critical message %s: ', message + " The Issue Level is: " + str(issue_level), extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
+            logger.critical('Critical message %s: ', message + " The Issue Level is: " + str(issue_level) \
+            , extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
