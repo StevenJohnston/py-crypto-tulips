@@ -1,4 +1,5 @@
 """
+
 Logger Modular
 """
 
@@ -57,7 +58,7 @@ class Logger:
         Returns:
         logger -- the logger object so the log function can log appropriately
         """
-        data = json.load(open('Logging/logging.json'))
+        data = json.load(open('logging.json'))
         if level == LoggingLevel.DEBUG:
             logger = Logger.generate_logger(
                 level.value,
@@ -91,7 +92,6 @@ class Logger:
     @staticmethod
     def log(message, issue_level, logging_level, stack_trace=''):
         """ The static method that the user will call to log to a specific file given the parameters
-
         Keyword arugments:
         message -- message the send to be logged
         issue_level -- Custom user error code
@@ -103,10 +103,10 @@ class Logger:
         logger = Logger.setup_logger(logging_level)
         function_call = inspect.stack()
         if logging_level == LoggingLevel.DEBUG:
-            logger.debug('debug message %s', message, extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
+            logger.debug('debug message %s: ', message + " The Issue Level is: " + str(issue_level), extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
         elif logging_level == LoggingLevel.INFO:
             logger.info(message)
         elif logging_level == LoggingLevel.ERROR:
-            logger.error('Error Message %s', message, extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
+            logger.error('Error Message %s: ', message + " The Issue Level is: " + str(issue_level), extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
         elif logging_level == LoggingLevel.CRITICAL:
-            logger.critical('Critical message %s', message, extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
+            logger.critical('Critical message %s: ', message + " The Issue Level is: " + str(issue_level), extra={'functioncall': str(function_call[1][4]), 'Stacktrace': stack_trace})
