@@ -10,13 +10,16 @@ class P2pClientPair:
     Class that contains information returned from a connected client to a server
     """
 
-    socket = None
-    address = None
+    def base_values(self):
+        self.socket = None
+        self.address = None
 
     def __init__(self, sock, addr):
         """
         Construtor to initialize the class
         """
+
+        self.base_values()
 
         self.socket = sock
         self.address = addr
@@ -27,12 +30,12 @@ class P2pServer:
     Class that allows to listen to incomming TCP connections to exhcnage messages
     """
 
-    data_size = 1024
-    sock = None
-    host = None
-    port = None
-
-    __socket_open = False
+    def base_values(self):
+        self.data_size = 1024
+        self.sock = None
+        self.host = None
+        self.port = None
+        self.__socket_open = False
 
     def __init__(self, port, data_size=1024):
         """
@@ -41,6 +44,8 @@ class P2pServer:
         Arguments:
         data_size -- how much data to read at a time. The default is 1024
         """
+
+        self.base_values()
 
         self.do_socket_creation()
 

@@ -17,29 +17,30 @@ class ConnectionManager:
     still active and remove inactive.
     """
 
-    server_port = None
-    server = None
 
-    peer_timeout = None
-    recv_data_size = None
-    run = True
-    blocking_accept = False
-    removing_peers = True
+    def base_values(self):
+        self.server_port = None
+        self.server = None
+        self.peer_timeout = None
+        self.recv_data_size = None
+        self.run = True
+        self.blocking_accept = False
+        self.removing_peers = True
+        self.peer_list = []
+        self.runnings_threads = []
+        self.socket_timeout = 10
+        self.ok_response = '\x03'
+        self.client_connection_msg = '\x01'
 
-    peer_list = []
-    runnings_threads = []
-    socket_timeout = 10
-
-    ok_response = '\x03'
-    client_connection_msg = '\x01'
-
-    def __init__(self, server_port=None, peer_timeout=10, recv_data_size=1024):
+    def __init__(self, server_port=None, peer_timeout=10, recv_data_size=1024, socket_timeout=10):
+        self.base_values()
+        self.socket_timeout = socket_timeout
         self.server_port = server_port
         self.peer_timeout = peer_timeout
         self.recv_data_size = recv_data_size
         self.server = p2p_server.P2pServer(server_port, data_size=recv_data_size)
         if peer_timeout > 0:
-            a_thread = threading.Thread(target=self.auto_remove_peers)
+            a_thread = threading.Thread(target=self.auto_remove_peers, args=())
             self.runnings_threads.append(a_thread)
             a_thread.start()
 
@@ -151,26 +152,25 @@ class ConnectionManager:
         Method to remove peers that have not send any msges for some time
         """
 
+        time_to_sleep = self.peer_timeout
         smallest_time_difference = float("inf")
         peers_to_remove = []
         for peer in self.peer_list:
             difference = int(peer.give_time_difference())
             if difference < smallest_time_difference:
                 smallest_time_difference = difference
-            if difference > self.peer_timeout:
+            if difference >= self.peer_timeout:
                 peers_to_remove.append(peer)
-        if smallest_time_difference == float("inf"):
-            smallest_time_difference = self.peer_timeout
-        elif smallest_time_difference > self.peer_timeout:
-            smallest_time_difference = self.peer_timeout
-        print("Removing {} peers".format(len(peers_to_remove)))
-        print("Want to sleep for {}".format(smallest_time_difference))
+        if smallest_time_difference < self.peer_timeout and smallest_time_difference >= 0:
+            time_to_sleep = self.peer_timeout - smallest_time_difference
+        print("Removing {} peers out of {}".format(len(peers_to_remove), len(self.peer_list)))
+        print("Want to sleep for {}".format(time_to_sleep))
         while peers_to_remove:
             try:
                 self.close_peer(peers_to_remove.pop(0))
             except ValueError as ex:
                 print('peer was already removed, {}'.format(ex))
-        return smallest_time_difference
+        return time_to_sleep
 
     def unblock_accept(self):
         """
@@ -239,7 +239,18 @@ class ConnectionManager:
         callback -- function to be called when data is received. Requires data argument
         """
 
+        #peer.socket.sock.setblocking(0)
+
         while self.run:
+            """ready = select.select([peer.socket.sock], [], [], self.socket_timeout)
+            if ready[0]:
+                recv_data = peer.socket.recv_msg()
+                if recv_data != '':
+                    peer.make_timestamp()
+                    callback(data=recv_data)
+            else:
+                print('socket timeout on a client read')
+                """
             try:
                 recv_data = peer.socket.recv_msg()
             except socket.timeout:
@@ -248,13 +259,13 @@ class ConnectionManager:
                 if ex.errno == 9:
                     print("other side's socket on client read got closed")
                 else:
-                    print('unknown server OSError')
+                    print('unknown client OSError, {}'.format(ex))
                 break
             else:
                 if recv_data != '':
                     peer.make_timestamp()
-                    callback(data=recv_data)
-        print('Ended a recv msg client thread')
+                    callback(data=recv_data)#"""
+        print('Ended a recv msg client thread, run is {}'.format(self.run))
 
     def recv_msg_server(self, peer, callback):
         """
@@ -274,13 +285,13 @@ class ConnectionManager:
                 if ex.errno == 9:
                     print("other side's socket on server read got closed")
                 else:
-                    print('unknown server OSError')
+                    print('unknown server OSError, {}'.format(ex))
                 break
             else:
                 if recv_data != '':
                     peer.make_timestamp()
                     callback(data=recv_data)
-        print('Ended a recv msg server thread')
+        print('Ended a recv msg server thread, run is {}'.format(self.run))
 
     def close_peer(self, peer, remove_peer=True):
         """

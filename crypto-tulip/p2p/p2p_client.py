@@ -10,13 +10,13 @@ class P2pClient:
     Class that allows connection to a TCP server and exchange of messages
     """
 
-    data_size = 1024
-    sock = None
-    host = None
-    port = None
-
-    __connected = False
-    __socket_open = False
+    def base_values(self):
+        self.data_size = 1024
+        self.sock = None
+        self.host = None
+        self.port = None
+        self.__connected = False
+        self.__socket_open = False
 
     def __init__(self, data_size=1024):
         """
@@ -25,7 +25,7 @@ class P2pClient:
         Arguments:
         data_size -- how much data to read at a time. The default is 1024
         """
-
+        self.base_values()
         self.__do_socket_creation()
 
         self.__connected = False
