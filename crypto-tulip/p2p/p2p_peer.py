@@ -21,13 +21,6 @@ class Peer:
     Peer class that stores information about a peer required to communicate with that peer
     """
 
-    def base_values(self):
-        self.socket = None
-        self.ip_address = None
-        self.port = None
-        self.mode = None
-        self.last_message_time = None
-
     def __init__(self, socket=None, ip_address=None, port=None, mode=None):
         """
         Initializer for a Peer.
@@ -38,7 +31,11 @@ class Peer:
         port -- port of the peer
         mode -- a PeerMode instance to specify how peer got connected to
         """
-        self.base_values()
+        self.socket = None
+        self.ip_address = None
+        self.port = None
+        self.mode = None
+        self.last_message_time = None
 
         self.socket = socket
         self.ip_address = ip_address
@@ -50,13 +47,11 @@ class Peer:
         """
         Give peer's last_message_time timestamp
         """
-
         self.last_message_time = time.time()
 
     def give_time_difference(self):
         """
         Return the difference between current time and the last_message_time of a peer
         """
-
         current_time = time.time()
         return current_time - self.last_message_time

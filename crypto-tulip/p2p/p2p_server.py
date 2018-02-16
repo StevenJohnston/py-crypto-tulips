@@ -10,17 +10,10 @@ class P2pClientPair:
     Class that contains information returned from a connected client to a server
     """
 
-    def base_values(self):
-        self.socket = None
-        self.address = None
-
     def __init__(self, sock, addr):
         """
         Construtor to initialize the class
         """
-
-        self.base_values()
-
         self.socket = sock
         self.address = addr
 
@@ -30,13 +23,6 @@ class P2pServer:
     Class that allows to listen to incomming TCP connections to exhcnage messages
     """
 
-    def base_values(self):
-        self.data_size = 1024
-        self.sock = None
-        self.host = None
-        self.port = None
-        self.__socket_open = False
-
     def __init__(self, port, data_size=1024):
         """
         Basic constructor.
@@ -44,22 +30,22 @@ class P2pServer:
         Arguments:
         data_size -- how much data to read at a time. The default is 1024
         """
-
-        self.base_values()
+        self.data_size = 1024
+        self.sock = None
+        self.host = None
+        self.port = None
+        self.__socket_open = False
 
         self.do_socket_creation()
-
         self.data_size = data_size
         self.host = socket.gethostname()
         self.port = port
-
         self.do_binding()
 
     def do_socket_creation(self):
         """
         Create socket
         """
-
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
@@ -72,7 +58,6 @@ class P2pServer:
         client_pair -- P2pClientPair which socket to change
         client_socket -- client socket which socket to change
         """
-
         if client_pair is None:
             client_socket.settimeout(timeout)
         else:
@@ -82,7 +67,6 @@ class P2pServer:
         """
         Bind socket to the server's host and port
         """
-
         self.sock.bind((self.host, self.port))
         self.__socket_open = True
         self.sock.listen(5)
@@ -94,7 +78,6 @@ class P2pServer:
         Returns:
         P2pClientPair -- a class that has accepted client's socket and ip address
         """
-
         if not self.__socket_open:
             self.do_socket_creation()
             self.do_binding()
@@ -111,7 +94,6 @@ class P2pServer:
         client_pair -- a P2pClientPair of a client that should receive the msg. Either client_pair or client_socket can be used
         client_socket -- socket of a client. Either client_pair or client_socket can be used
         """
-
         if client_pair is None:
             socket_to_use = client_socket
         else:
@@ -129,7 +111,6 @@ class P2pServer:
         Returns:
         String representation of received msg
         """
-
         if client_pair is None:
             socket_to_use = client_socket
         else:
@@ -145,7 +126,6 @@ class P2pServer:
         client_pair -- a P2pClientPair of a client that is needed to be closed
         client_socket -- a socket that needs to be closed
         """
-
         if client_pair is None:
             client_socket.close()
         else:
@@ -155,6 +135,5 @@ class P2pServer:
         """
         Close server's socket
         """
-
         self.sock.close()
         self.__socket_open = False

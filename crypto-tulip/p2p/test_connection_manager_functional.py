@@ -125,14 +125,14 @@ def test_peer_timeout():
     client_port = CallbackStore.port_for_client
     CallbackStore.increment_ports()
 
-    server_connection = connection_manager.ConnectionManager(server_port=server_port, peer_timeout=10, socket_timeout=2)
+    server_connection = connection_manager.ConnectionManager(server_port=server_port, peer_timeout=5, socket_timeout=2)
     client_connection = connection_manager.ConnectionManager(server_port=client_port, peer_timeout=0, socket_timeout=2)
     second_client = connection_manager.ConnectionManager(server_port=22322, peer_timeout=0, socket_timeout=2)
 
-    time.sleep(5)
+    time.sleep(1)
     server_connection.accept_connection(read_callback=callback_server, run_as_a_thread=True)
     client_connection.connect_to(socket.gethostname(), server_port, read_callback=callback_client)
-    time.sleep(30)
+    time.sleep(15)
     client_connection.connect_to(socket.gethostname(), server_port, read_callback=callback_second_client)
 
     server_connection.send_msg('test data')
