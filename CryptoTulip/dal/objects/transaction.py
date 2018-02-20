@@ -1,11 +1,9 @@
-# Stored in database with keys:
-#       transaction:id:hash 
-#       transaction:id:to-addr
-#       transaction:id:from-addr
-#       transaction:id:amount
-#       transaction:id:timestamp
+# Stored in database as a hash with key:
+#       transaction:hash
 
 class Transaction:
+
+    prefix = "transaction"
 
     transaction_hash = ''
     to_addr = ''
@@ -19,3 +17,7 @@ class Transaction:
         self.from_addr = from_addr
         self.amount = amount
         self.timestamp = timestamp
+
+
+    def _from_json(self, json_str):
+        self.transaction_hash = ""
