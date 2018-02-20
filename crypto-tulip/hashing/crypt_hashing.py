@@ -1,5 +1,5 @@
 """
-Hashing Modular
+Hashing Module
 """
 
 import hashlib
