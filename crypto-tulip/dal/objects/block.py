@@ -1,5 +1,5 @@
 # Stored in database with key -> value
-#       block:id:actual_hash_here -> block_data
+#       block:actual_hash_here -> block_data
 
 class Block:
     block_hash = ''

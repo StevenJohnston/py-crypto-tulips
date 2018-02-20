@@ -1,6 +1,6 @@
 import json
 import redis
-import block
+from objects import block
 
 class BlockService:
     _host = ''
@@ -10,8 +10,9 @@ class BlockService:
 
     def __init__(self):
         settings = json.load(open('db_settings.json'))
-        self.host = settings[0]["host"]
-        self.port = settings[0]["port"]
+        print(settings["host"] + ":" + settings["port"])
+        self.host = settings["host"]
+        self.port = settings["port"]
 
     def store_block(self, block):
         r = self._connect()
