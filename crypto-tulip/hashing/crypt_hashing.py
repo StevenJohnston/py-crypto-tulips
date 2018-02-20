@@ -19,6 +19,6 @@ class Hashing:
         json_block -- JSON string
 
         Returns:
-        logger -- Returns the sha256 hash of the JSON string provided
+        string -- Returns the sha256 hash of the JSON string provided
         """
         return hashlib.sha256((json.dumps(json_block)).encode('utf-8')).hexdigest()

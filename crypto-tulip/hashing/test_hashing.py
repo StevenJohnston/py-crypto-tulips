@@ -16,12 +16,10 @@ def test_hashing_string():
 
 def test_hashing_json():
     hash = hashing_string(jsonTest)
-    print(hash)
     assert hash == "08f04b54179fffeea74ebcef9c799562f478150d40b5abba1a8cd36ae53f2b0a"
 
 def test_hashing_invalid_json():
     hash = hashing_string(jsonTestInvalid)
-    print(hash)
     assert hash == "d1908ea7bb037ceb78352064cff27baa70db25c69beeaf9918155d9ce95c0958"
 
 def hashing_string(string_to_hash):
