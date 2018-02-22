@@ -1,6 +1,7 @@
 import json
 import redis
-import block
+from dal.objects import block
+from logger import crypt_logger
 
 class BlockService:
     _host = ''
@@ -9,13 +10,13 @@ class BlockService:
     key_suffix = 'block:'
 
     def __init__(self):
-        settings = json.load(open('db_settings.json'))
-        self.host = settings[0]["host"]
-        self.port = settings[0]["port"]
+        settings = json.load(open('config/db_settings.json'))
+        self.host = settings["host"]
+        self.port = settings["port"]
+        crypt_logger.Logger.log("BlockService Initialized with redis running on " + self.host + ":" + self.port, 0, crypt_logger.LoggingLevel.INFO)
 
     def store_block(self, block):
         r = self._connect()
-        #print("full key: " + BlockService.key_suffix + block.block_hash)
         return r.set(BlockService.key_suffix + block.block_hash, block.block_data)
 
     def find_by_hash(self, block_hash):

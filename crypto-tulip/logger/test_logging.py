@@ -3,12 +3,13 @@ import os.path
 import pytest
 
 def test_critical_logger():
+    file_name = "./logs/critical.log"
     critical_file_message = "TESTING FOR CRITICAL LOGGER"
     crypt_logger.Logger.log(critical_file_message, 20, crypt_logger.LoggingLevel.CRITICAL)
     print("Testing to see if file exist....")
-    assert os.path.isfile("critical.log") == True
+    assert os.path.isfile(file_name) == True
     print("Testing to see if content is correct")
-    status = open_file_check_content("critical.log", critical_file_message)
+    status = open_file_check_content(file_name, critical_file_message)
     assert status == True
 
 def open_file_check_content(filename, content_to_check):
@@ -22,7 +23,7 @@ def open_file_check_content(filename, content_to_check):
     return logged_status
 
 def test_error_logger():
-    file_name = "errors.log"
+    file_name = "./logs/errors.log"
     error_file_message = "TESTING FOR ERROR LOGGER"
     crypt_logger.Logger.log(error_file_message, 20, crypt_logger.LoggingLevel.ERROR)
     print("Testing to see if file exist....")
@@ -32,7 +33,7 @@ def test_error_logger():
     assert status == True
 
 def test_info_logger():
-    file_name = "info.log"
+    file_name = "./logs/info.log"
     info_file_message = "TESTING FOR INFO LOGGER"
     crypt_logger.Logger.log(info_file_message, 20, crypt_logger.LoggingLevel.INFO)
     print("Testing to see if file exist....")
@@ -42,7 +43,7 @@ def test_info_logger():
     assert status == True
 
 def test_debug_logger():
-    file_name = "debug.log"
+    file_name = "./logs/debug.log"
     debug_file_message = "TESTING FOR DEBUG LOGGER"
     crypt_logger.Logger.log(debug_file_message, 20, crypt_logger.LoggingLevel.DEBUG)
     print("Testing to see if file exist....")

@@ -58,7 +58,7 @@ class Logger:
         Returns:
         logger -- the logger object so the log function can log appropriately
         """
-        data = json.load(open('logger_setting.json'))
+        data = json.load(open('config/logger_setting.json'))
         if level == LoggingLevel.DEBUG:
             logger = Logger.generate_logger(
                 level.value,
