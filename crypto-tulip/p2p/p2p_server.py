@@ -85,7 +85,7 @@ class P2pServer:
         client_pair = P2pClientPair(client_sock, client_addr)
         return client_pair
 
-    def send_msg(self, data, client_pair=None, client_socket=None):
+    def send_msg(self, data, client_pair=None, client_socket=None, encode=True):
         """
         Sends a msg to a given client
 
@@ -98,9 +98,13 @@ class P2pServer:
             socket_to_use = client_socket
         else:
             socket_to_use = client_pair.socket
-        socket_to_use.send(data.encode())
+        if encode:
+            send_data = data.encode()
+        else:
+            send_data = data
+        socket_to_use.send(send_data)
 
-    def recv_msg(self, client_pair=None, client_socket=None):
+    def recv_msg(self, client_pair=None, client_socket=None, decode=True):
         """
         Reads a msg from a given client
 
@@ -116,7 +120,9 @@ class P2pServer:
         else:
             socket_to_use = client_pair.socket
         data = socket_to_use.recv(self.data_size)
-        return data.decode('utf-8')
+        if decode:
+            return data.decode('utf-8')
+        return data
 
     def close_client(self, client_pair=None, client_socket=None):
         """

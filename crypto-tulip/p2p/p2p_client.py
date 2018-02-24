@@ -63,16 +63,20 @@ class P2pClient:
         self.sock.connect((self.host, self.port))
         self.__connected = True
 
-    def send_msg(self, data):
+    def send_msg(self, data, encode=True):
         """
         Send a message to the connected host
 
         Arguments:
         data -- data to send
         """
-        self.sock.send(data.encode())
+        if encode:
+            send_data = data.encode()
+        else:
+            send_data = data
+        self.sock.send(send_data)
 
-    def recv_msg(self):
+    def recv_msg(self, decode=True):
         """
         Read msg from the host
 
@@ -80,7 +84,9 @@ class P2pClient:
         String that was read
         """
         data = self.sock.recv(self.data_size)
-        return data.decode('utf-8')
+        if decode:
+            return data.decode('utf-8')
+        return data
 
     def close_socket(self):
         """
