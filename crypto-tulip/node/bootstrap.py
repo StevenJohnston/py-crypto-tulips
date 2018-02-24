@@ -53,5 +53,25 @@ class BootstrapNode:
         self.server.send_msg(pickled_list, client_pair=client_pair, encode=False)
         # save peer to the peer list
         peer = p2p_peer.Peer(ip_address=ip_addr, port=port, mode=p2p_peer.PeerMode.Unknown)
-        self.peer_list.append(peer)
-        self.server.close_client(client_pair=client_pair)
+        exists = self.check_peer_duplicate(ip_addr, port)
+        if not exists:
+            self.peer_list.append(peer)
+            self.server.close_client(client_pair=client_pair)
+
+    def check_peer_duplicate(self, ip_addr, port):
+        """
+        Check if given peer already exists in the list of peers
+
+        Arguments:
+        ip -- ip of the peer
+        port -- port of the peer
+
+        Returns
+        bool -- is peer already in the list
+        """
+        exists = False
+        for peer in self.peer_list:
+            if peer.ip_address == ip_addr and peer.port == port:
+                exists = True
+                break
+        return exists
