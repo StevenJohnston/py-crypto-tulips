@@ -67,9 +67,15 @@ class ConnectionManager:
         host -- host to connect to
         port -- port to connect to
         read_callback -- a callback function that is going to be called when msg is received. Requires data argument
+
+        Return:
+        bool -- was the connection successful
         """
         client = p2p_client.P2pClient(data_size=self.recv_data_size)
-        client.connect_to(host, port)
+        success = client.connect_to(host, port)
+        if not success:
+            print('Unable to connect')
+            return False
         client.send_msg(self.client_connection_msg)
         response = client.recv_msg()
         if response != self.ok_response:
@@ -80,6 +86,7 @@ class ConnectionManager:
         self.peer_list.append(peer)
         self.start_recv_thread(peer=peer, callback=read_callback, target=self.recv_msg_client)
         print('Client connected to a server and started to recv')
+        return True
 
     def start_recv_thread(self, peer, callback, target):
         """
