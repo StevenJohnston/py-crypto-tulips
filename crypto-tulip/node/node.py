@@ -3,8 +3,7 @@ Module with node class and its functionality
 """
 import socket
 import pickle
-from p2p import p2p_client
-from p2p import connection_manager
+from p2p import p2p_client, connection_manager
 
 class Node:
     """
@@ -14,7 +13,6 @@ class Node:
     def __init__(self, my_port):
         self.port = my_port
         self.peer_list = []
-        self.known_peers = []
         self.connection_manager = None
         print('Started a node')
 
@@ -36,15 +34,24 @@ class Node:
         bootstrap_host -- host name of the bootstrap node
         bootstrap_port -- port of the bootstrap node
         """
-        self.connect_to_bootstrap(host=bootstrap_host, port=bootstrap_port)
+        known_peers = self.connect_to_bootstrap(host=bootstrap_host, port=bootstrap_port)
         self.connection_manager = connection_manager.ConnectionManager(server_port=self.port, \
                 peer_timeout=peer_timeout, recv_data_size=recv_data_size, socket_timeout=socket_timeout)
         self.connection_manager.accept_connection(read_callback=Node.read_callback, run_as_a_thread=True)
-        for peer in self.known_peers:
-            self.connection_manager.connect_to(host=peer.ip_address, \
-                    port=int(peer.port), read_callback=Node.read_callback)
+        for peer in known_peers:
+            self.peer_connection(peer)
+
+    def peer_connection(self, peer):
+        """
+        Communication with a regular node during connection
+
+        Arguments:
+        peer -- peer to connect to
+        """
+        success = self.connection_manager.connect_to(host=peer.ip_address, \
+                port=int(peer.port), read_callback=Node.read_callback)
+        if success:
             self.peer_list.append(peer)
-        self.known_peers = []
 
     def connect_to_bootstrap(self, host, port):
         """
@@ -62,7 +69,6 @@ class Node:
         client.send_msg(str(host) + ':' + str(self.port))
         recv_data = client.recv_msg(decode=False)
         known_peers = pickle.loads(recv_data)
-        self.known_peers = known_peers
         client.close_socket()
         return known_peers
 

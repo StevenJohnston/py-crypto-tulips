@@ -53,6 +53,9 @@ class P2pClient:
         Arguments:
         host -- host's name
         port -- host's port
+
+        Returns:
+        bool -- was the connection successful
         """
         if self.__connected:
             self.close_socket()
@@ -60,8 +63,15 @@ class P2pClient:
             self.__do_socket_creation()
         self.host = host
         self.port = port
-        self.sock.connect((self.host, self.port))
-        self.__connected = True
+        try:
+            self.sock.connect((self.host, self.port))
+        except socket.error:
+            print('Was not able to connect to server {}:{}'.format(self.host, self.port))
+            success = False
+        else:
+            self.__connected = True
+            success = True
+        return success
 
     def send_msg(self, data, encode=True):
         """
