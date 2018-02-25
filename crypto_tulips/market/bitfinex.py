@@ -1,4 +1,5 @@
-from market.base import Exchange
+from .exchange import Exchange
+from crypto_tulips.dal.objects.price_stamp import PriceStamp
 import json
 
 
@@ -13,14 +14,17 @@ class Bitfinex(Exchange):
     })
     @classmethod
     def trade_pricestamp_adaptor(self, data):
-        print('bifinex adaptor')
-        print(data)
+        frame = data[2]
+        time = frame[1]
+        price = frame[3]
+        return PriceStamp("bitfinex", time, price)
     @classmethod
     def on_message(self, ws, message):
         msg = json.loads(message)
-        print('on_message bitfinex')
-        print(message)
-        print(msg)
+        if msg[1] == "tu":
+            # add this to the db
+            self.trade_pricestamp_adaptor(msg)
+        
 
 
 if __name__ == "__main__":

@@ -1,20 +1,23 @@
 
 import websocket # pylint: disable=import-error
 try:
-    import thread
+    import threading
 except ImportError:
     import _thread as thread
 
-class Exchange():
+class Exchange(threading.Thread):
     WEBSOCKET_URL = None
     REST_URL = None
     SUBSCRIBE_TRADES = None
     def __init__(self, *args, **kwargs):
+        threading.Thread.__init__(self)
         self.websocket_url = self.WEBSOCKET_URL
         self.rest_url = self.REST_URL
         self.subscribe_trades = self.SUBSCRIBE_TRADES
-        # if websocket 
+        
         websocket.enableTrace(True)
+        
+    def run(self):
         ws = websocket.WebSocketApp(self.WEBSOCKET_URL,
                                 on_message = self.on_message,
                                 on_error = self.on_error,
@@ -38,7 +41,5 @@ class Exchange():
         print("### closed ###")
 
     def on_open(self, ws):
-        def run(*args):
-            ws.send(self.SUBSCRIBE_TRADES)
-        thread.start_new_thread(run, ())
-        
+        ws.send(self.SUBSCRIBE_TRADES)
+

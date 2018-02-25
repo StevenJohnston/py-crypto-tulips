@@ -1,4 +1,4 @@
-from market.bitfinex import Bitfinex
+from .bitfinex import Bitfinex
 exchange_list = [
     Bitfinex
 ]
