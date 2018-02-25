@@ -3,7 +3,8 @@ Module containing bootstrap functionality
 """
 import threading
 import pickle
-from p2p import p2p_server, p2p_peer
+import socket
+from p2p import p2p_server, p2p_peer, p2p_client
 
 class BootstrapNode:
     """
@@ -11,24 +12,54 @@ class BootstrapNode:
     """
 
     def __init__(self, port, data_size=1024):
+        self.data_size = data_size
+        self.port = port
         self.server = p2p_server.P2pServer(port=port, data_size=data_size)
         self.peer_list = []
         self.thread_list = []
+        self.run = True
+        self.accepting_thread_running = False
         print('Created BootstrapNode')
 
     def close(self):
         """
         Clean up BootstrapNode before removing it
         """
+        self.run = False
+        if self.accepting_thread_running:
+            self.unblock_accept()
         for a_thread in self.thread_list:
             a_thread.join()
+        print('All threads are joined')
         self.server.close_socket()
 
     def __del__(self):
         print('Length of peer list is {}'.format(len(self.peer_list)))
         print('BootstrapNode ended')
 
-    def accept(self):
+    def accept(self, run_as_a_thread=False):
+        """
+        Accept regular node to add to the peer list and to provide it
+        with current list of known peers
+        """
+        if run_as_a_thread:
+            a_thread = threading.Thread(target=self.accepting_thread)
+            self.thread_list.append(a_thread)
+            a_thread.start()
+            self.accepting_thread_running = True
+        else:
+            self.accept_one()
+
+    def accepting_thread(self):
+        """
+        Thread method that accepst nodes until boostrap node is closed
+        """
+        print('Started accepting thread')
+        while self.run:
+            self.accept_one()
+        print('Ended accepting thread')
+
+    def accept_one(self):
         """
         Accept regular node to add to the peer list and to provide it
         with current list of known peers
@@ -38,6 +69,18 @@ class BootstrapNode:
         self.thread_list.append(a_thread)
         a_thread.start()
 
+    def unblock_accept(self):
+        """
+        Unblock running accepting thread
+        """
+        client = p2p_client.P2pClient(data_size=self.data_size)
+        host = socket.gethostname()
+        port = self.port
+        client.connect_to(host, port)
+        client.send_msg('')
+        client.close_socket()
+
+
     def communication(self, client_pair):
         """
         Thread method to will exchange msgs with a regular node
@@ -46,6 +89,8 @@ class BootstrapNode:
         client_pair -- The result of accepting client from the server
         """
         connection_info = self.server.recv_msg(client_pair=client_pair)
+        if ':' not in connection_info:
+            return
         # incomming msg should be in the format '127.0.0.1:25255'
         ip_addr, port = connection_info.split(':')
         # serialize current peer list and send it to the peer
