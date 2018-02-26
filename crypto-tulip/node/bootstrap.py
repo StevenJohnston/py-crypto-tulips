@@ -41,6 +41,9 @@ class BootstrapNode:
         """
         Accept regular node to add to the peer list and to provide it
         with current list of known peers
+
+        Arguments:
+        run_as_a_thread -- start a thread to accept nodes or only accept one
         """
         if run_as_a_thread:
             a_thread = threading.Thread(target=self.accepting_thread)

@@ -50,18 +50,15 @@ def test_node_bootstrap_connection():
             bootstrap_port=port_bootstrap, read_callback=callback_second_client)
 
     time.sleep(2)
-    first_node_peers = len(a_node.peer_list)
-    second_node_peers = len(second_node.peer_list)
+    first_node_peers = len(a_node.connection_manager.peer_list)
+    second_node_peers = len(second_node.connection_manager.peer_list)
     boot_peers = len(boot_node.peer_list)
 
     a_node.close()
     second_node.close()
     boot_node.close()
 
-    # right now connections node made from
-    # bootstrap and internal connections
-    # that node accepted are not synced
-    assert first_node_peers == 0
+    assert first_node_peers == 1
     assert second_node_peers == 1
     assert boot_peers == 2
 
