@@ -90,6 +90,7 @@ class BootstrapNode:
         """
         connection_info = self.server.recv_msg(client_pair=client_pair)
         if ':' not in connection_info:
+            print('Ignoring connection, did not provide correct first msg format, {}'.format(connection_info))
             return
         # incomming msg should be in the format '127.0.0.1:25255'
         ip_addr, port = connection_info.split(':')
