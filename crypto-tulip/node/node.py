@@ -12,7 +12,6 @@ class Node:
 
     def __init__(self, my_port):
         self.port = my_port
-        self.peer_list = []
         self.connection_manager = None
         print('Started a node')
 
@@ -33,6 +32,10 @@ class Node:
         Arguments:
         bootstrap_host -- host name of the bootstrap node
         bootstrap_port -- port of the bootstrap node
+        peer_timeout=10 -- timeout on the peer before it is considered to be inactive
+        recv_data_size=1024 -- default read size
+        socket_timeout=10 -- timeout on socket recv
+        read_callback=None -- callback to which redirect recv msgs
         """
         if read_callback is None:
             callback = Node.read_callback
@@ -51,15 +54,14 @@ class Node:
 
         Arguments:
         peer -- peer to connect to
+        read_callback=None -- callback to which redirect recv msgs
         """
         if read_callback is None:
             callback = Node.read_callback
         else:
             callback = read_callback
-        success = self.connection_manager.connect_to(host=peer.ip_address, \
+        self.connection_manager.connect_to(host=peer.ip_address, \
                 port=int(peer.port), read_callback=callback)
-        if success:
-            self.peer_list.append(peer)
 
     def connect_to_bootstrap(self, host, port):
         """
@@ -68,6 +70,7 @@ class Node:
         Arguments:
         host -- host address of the bootstrap node
         port -- port of the bootstrap node
+
         Return:
         list -- list of known Pp2p.p2p_peer.Peer
         """
