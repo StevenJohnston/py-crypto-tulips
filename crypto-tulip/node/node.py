@@ -26,7 +26,7 @@ class Node:
         """
         print('\t\t{}'.format(data))
 
-    def join_network(self, bootstrap_host, bootstrap_port, peer_timeout=10, recv_data_size=1024, socket_timeout=10):
+    def join_network(self, bootstrap_host, bootstrap_port, peer_timeout=10, recv_data_size=1024, socket_timeout=10, read_callback=None):
         """
         Join the network and start communications
 
@@ -34,22 +34,30 @@ class Node:
         bootstrap_host -- host name of the bootstrap node
         bootstrap_port -- port of the bootstrap node
         """
+        if read_callback is None:
+            callback = Node.read_callback
+        else:
+            callback = read_callback
         known_peers = self.connect_to_bootstrap(host=bootstrap_host, port=bootstrap_port)
         self.connection_manager = connection_manager.ConnectionManager(server_port=self.port, \
                 peer_timeout=peer_timeout, recv_data_size=recv_data_size, socket_timeout=socket_timeout)
-        self.connection_manager.accept_connection(read_callback=Node.read_callback, run_as_a_thread=True)
+        self.connection_manager.accept_connection(read_callback=callback, run_as_a_thread=True)
         for peer in known_peers:
-            self.peer_connection(peer)
+            self.peer_connection(peer, read_callback=read_callback)
 
-    def peer_connection(self, peer):
+    def peer_connection(self, peer, read_callback=None):
         """
         Communication with a regular node during connection
 
         Arguments:
         peer -- peer to connect to
         """
+        if read_callback is None:
+            callback = Node.read_callback
+        else:
+            callback = read_callback
         success = self.connection_manager.connect_to(host=peer.ip_address, \
-                port=int(peer.port), read_callback=Node.read_callback)
+                port=int(peer.port), read_callback=callback)
         if success:
             self.peer_list.append(peer)
 
