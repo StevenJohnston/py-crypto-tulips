@@ -6,18 +6,11 @@ class CallbackStore():
     return_result_server = ''
     return_result_client = ''
     return_result_second_client = ''
-    port_for_server = 23300
-    port_for_client = 23400
 
     @staticmethod
     def clean():
         CallbackStore.return_result_client = ''
         CallbackStore.return_result_server = ''
-
-    @staticmethod
-    def increment_ports():
-        CallbackStore.port_for_client += 1
-        CallbackStore.port_for_server += 1
 
 
 def callback_client(data):
