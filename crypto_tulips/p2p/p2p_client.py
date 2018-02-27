@@ -3,12 +3,14 @@ Module with class with TCP client functionality for a peer
 """
 
 import socket
+import ssl
 
 
 class P2pClient:
     """
     Class that allows connection to a TCP server and exchange of messages
     """
+    certfile = 'p2p/cacert.pem'
 
     def __init__(self, data_size=1024):
         """
@@ -33,8 +35,10 @@ class P2pClient:
         """
         Create socket
         """
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        a_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        a_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock = ssl.wrap_socket(a_sock, cert_reqs=ssl.CERT_REQUIRED, \
+                ca_certs=self.certfile)
         self.__socket_open = True
 
     def set_timeout(self, timeout):

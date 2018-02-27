@@ -19,6 +19,7 @@ class BootstrapNode:
         self.thread_list = []
         self.run = True
         self.accepting_thread_running = False
+        self.unblocking_msg = '\x05'
         print('Created BootstrapNode')
 
     def close(self):
@@ -80,7 +81,7 @@ class BootstrapNode:
         host = socket.gethostname()
         port = self.port
         client.connect_to(host, port)
-        client.send_msg('')
+        client.send_msg(self.unblocking_msg)
         client.close_socket()
 
 
