@@ -37,3 +37,6 @@ class Transaction:
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
+    def _to_index(self):
+        return ['from_addr', 'to_addr']
