@@ -23,8 +23,8 @@ def test_store_get_transaction_by_hash():
     success = service.store_hash(t)
     assert success
 
-    result = service.get_object_by_hash("test_hash", transaction.Transaction)
-    new_t = Transaction.from_dict(result)
+    new_t = service.get_object_by_hash("test_hash", Transaction)
+
     assert t == new_t
 
 

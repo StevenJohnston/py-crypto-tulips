@@ -4,11 +4,15 @@
 class Block:
     block_hash = ''
     block_data = ''
+
     prefix = 'block'
 
-    def __init__(self, block_hash, block_data):
+    transactions = []
+
+    def __init__(self, block_hash, block_data, transactions):
         self.block_hash = block_hash
         self.block_data = block_data
+        self.transactions = transactions
 
     def to_string(self):
         return str(self.block_hash) + "->" + str(self.block_data)

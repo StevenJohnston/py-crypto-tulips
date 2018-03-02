@@ -1,6 +1,6 @@
 from dal.objects.transaction import Transaction
 from dal.services.hash_service import HashService
-from services.transaction_service.transaction_service import TransactionService
+from services.transaction_service import TransactionService
 
 hs = HashService()
 
@@ -16,13 +16,13 @@ hs.store_hash(t4)
 
 ts = TransactionService()
 
-matt_t = ts.get_transactions_by_public_key('matt')
+matt_t, matt_balance = ts.get_transactions_by_public_key('matt')
 
 print("\nNumber of transactions that Matt was a part of: " + str(len(matt_t)))
 for t in matt_t:
     print(t.to_string() + "\n")
 
-will_t = ts.get_transactions_by_public_key('william')
+will_t, will_balance = ts.get_transactions_by_public_key('william')
 
 print("\nNumber of transactions that William was a part of: " + str(len(will_t)))
 for t in will_t:

@@ -33,7 +33,7 @@ class TransactionService:
         pass
 
     @staticmethod
-    def _get_transactions_to_from_public_key(public_key, to_from, redis_conn = None, pipe = None):
+    def _get_transactions_to_from_public_key(public_key, to_from, redis_conn = None, pipe = None, hs = None):
         """
         Get all transactions to or from a given public key
 
@@ -48,7 +48,7 @@ class TransactionService:
             OR
         pipe        -- pipe with the query queued for continued use outside this method
         """
-        
+
         transactions = list()
 
         direction = ""
@@ -64,13 +64,16 @@ class TransactionService:
         if redis_conn == None:
             redis_conn = TransactionService._connect()
 
+        if hs == None:
+            hs = HashService()
+
         # if pipe is not established already, pipe should be executed within this method
         if pipe == None:
             pipe = redis_conn.pipeline()
             pipe.smembers(index_key)
             # get all of the transactions that were sent TO the given public key
             results = pipe.execute()
-            for transaction_hash in results:
+            for transaction_hash in results[0]:
                 t = hs.get_object_by_full_key(transaction_hash, Transaction)
                 transactions.append(t)
             return transactions
@@ -81,7 +84,7 @@ class TransactionService:
             return pipe
 
     @staticmethod
-    def get_transactions_from_public_key(public_key, redis_conn = None, pipe = None):
+    def get_transactions_from_public_key(public_key, redis_conn = None, pipe = None, hs = None):
         """
         Get all transactions from a given public key
 
@@ -89,16 +92,17 @@ class TransactionService:
         public_key  -- string of the public key to query the blockchain with
         redis_conn  -- redis connection if already established
         pipe        -- pipeline if already established
+        hs          -- HashService instance if established
 
         Returns:
         list        -- list containing transactions from the given public key
             OR
         pipe        -- pipe with the query queued for continued use outside this method
         """
-        return TransactionService._get_transactions_to_from_public_key(public_key, 1, redis_conn, pipe)
+        return TransactionService._get_transactions_to_from_public_key(public_key, 1, redis_conn, pipe, hs)
 
     @staticmethod
-    def get_transactions_to_public_key(public_key, redis_conn = None, pipe = None):
+    def get_transactions_to_public_key(public_key, redis_conn = None, pipe = None, hs = None):
         """
         Get all transactions to a given public key
 
@@ -106,13 +110,14 @@ class TransactionService:
         public_key  -- string of the public key to query the blockchain with
         redis_conn  -- redis connection if already established
         pipe        -- pipeline if already established
+        hs          -- HashService instance if established
 
         Returns:
         list        -- list containing transactions to the given public key
             OR
         pipe        -- pipe with the query queued for continued use outside this method
         """
-        return TransactionService._get_transactions_to_from_public_key(public_key, 0, redis_conn, pipe)
+        return TransactionService._get_transactions_to_from_public_key(public_key, 0, redis_conn, pipe, hs)
 
     @staticmethod
     def get_transactions_by_public_key(public_key):
@@ -124,29 +129,38 @@ class TransactionService:
 
         Returns:
         list        -- list containing all transactions that a given public key was a part of
+            AND
+        float       -- float containing current balance for the supplied public key
         """
         r = TransactionService._connect()
         pipe = r.pipeline()
-        
-        # get indexes for to_addr and from_addr
-        pipe = TransactionService.get_transactions_to_public_key(public_key, pipe = pipe)
-        pipe = TransactionService.get_transactions_from_public_key(public_key, pipe = pipe)
-        results = pipe.execute()
-        
+
+
         hs = HashService()
+
+        # get indexes for to_addr and from_addr
+        pipe = TransactionService.get_transactions_to_public_key(public_key, pipe = pipe, hs = hs)
+        pipe = TransactionService.get_transactions_from_public_key(public_key, pipe = pipe, hs = hs)
+        results = pipe.execute()
+
+
         transactions = list()
+
+        balance = 0.0
+
         # get all of the transactions that were sent TO the given public key
         for transaction_hash in results[0]:
             t = hs.get_object_by_full_key(transaction_hash, Transaction)
             transactions.append(t)
+            balance += t.amount
 
         # get all of the transactions that were sent FROM the given public key
         for transaction_hash in results[1]:
             t = hs.get_object_by_full_key(transaction_hash, Transaction)
             transactions.append(t)
+            balance -= t.amount
 
-        return transactions
-
+        return transactions, balance
 
     @staticmethod
     def _connect():

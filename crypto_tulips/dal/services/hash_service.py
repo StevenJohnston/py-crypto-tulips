@@ -5,11 +5,11 @@ Module to store objects in the redis database.
 import redis
 import json
 import inspect
-from logger import crypt_logger
+from logger.crypt_logger import Logger, LoggingLevel
 
 class HashService:
     """
-    Service to generically interact with redis. Designed for use with objects that need to be stored with multiple 
+    Service to generically interact with redis. Designed for use with objects that need to be stored with multiple
     fields (ie: transactions, contracts).
     The object that is being stored will need:
     - a method called _to_index(self) that returns a list of fields as strings indicating the fields to be indexed
@@ -32,7 +32,7 @@ class HashService:
         settings = json.load(open('config/db_settings.json'))
         self.host = settings["host"]
         self.port = settings["port"]
-        crypt_logger.Logger.log("HashService Initialized with redis running on " + self.host + ":" + self.port, 0, crypt_logger.LoggingLevel.INFO)
+        Logger.log("HashService Initialized with redis running on " + self.host + ":" + self.port, 0, LoggingLevel.INFO)
 
     def store_hash(self, obj):
         """
@@ -46,7 +46,7 @@ class HashService:
         Returns:
         list    -- list containing results of each query used to store an object (0s and 1s)
                 0s indicate that the field was updated (already present)
-                1s indicate that the field is new and was stored 
+                1s indicate that the field is new and was stored
         """
         attr_dict = self._get_attributes(obj)
         prefix = attr_dict.get(self._prefix)
@@ -107,7 +107,7 @@ class HashService:
         keys = list()
         # iterate through attributes of object
         for key, value in attr_dict.items():
-            # ignore attribute named 'prefix' 
+            # ignore attribute named 'prefix'
             if key != self._prefix:
                 # queue hget
                 pipe.hget(obj_key, key)
@@ -115,7 +115,7 @@ class HashService:
                 keys.append(key)
         # execute queue of commands, save values
         values = pipe.execute()
-        
+
         # instantiate object from dictionary with keys and values
         obj = obj.from_dict(dict(zip(keys, values)))
         return obj
