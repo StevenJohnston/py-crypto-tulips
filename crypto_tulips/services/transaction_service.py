@@ -135,14 +135,12 @@ class TransactionService:
         r = TransactionService._connect()
         pipe = r.pipeline()
 
-
         hs = HashService()
 
         # get indexes for to_addr and from_addr
         pipe = TransactionService.get_transactions_to_public_key(public_key, pipe = pipe, hs = hs)
         pipe = TransactionService.get_transactions_from_public_key(public_key, pipe = pipe, hs = hs)
         results = pipe.execute()
-
 
         transactions = list()
 
