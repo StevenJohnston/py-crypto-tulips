@@ -3,12 +3,14 @@ Module with class with TCP client functionality for a peer
 """
 
 import socket
+import ssl
 
 
 class P2pClient:
     """
     Class that allows connection to a TCP server and exchange of messages
     """
+    certfile = 'p2p/cacert.pem'
 
     def __init__(self, data_size=1024):
         """
@@ -33,8 +35,10 @@ class P2pClient:
         """
         Create socket
         """
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        a_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        a_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock = ssl.wrap_socket(a_sock, cert_reqs=ssl.CERT_REQUIRED, \
+                ca_certs=self.certfile)
         self.__socket_open = True
 
     def set_timeout(self, timeout):
@@ -53,6 +57,9 @@ class P2pClient:
         Arguments:
         host -- host's name
         port -- host's port
+
+        Returns:
+        bool -- was the connection successful
         """
         if self.__connected:
             self.close_socket()
@@ -60,19 +67,30 @@ class P2pClient:
             self.__do_socket_creation()
         self.host = host
         self.port = port
-        self.sock.connect((self.host, self.port))
-        self.__connected = True
+        try:
+            self.sock.connect((self.host, self.port))
+        except socket.error:
+            print('Was not able to connect to server {}:{}'.format(self.host, self.port))
+            success = False
+        else:
+            self.__connected = True
+            success = True
+        return success
 
-    def send_msg(self, data):
+    def send_msg(self, data, encode=True):
         """
         Send a message to the connected host
 
         Arguments:
         data -- data to send
         """
-        self.sock.send(data.encode())
+        if encode:
+            send_data = data.encode()
+        else:
+            send_data = data
+        self.sock.send(send_data)
 
-    def recv_msg(self):
+    def recv_msg(self, decode=True):
         """
         Read msg from the host
 
@@ -80,7 +98,9 @@ class P2pClient:
         String that was read
         """
         data = self.sock.recv(self.data_size)
-        return data.decode('utf-8')
+        if decode:
+            return data.decode('utf-8')
+        return data
 
     def close_socket(self):
         """
