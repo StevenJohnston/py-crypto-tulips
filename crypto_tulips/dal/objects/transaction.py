@@ -29,6 +29,7 @@ class Transaction:
         from_addr = dict_values.get('from_addr')
         amount = dict_values.get('amount')
         timestamp = dict_values.get('timestamp')
+        # print(transaction_hash, to_addr, from_addr, str(amount), timestamp)
         new_transaction = Transaction(transaction_hash, to_addr, from_addr, amount, timestamp)
         return new_transaction
 
@@ -37,3 +38,6 @@ class Transaction:
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
+    def _to_index(self):
+        return ['from_addr', 'to_addr']
