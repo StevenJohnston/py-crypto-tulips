@@ -4,6 +4,7 @@ import json
 import time
 
 from crypto_tulips.dal.objects.transaction import Transaction
+from crypto_tulips.dal.objects.pos_transaction import PosTransaction
 from crypto_tulips.dal.objects.hashable import Hashable
 from crypto_tulips.dal.objects.sendable import Sendable
 
