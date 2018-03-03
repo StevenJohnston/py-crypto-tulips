@@ -17,7 +17,7 @@ class Block(Hashable, Sendable):
     contract_transactions = []
     timestamp = ''
 
-    def __init__(self, block_hash, transactions, pos_transactions, contract_transactions, timestamp):
+    def __init__(self, block_hash, transactions, pos_transactions, contract_transactions, timestamp = time.time()):
         self.block_hash = block_hash
         self.transactions = transactions
         self.pos_transactions = pos_transactions

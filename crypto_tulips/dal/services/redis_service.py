@@ -39,13 +39,15 @@ class RedisService:
         self.port = settings["port"]
         Logger.log("HashService Initialized with redis running on " + self.host + ":" + self.port, 0, LoggingLevel.INFO)
 
-    def store_object(self, obj):
+    def store_object(self, obj, redis_conn = None, pipe = None):
         """
         Store an object in redis.
         Uses reflection to get the fields of an object to store them.
 
         Arguments:
-        obj     -- object to be stored in redis
+        obj         -- object to be stored in redis
+        redis_conn  -- redis connection if already established
+        pipe        -- pipeline if already established
 
         Returns:
         list    -- list containing results of each query used to store an object (0s and 1s)
@@ -55,8 +57,11 @@ class RedisService:
         attr_dict = self._get_attributes(obj)
 
 
-        r = self._connect()
-        pipe = r.pipeline()
+        if redis_conn == None :
+            redis_conn = self._connect()
+
+        if pipe == None:
+            pipe = redis_conn.pipeline()
         # name will be the prefix specified in the object + _hash
         obj_field_keys = obj._to_index()
         prefix = obj_field_keys[-1]
