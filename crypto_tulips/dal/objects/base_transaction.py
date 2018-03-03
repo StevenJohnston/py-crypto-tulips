@@ -5,8 +5,9 @@ Base Transaction Class
 import json
 import time
 from crypto_tulips.dal.objects.hashable import Hashable
+from crypto_tulips.dal.objects.sendable import Sendable
 
-class BaseTransaction(Hashable):
+class BaseTransaction(Hashable, Sendable):
 
     _hash = ''
     to_addr = ''
@@ -30,12 +31,21 @@ class BaseTransaction(Hashable):
     @staticmethod
     def _to_index():
         return ['from_addr', 'to_addr']
-        
+
     # Returns the object that will be hashed into blockchain
-    def hashable(self): 
+    def hashable(self):
         return {
             'to_addr': self.to_addr,
             'from_addr': self.from_addr,
             'amount': self.amount,
             'timestamp': self.timestamp
+        }
+
+    def get_sendable(self):
+        return {
+            'to_addr': self.to_addr,
+            'from_addr': self.from_addr,
+            'amount': self.amount,
+            'timestamp': self.timestamp,
+            '_hash': self._hash
         }

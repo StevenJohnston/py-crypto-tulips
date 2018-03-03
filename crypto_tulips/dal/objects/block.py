@@ -5,8 +5,9 @@ import time
 
 from crypto_tulips.dal.objects.transaction import Transaction
 from crypto_tulips.dal.objects.hashable import Hashable
+from crypto_tulips.dal.objects.sendable import Sendable
 
-class Block(Hashable):
+class Block(Hashable, Sendable):
     prefix = 'block'
 
     block_hash = ''
@@ -41,7 +42,7 @@ class Block(Hashable):
 
     def _to_index(self):
         return []
-    
+
     # Returns the object that will be hashed into blockchain
     def hashable(self):
         return {
@@ -50,5 +51,16 @@ class Block(Hashable):
             'contract_transactions': list(map(Hashable.hashable_callback, self.contract_transactions)),
             'timestamp': self.timestamp
         }
+
+    # Returns the object to be sent around
+    def get_sendable(self):
+        return {
+            'transactions': list(map(Sendable.get_sendable_callback, self.transactions)),
+            'pos_transactions': list(map(Sendable.get_sendable_callback, self.pos_transactions)),
+            'contract_transactions': list(map(Sendable.get_sendable_callback, self.contract_transactions)),
+            'timestamp': self.timestamp,
+            'block_hash': self.block_hash
+        }
+
     def from_json(self, json_str):
         self.block_hash = ""
