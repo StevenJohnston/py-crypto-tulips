@@ -4,7 +4,7 @@ Module containing bootstrap functionality
 import threading
 import pickle
 import socket
-from p2p import p2p_server, p2p_peer, p2p_client
+from crypto_tulips.p2p import p2p_server, p2p_peer, p2p_client
 
 class BootstrapNode:
     """
@@ -94,7 +94,7 @@ class BootstrapNode:
         """
         connection_info = self.server.recv_msg(client_pair=client_pair)
         if ':' not in connection_info:
-            print('Ignoring connection, did not provide correct first msg format, {}'.format(connection_info))
+            print('Ignoring connection, did not provide correct first msg format')
             return
         # incomming msg should be in the format '127.0.0.1:25255'
         ip_addr, port = connection_info.split(':')

@@ -50,6 +50,7 @@ def test_connection():
     number_of_connected_client = len(client_connection.peer_list)
 
     client_connection.close_all()
+    time.sleep(5)
     server_connection.close_all()
 
     assert number_of_connected_server == 1

@@ -10,9 +10,9 @@ class P2pClient:
     """
     Class that allows connection to a TCP server and exchange of messages
     """
-    certfile = 'p2p/cacert.pem'
+    certfile = 'crypto_tulips/p2p/cacert.pem'
 
-    def __init__(self, data_size=1024):
+    def __init__(self, data_size=1024, silent=True):
         """
         Basic constructor.
 
@@ -25,6 +25,7 @@ class P2pClient:
         self.port = None
         self.__connected = False
         self.__socket_open = False
+        self.silent = silent
 
         self.__do_socket_creation()
 
@@ -70,7 +71,8 @@ class P2pClient:
         try:
             self.sock.connect((self.host, self.port))
         except socket.error:
-            print('Was not able to connect to server {}:{}'.format(self.host, self.port))
+            if not self.silent:
+                print('Was not able to connect to server {}:{}'.format(self.host, self.port))
             success = False
         else:
             self.__connected = True

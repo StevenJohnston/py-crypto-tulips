@@ -3,7 +3,7 @@ Module with node class and its functionality
 """
 import socket
 import pickle
-from p2p import p2p_client, connection_manager
+from crypto_tulips.p2p import p2p_client, connection_manager
 
 class Node:
     """
@@ -23,7 +23,10 @@ class Node:
         """
         Temporary read callback
         """
-        print('\t\t{}'.format(data))
+        print('\n\t\t{}'.format(data))
+
+    def make_silent(self, silent):
+        self.connection_manager.silent = silent
 
     def join_network(self, bootstrap_host, bootstrap_port, peer_timeout=10, recv_data_size=1024, socket_timeout=10, read_callback=None):
         """

@@ -23,8 +23,8 @@ class P2pServer:
     """
     Class that allows to listen to incomming TCP connections to exhcnage messages
     """
-    keyfile = 'p2p/private.pem'
-    certfile = 'p2p/cacert.pem'
+    keyfile = 'crypto_tulips/p2p/private.pem'
+    certfile = 'crypto_tulips/p2p/cacert.pem'
 
     def __init__(self, port, data_size=1024):
         """
