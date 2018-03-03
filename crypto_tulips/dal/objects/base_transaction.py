@@ -15,7 +15,7 @@ class BaseTransaction(Hashable, Sendable):
     amount = ''
     timestamp = ''
 
-    def __init__(self, transaction_hash, to_addr, from_addr, amount, timestamp = time.strftime("%Y/%m/%d-%H:%M:%S")):
+    def __init__(self, transaction_hash, to_addr, from_addr, amount, timestamp = time.time()):
         self._hash = transaction_hash
         self.to_addr = to_addr
         self.from_addr = from_addr
