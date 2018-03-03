@@ -1,10 +1,10 @@
 from .exchange import Exchange
 from crypto_tulips.dal.objects.price_stamp import PriceStamp
+from crypto_tulips.dal.services.hash_service import HashService
 import json
 
 
 class Bitfinex(Exchange):
-
     WEBSOCKET_URL = "wss://api.bitfinex.com/ws/2"
     REST_URL = None
     SUBSCRIBE_TRADES = json.dumps({ 
@@ -21,12 +21,16 @@ class Bitfinex(Exchange):
     @classmethod
     def on_message(self, ws, message):
         msg = json.loads(message)
-        if msg[1] == "tu":
-            # add this to the db
-            self.trade_pricestamp_adaptor(msg)
+        print(msg)
+        if isinstance(msg, list) :
+            if msg[1] == "tu":
+                # add this to the db
+                hashService = HashService()
+                #hashService.store_hash(self.trade_pricestamp_adaptor(msg))
         
 
 
 if __name__ == "__main__":
-    Bitfinex()
+    bitfinex = Bitfinex()
+    bitfinex.start()
   

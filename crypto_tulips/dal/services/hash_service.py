@@ -5,7 +5,7 @@ Module to store objects in the redis database.
 import redis
 import json
 import inspect
-from logger import crypt_logger
+from crypto_tulips.logger import crypt_logger
 
 class HashService:
     """
@@ -25,7 +25,7 @@ class HashService:
 
         Gets the host and port from config/db_settings.json for redis
         """
-        settings = json.load(open('config/db_settings.json'))
+        settings = json.load(open('crypto_tulips/config/db_settings.json'))
         self.host = settings["host"]
         self.port = settings["port"]
         crypt_logger.Logger.log("HashService Initialized with redis running on " + self.host + ":" + self.port, 0, crypt_logger.LoggingLevel.INFO)

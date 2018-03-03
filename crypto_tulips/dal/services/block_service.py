@@ -10,7 +10,7 @@ class BlockService:
     key_suffix = 'block:'
 
     def __init__(self):
-        settings = json.load(open('config/db_settings.json'))
+        settings = json.load(open('crypto_tulips/config/db_settings.json'))
         self.host = settings["host"]
         self.port = settings["port"]
         crypt_logger.Logger.log("BlockService Initialized with redis running on " + self.host + ":" + self.port, 0, crypt_logger.LoggingLevel.INFO)
