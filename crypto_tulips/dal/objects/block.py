@@ -44,11 +44,11 @@ class Block(Hashable, Sendable):
         return []
 
     # Returns the object that will be hashed into blockchain
-    def hashable(self):
+    def get_hashable(self):
         return {
-            'transactions': list(map(Hashable.hashable_callback, self.transactions)),
-            'pos_transactions': list(map(Hashable.hashable_callback, self.pos_transactions)),
-            'contract_transactions': list(map(Hashable.hashable_callback, self.contract_transactions)),
+            'transactions': list(map(Sendable.get_sendable_callback, self.transactions)),
+            'pos_transactions': list(map(Sendable.get_sendable_callback, self.pos_transactions)),
+            'contract_transactions': list(map(Sendable.get_sendable_callback, self.contract_transactions)),
             'timestamp': self.timestamp
         }
 

@@ -8,7 +8,7 @@ import time
 def test_hashable():
     test_time = time.time()
     transaction = Transaction('block_hash_test', 'to_steven_test', 'from_matt_test', 1, test_time)
-    actual = transaction.hashable()
+    actual = transaction.get_hashable()
     expected = {
         'to_addr': 'to_steven_test',
         'from_addr': 'from_matt_test',
@@ -20,7 +20,7 @@ def test_hashable():
 def test_hashable_fail():
     test_time = time.time()
     transaction = Transaction('block_hash_test', 'to_steven_test', 'from_matt_test', 1, test_time)
-    actual = transaction.hashable()
+    actual = transaction.get_hashable()
     not_expected = {
         'to_addr': 'to_steven_test',
         'from_addr': 'from_matt_test',

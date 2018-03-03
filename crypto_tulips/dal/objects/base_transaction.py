@@ -33,7 +33,7 @@ class BaseTransaction(Hashable, Sendable):
         return ['from_addr', 'to_addr']
 
     # Returns the object that will be hashed into blockchain
-    def hashable(self):
+    def get_hashable(self): 
         return {
             'to_addr': self.to_addr,
             'from_addr': self.from_addr,
