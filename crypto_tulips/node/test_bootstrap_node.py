@@ -30,19 +30,23 @@ def test_node_bootstrap_connection():
     port_node = 25266
     port_second_node = 25277
     port_bootstrap = 25255
+    peer_timeout = 0
+    socket_timeout = 1
     boot_node = set_up_bootstrap(port_bootstrap)
     boot_node.accept(True)
 
     a_node = node.Node(port_node)
     a_node.join_network(bootstrap_host=socket.gethostname(), \
-            bootstrap_port=port_bootstrap, read_callback=callback_client)
+            bootstrap_port=port_bootstrap, read_callback=callback_client, peer_timeout=peer_timeout, \
+            socket_timeout=socket_timeout)
 
-    time.sleep(2)
+    time.sleep(1)
     second_node = node.Node(port_second_node)
     second_node.join_network(bootstrap_host=socket.gethostname(), \
-            bootstrap_port=port_bootstrap, read_callback=callback_second_client)
+            bootstrap_port=port_bootstrap, read_callback=callback_second_client, peer_timeout=peer_timeout, \
+            socket_timeout=socket_timeout)
 
-    time.sleep(2)
+    time.sleep(1)
     first_node_peers = len(a_node.connection_manager.peer_list)
     second_node_peers = len(second_node.connection_manager.peer_list)
     boot_peers = len(boot_node.peer_list)
@@ -61,23 +65,25 @@ def test_node_bootstrap_send_msg():
     port_node = 25266
     port_second_node = 25277
     port_bootstrap = 25255
+    peer_timeout = 0
+    socket_timeout = 1
     boot_node = set_up_bootstrap(port_bootstrap)
     boot_node.accept(True)
 
     a_node = node.Node(port_node)
     a_node.join_network(bootstrap_host=socket.gethostname(), \
-            bootstrap_port=port_bootstrap, read_callback=callback_client)
-
-    time.sleep(2)
+            bootstrap_port=port_bootstrap, read_callback=callback_client, peer_timeout=peer_timeout, socket_timeout=socket_timeout)
+    time.sleep(1)
     second_node = node.Node(port_second_node)
     second_node.join_network(bootstrap_host=socket.gethostname(), \
-            bootstrap_port=port_bootstrap, read_callback=callback_second_client)
+            bootstrap_port=port_bootstrap, read_callback=callback_second_client, peer_timeout=peer_timeout, \
+            socket_timeout=socket_timeout)
 
-    time.sleep(5)
+    time.sleep(1)
     a_node.connection_manager.send_msg('test data1')
     time.sleep(1)
     second_node.connection_manager.send_msg('test data2')
-    time.sleep(2)
+    time.sleep(1)
 
     a_node.close()
     second_node.close()
