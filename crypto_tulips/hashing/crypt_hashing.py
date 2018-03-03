@@ -86,6 +86,7 @@ class Hashing:
         signature = pkcs1_15.new(pkey).sign(hash_message)
         return signature
 
+    @staticmethod
     def encode_validate_signature(data, pub_key, signature):
         """ A wrapper function that Validate the signiture base on the data, public key and a signiture
         but you can provide a string for this function
@@ -124,3 +125,18 @@ class Hashing:
         except (ValueError, TypeError):
             print("The signature is not valid.")
             return False
+
+    @staticmethod
+    def get_public_key(private_key):
+        """ Get the public key base on the private key
+
+        Keyword arugments:
+        private_key -- Private Key
+
+        Returns:
+        pub_key -- Public Key
+        """
+        key = RSA.importKey(private_key)
+        pub_key = key.publickey()
+        return pub_key.exportKey().decode()
+

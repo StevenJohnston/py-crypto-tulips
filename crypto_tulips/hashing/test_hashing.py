@@ -8,6 +8,11 @@ jsonTest = {
 jsonTestInvalid = {
     "Temp": None
 }
+b_message = b'To be signed'
+b_different_message = b'change message'
+message = "asdfasdf"
+invalid = "asdf"
+
 
 def test_hashing_string():
     hash = hashing_string("test")
@@ -26,33 +31,45 @@ def hashing_string(string_to_hash):
 
 
 def test_valid_signature():
-    message = b'To be signed'
-    a, b = crypt_hashing.Hashing.generate_rsa_key("asdfasdf")
-    c = crypt_hashing.Hashing.signature_of_data(message, b)
-    d = crypt_hashing.Hashing.validate_signature(message, a, c)
-    assert d == True
+    public_key, private_key = crypt_hashing.Hashing.generate_rsa_key("asdfasdf")
+    signature = crypt_hashing.Hashing.signature_of_data(b_message, private_key)
+    status = crypt_hashing.Hashing.validate_signature(b_message, public_key, signature)
+    assert status == True
 
 def test_invalid_signature():
-    message = b'To be signed'
-    a, b = crypt_hashing.Hashing.generate_rsa_key("asdfasdf")
-    c = crypt_hashing.Hashing.signature_of_data(message, b)
-    message = b'change message'
-    d = crypt_hashing.Hashing.validate_signature(message, a, c)
-    assert d == False
+    public_key, private_key = crypt_hashing.Hashing.generate_rsa_key("asdfasdf")
+    signature = crypt_hashing.Hashing.signature_of_data(b_message, private_key)
+    status = crypt_hashing.Hashing.validate_signature(b_different_message, public_key, signature)
+    assert status == False
 
 def test_normal_string_signature():
-    message = "asdfasdf"
-    a, b = crypt_hashing.Hashing.generate_rsa_key(message)
-    c = crypt_hashing.Hashing.encode_signature_of_data(message, b)
-    d = crypt_hashing.Hashing.encode_validate_signature(message, a, c)
-    assert d == True
+    public_key, private_key = crypt_hashing.Hashing.generate_rsa_key(message)
+    signature = crypt_hashing.Hashing.encode_signature_of_data(message, private_key)
+    status = crypt_hashing.Hashing.encode_validate_signature(message, public_key, signature)
+    assert status == True
 
 
 def test_invalid_string_signature():
-    message = "asdfasdf"
-    invalid = "asdf"
-    a, b = crypt_hashing.Hashing.generate_rsa_key(message)
-    c = crypt_hashing.Hashing.encode_signature_of_data(message, b)
-    d = crypt_hashing.Hashing.encode_validate_signature(invalid, a, c)
-    assert d == False
+    public_key, private_key = crypt_hashing.Hashing.generate_rsa_key(message)
+    signature = crypt_hashing.Hashing.encode_signature_of_data(message, private_key)
+    status = crypt_hashing.Hashing.encode_validate_signature(invalid, public_key, signature)
+    assert status == False
 
+def test_recover_public_key():
+    public_key, private_key = crypt_hashing.Hashing.generate_rsa_key(message)
+    recover_public_key = crypt_hashing.Hashing.get_public_key(private_key)
+    assert public_key == recover_public_key
+
+def test_recover_public_key_full_usecase():
+    public_key, private_key = crypt_hashing.Hashing.generate_rsa_key(message)
+    recover_public_key = crypt_hashing.Hashing.get_public_key(private_key)
+    signature = crypt_hashing.Hashing.encode_signature_of_data(message, private_key)
+    status = crypt_hashing.Hashing.encode_validate_signature(message, recover_public_key, signature)
+    assert status == True
+
+def test_invalid_recover_public_key_full_usecase():
+    public_key, private_key = crypt_hashing.Hashing.generate_rsa_key(message)
+    recover_public_key = crypt_hashing.Hashing.get_public_key(private_key)
+    signature = crypt_hashing.Hashing.encode_signature_of_data(message, private_key)
+    status = crypt_hashing.Hashing.encode_validate_signature(invalid, recover_public_key, signature)
+    assert status == False
