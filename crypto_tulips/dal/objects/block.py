@@ -1,17 +1,54 @@
 # Stored in database with key -> value
 #       block:id:actual_hash_here -> block_data
+import json
+import time
 
-class Block:
-    block_hash = ''
-    block_data = ''
+from crypto_tulips.dal.objects.transaction import Transaction
+from crypto_tulips.dal.objects.hashable import Hashable
+
+class Block(Hashable):
     prefix = 'block'
 
-    def __init__(self, block_hash, block_data):
+    block_hash = ''
+    transactions = []
+    pos_transactions = []
+    contract_transactions = []
+    timestamp = ''
+
+    def __init__(self, block_hash, transactions, pos_transactions, contract_transactions, timestamp):
         self.block_hash = block_hash
-        self.block_data = block_data
+        self.transactions = transactions
+        self.pos_transactions = pos_transactions
+        self.contract_transactions = contract_transactions
+        self.timestamp = timestamp
+
+    @staticmethod
+    def from_dict(dict_values):
+        block_hash = dict_values.get('block_hash')
+        transactions = dict_values.get('transactions')
+        pos_transactions = dict_values.get('pos_transactions')
+        contract_transactions = dict_values.get('contract_transactions')
+        timestamp = dict_values.get('timestamp')
+        new_block = Block(block_hash, transactions, pos_transactions, contract_transactions, timestamp)
+        return new_block
 
     def to_string(self):
-        return str(self.block_hash) + "->" + str(self.block_data)
+        return json.dumps(self.__dict__)
+        #return str(self.block_hash) + "->" + str(self.block_data)
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
+    def _to_index(self):
+        return []
+    
+    # Returns the object that will be hashed into blockchain
+    def hashable(self):
+        return {
+            'transactions': list(map(Hashable.hashable_callback, self.transactions)),
+            'pos_transactions': list(map(Hashable.hashable_callback, self.pos_transactions)),
+            'contract_transactions': list(map(Hashable.hashable_callback, self.contract_transactions)),
+            'timestamp': self.timestamp
+        }
     def from_json(self, json_str):
         self.block_hash = ""

@@ -12,7 +12,7 @@
         "debug_file_handler": {
             "level": "DEBUG",
             "name": "DEBUG_LOGGER",
-            "filename": "logs/debug.log",
+            "filename": "crypto_tulips/logs/debug.log",
             "maxBytes": 10485760,
             "backupCount": 20,
             "encoding": "utf8"
@@ -20,7 +20,7 @@
         "info_file_handler": {
             "level": "INFO",
             "name": "INFO_LOGGER",
-            "filename": "logs/info.log",
+            "filename": "crypto_tulips/logs/info.log",
             "maxBytes": 10485760,
             "backupCount": 20,
             "encoding": "utf8"
@@ -29,7 +29,7 @@
         "error_file_handler": {
             "level": "ERROR",
             "name": "ERROR_LOGGER",
-            "filename": "logs/errors.log",
+            "filename": "crypto_tulips/logs/errors.log",
             "maxBytes": 10485760,
             "backupCount": 20,
             "encoding": "utf8"
@@ -37,7 +37,7 @@
         "critical_file_handler": {
             "level": "CRITICAL",
             "name": "CRITICAL_LOGGER",
-            "filename": "logs/critical.log",
+            "filename": "crypto_tulips/logs/critical.log",
             "maxBytes": 10485760,
             "backupCount": 20,
             "encoding": "utf8"

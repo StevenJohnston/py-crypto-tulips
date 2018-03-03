@@ -1,0 +1,41 @@
+"""
+Base Transaction Class
+"""
+
+import json
+import time
+from crypto_tulips.dal.objects.hashable import Hashable
+
+class BaseTransaction(Hashable):
+
+    _hash = ''
+    to_addr = ''
+    from_addr = ''
+    amount = ''
+    timestamp = ''
+
+    def __init__(self, transaction_hash, to_addr, from_addr, amount, timestamp = time.strftime("%Y/%m/%d-%H:%M:%S")):
+        self._hash = transaction_hash
+        self.to_addr = to_addr
+        self.from_addr = from_addr
+        self.amount = float(amount)
+        self.timestamp = timestamp
+
+    def to_string(self):
+        return json.dumps(self.__dict__)
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
+    @staticmethod
+    def _to_index():
+        return ['from_addr', 'to_addr']
+        
+    # Returns the object that will be hashed into blockchain
+    def hashable(self): 
+        return {
+            'to_addr': self.to_addr,
+            'from_addr': self.from_addr,
+            'amount': self.amount,
+            'timestamp': self.timestamp
+        }

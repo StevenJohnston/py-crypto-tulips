@@ -86,7 +86,6 @@ class Hashing:
         signature = pkcs1_15.new(pkey).sign(hash_message)
         return signature
 
-
     def encode_validate_signature(data, pub_key, signature):
         """ A wrapper function that Validate the signiture base on the data, public key and a signiture
         but you can provide a string for this function
@@ -101,6 +100,7 @@ class Hashing:
         """
         data_as_bytes = str.encode(data)
         return Hashing.validate_signature(data_as_bytes, pub_key, signature)
+
 
 
     @staticmethod

@@ -55,3 +55,4 @@ def test_invalid_string_signature():
     c = crypt_hashing.Hashing.encode_signature_of_data(message, b)
     d = crypt_hashing.Hashing.encode_validate_signature(invalid, a, c)
     assert d == False
+

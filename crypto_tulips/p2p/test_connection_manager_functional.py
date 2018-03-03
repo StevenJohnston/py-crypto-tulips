@@ -2,7 +2,7 @@ import socket
 import time
 from . import connection_manager
 
-def set_up_server_client(server_port, client_port, peer_timeout=0, socket_timeout=2):
+def set_up_server_client(server_port, client_port, peer_timeout=0, socket_timeout=1):
     server_connection = connection_manager.ConnectionManager(server_port=server_port, peer_timeout=peer_timeout, socket_timeout=socket_timeout)
     client_connection = connection_manager.ConnectionManager(server_port=client_port, peer_timeout=peer_timeout, socket_timeout=socket_timeout)
     return server_connection, client_connection
@@ -50,6 +50,7 @@ def test_connection():
     number_of_connected_client = len(client_connection.peer_list)
 
     client_connection.close_all()
+    time.sleep(1)
     server_connection.close_all()
 
     assert number_of_connected_server == 1
@@ -102,7 +103,7 @@ def test_multiple_client_send():
     CallbackStore.increment_ports()
 
     server_connection, client_connection = set_up_server_client(server_port, client_port)
-    second_client = connection_manager.ConnectionManager(server_port=22222, peer_timeout=0, socket_timeout=2)
+    second_client = connection_manager.ConnectionManager(server_port=22222, peer_timeout=0, socket_timeout=1)
 
     server_connection.accept_connection(read_callback=callback_server, run_as_a_thread=True)
     client_connection.connect_to(socket.gethostname(), server_port, read_callback=callback_client)
@@ -125,14 +126,14 @@ def test_peer_timeout():
     client_port = CallbackStore.port_for_client
     CallbackStore.increment_ports()
 
-    server_connection = connection_manager.ConnectionManager(server_port=server_port, peer_timeout=5, socket_timeout=2)
-    client_connection = connection_manager.ConnectionManager(server_port=client_port, peer_timeout=0, socket_timeout=2)
-    second_client = connection_manager.ConnectionManager(server_port=22322, peer_timeout=0, socket_timeout=2)
+    server_connection = connection_manager.ConnectionManager(server_port=server_port, peer_timeout=5, socket_timeout=1)
+    client_connection = connection_manager.ConnectionManager(server_port=client_port, peer_timeout=0, socket_timeout=1)
+    second_client = connection_manager.ConnectionManager(server_port=22322, peer_timeout=0, socket_timeout=1)
 
     time.sleep(1)
     server_connection.accept_connection(read_callback=callback_server, run_as_a_thread=True)
     client_connection.connect_to(socket.gethostname(), server_port, read_callback=callback_client)
-    time.sleep(15)
+    time.sleep(10)
     client_connection.connect_to(socket.gethostname(), server_port, read_callback=callback_second_client)
 
     server_connection.send_msg('test data')

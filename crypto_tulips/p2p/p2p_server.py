@@ -3,6 +3,7 @@ Module with classes with TCP server functionality for a peer
 """
 
 import socket
+import ssl
 
 
 class P2pClientPair:
@@ -22,6 +23,8 @@ class P2pServer:
     """
     Class that allows to listen to incomming TCP connections to exhcnage messages
     """
+    keyfile = 'crypto_tulips/p2p/private.pem'
+    certfile = 'crypto_tulips/p2p/cacert.pem'
 
     def __init__(self, port, data_size=1024):
         """
@@ -46,8 +49,11 @@ class P2pServer:
         """
         Create socket
         """
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        a_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        a_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock = ssl.wrap_socket(a_sock, server_side=True, \
+                keyfile=self.keyfile, \
+                certfile=self.certfile)
 
     def set_timeout(self, timeout, client_pair=None, client_socket=None):
         """
@@ -85,7 +91,7 @@ class P2pServer:
         client_pair = P2pClientPair(client_sock, client_addr)
         return client_pair
 
-    def send_msg(self, data, client_pair=None, client_socket=None):
+    def send_msg(self, data, client_pair=None, client_socket=None, encode=True):
         """
         Sends a msg to a given client
 
@@ -98,9 +104,13 @@ class P2pServer:
             socket_to_use = client_socket
         else:
             socket_to_use = client_pair.socket
-        socket_to_use.send(data.encode())
+        if encode:
+            send_data = data.encode()
+        else:
+            send_data = data
+        socket_to_use.send(send_data)
 
-    def recv_msg(self, client_pair=None, client_socket=None):
+    def recv_msg(self, client_pair=None, client_socket=None, decode=True):
         """
         Reads a msg from a given client
 
@@ -116,7 +126,9 @@ class P2pServer:
         else:
             socket_to_use = client_pair.socket
         data = socket_to_use.recv(self.data_size)
-        return data.decode('utf-8')
+        if decode:
+            return data.decode('utf-8')
+        return data
 
     def close_client(self, client_pair=None, client_socket=None):
         """
