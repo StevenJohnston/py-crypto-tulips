@@ -8,7 +8,7 @@ from crypto_tulips.dal.objects.base_transaction import BaseTransaction
 
 class MemTransaction(BaseTransaction):
 
-    def __init__(self, mem_transaction_hash, to_addr, from_addr, amount, timestamp = time.strftime("%Y/%m/%d-%H:%M:%S")):
+    def __init__(self, mem_transaction_hash, to_addr, from_addr, amount, timestamp = time.time()):
         BaseTransaction.__init__(self, mem_transaction_hash, to_addr, from_addr, amount, timestamp)
 
     @staticmethod

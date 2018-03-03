@@ -22,7 +22,7 @@ class Block(Hashable, Sendable):
         self.transactions = transactions
         self.pos_transactions = pos_transactions
         self.contract_transactions = contract_transactions
-        self.timestamp = timestamp
+        self.timestamp = float(timestamp)
 
     @staticmethod
     def from_dict(dict_values):

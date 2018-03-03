@@ -20,7 +20,7 @@ class BaseTransaction(Hashable, Sendable):
         self.to_addr = to_addr
         self.from_addr = from_addr
         self.amount = float(amount)
-        self.timestamp = timestamp
+        self.timestamp = float(timestamp)
 
     def to_string(self):
         return json.dumps(self.__dict__)
@@ -33,7 +33,7 @@ class BaseTransaction(Hashable, Sendable):
         return ['from_addr', 'to_addr']
 
     # Returns the object that will be hashed into blockchain
-    def get_hashable(self): 
+    def get_hashable(self):
         return {
             'to_addr': self.to_addr,
             'from_addr': self.from_addr,
