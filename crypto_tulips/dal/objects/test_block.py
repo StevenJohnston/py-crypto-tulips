@@ -18,7 +18,7 @@ def test_map_test():
 
 def test_hashable():
     block = Block('block_hash_test', [], [], [], 'time_here_test')
-    actual = block.hashable()
+    actual = block.get_hashable()
     expected = {
         'transactions': [],
         'pos_transactions': [],
@@ -29,7 +29,7 @@ def test_hashable():
 
 def test_hashable_fail():
     block = Block('block_hash_test', [], [], [], 'time_here_test')
-    actual = block.hashable()
+    actual = block.get_hashable()
     not_expected = {
         'transactions': [],
         'pos_transactions': [],
@@ -46,11 +46,11 @@ def test_transaction_hashable_fail():
         transaction_1,
         transaction_2
     ], [], [], 'time_here_test')
-    actual = block.hashable()
+    actual = block.get_hashable()
     expected = {
         'transactions': [
-            transaction_1.hashable(),
-            transaction_2.hashable()
+            transaction_1.get_sendable(),
+            transaction_2.get_sendable()
         ],
         'pos_transactions': [],
         'contract_transactions': [],
