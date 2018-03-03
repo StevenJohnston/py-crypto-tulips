@@ -1,7 +1,7 @@
 import pytest
 
 from transaction_service import TransactionService
-from dal.services.hash_service import HashService
+from dal.services.redis_service import RedisService
 from dal.objects.transaction import Transaction
 
 # create some transactions
@@ -13,12 +13,12 @@ t4 = Transaction('ts_test_hash4', 'ts_william', 'ts_naween', 14605)
 @pytest.mark.first
 def setup():
     # run first to store test data in the database
-    hs = HashService()
+    rs = RedisService()
     # store them
-    hs.store_hash(t1)
-    hs.store_hash(t2)
-    hs.store_hash(t3)
-    hs.store_hash(t4)
+    rs.store_object(t1)
+    rs.store_object(t2)
+    rs.store_object(t3)
+    rs.store_object(t4)
 
 def test_get_transactions_by_public_key():
     ts = TransactionService()

@@ -4,27 +4,16 @@ Transaction Class
 
 import json
 import time
+from .base_transaction import BaseTransaction
 
-class Transaction:
-
-    prefix = "transaction"
-
-    transaction_hash = ''
-    to_addr = ''
-    from_addr = ''
-    amount = ''
-    timestamp = ''
+class Transaction(BaseTransaction):
 
     def __init__(self, transaction_hash, to_addr, from_addr, amount, timestamp = time.strftime("%Y/%m/%d-%H:%M:%S")):
-        self.transaction_hash = transaction_hash
-        self.to_addr = to_addr
-        self.from_addr = from_addr
-        self.amount = float(amount)
-        self.timestamp = timestamp
+        BaseTransaction.__init__(self, transaction_hash, to_addr, from_addr, amount, timestamp)
 
     @staticmethod
     def from_dict(dict_values):
-        transaction_hash = dict_values.get('transaction_hash')
+        transaction_hash = dict_values.get('_hash')
         to_addr = dict_values.get('to_addr')
         from_addr = dict_values.get('from_addr')
         amount = dict_values.get('amount')
@@ -33,11 +22,8 @@ class Transaction:
         new_transaction = Transaction(transaction_hash, to_addr, from_addr, amount, timestamp)
         return new_transaction
 
-    def to_string(self):
-        return json.dumps(self.__dict__)
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
-
-    def _to_index(self):
-        return ['from_addr', 'to_addr']
+    @staticmethod
+    def _to_index():
+        fields = super(Transaction, Transaction)._to_index()
+        fields.append('transaction')
+        return fields
