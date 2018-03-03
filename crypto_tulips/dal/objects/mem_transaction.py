@@ -4,7 +4,7 @@ MemTransaction Class
 
 import json
 import time
-from .base_transaction import BaseTransaction
+from crypto_tulips.dal.objects.base_transaction import BaseTransaction
 
 class MemTransaction(BaseTransaction):
 

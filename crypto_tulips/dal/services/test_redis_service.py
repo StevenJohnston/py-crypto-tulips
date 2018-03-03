@@ -1,8 +1,8 @@
 import pytest
 import time
 
-from .redis_service import RedisService
-from ..objects.transaction import Transaction
+from crypto_tulips.dal.services.redis_service import RedisService
+from crypto_tulips.dal.objects.transaction import Transaction
 
 
 def test_get_attributes():

@@ -1,8 +1,8 @@
 import pytest
 
-from mem_transaction_service import MemTransactionService
-from dal.services.redis_service import RedisService
-from dal.objects.mem_transaction import MemTransaction
+from crypto_tulips.services.mem_transaction_service import MemTransactionService
+from crypto_tulips.dal.services.redis_service import RedisService
+from crypto_tulips.dal.objects.mem_transaction import MemTransaction
 
 # create some transactions
 t1 = MemTransaction('mts_test_hash1', 'mts_matt', 'mts_william', 7000)

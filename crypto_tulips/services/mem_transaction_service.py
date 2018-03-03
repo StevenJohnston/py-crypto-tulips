@@ -2,8 +2,8 @@
 MemTransaction Service Module
 """
 
-from dal.objects.mem_transaction import MemTransaction
-from services.base_transaction_service import BaseTransactionService
+from crypto_tulips.dal.objects.mem_transaction import MemTransaction
+from crypto_tulips.services.base_transaction_service import BaseTransactionService
 
 class MemTransactionService(BaseTransactionService):
     """

@@ -1,8 +1,8 @@
 import pytest
 
-from transaction_service import TransactionService
-from dal.services.redis_service import RedisService
-from dal.objects.transaction import Transaction
+from crypto_tulips.services.transaction_service import TransactionService
+from crypto_tulips.dal.services.redis_service import RedisService
+from crypto_tulips.dal.objects.transaction import Transaction
 
 # create some transactions
 t1 = Transaction('ts_test_hash1', 'ts_matt', 'ts_william', 7000)

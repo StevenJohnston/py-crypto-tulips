@@ -2,8 +2,8 @@
 Transaction Service Module
 """
 
-from dal.objects.transaction import Transaction
-from services.base_transaction_service import BaseTransactionService
+from crypto_tulips.dal.objects.transaction import Transaction
+from crypto_tulips.services.base_transaction_service import BaseTransactionService
 
 class TransactionService(BaseTransactionService):
     """

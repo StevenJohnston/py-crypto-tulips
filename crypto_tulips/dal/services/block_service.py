@@ -1,7 +1,7 @@
 import json
 import redis
 from dal.objects import block
-from logger import crypt_logger
+from crypto_tulips.logger.crypt_logger import Logger, LoggingLevel
 
 class BlockService:
     _host = ''
@@ -13,7 +13,7 @@ class BlockService:
         settings = json.load(open('config/db_settings.json'))
         self.host = settings["host"]
         self.port = settings["port"]
-        crypt_logger.Logger.log("BlockService Initialized with redis running on " + self.host + ":" + self.port, 0, crypt_logger.LoggingLevel.INFO)
+        Logger.log("BlockService Initialized with redis running on " + self.host + ":" + self.port, 0, LoggingLevel.INFO)
 
     def store_block(self, block):
         r = self._connect()
