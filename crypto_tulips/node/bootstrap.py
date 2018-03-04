@@ -11,10 +11,10 @@ class BootstrapNode:
     Class to work as a bootstrap node and be an entry point to the network
     """
 
-    def __init__(self, port, data_size=1024):
+    def __init__(self, port, data_size=1024, host='0.0.0.0'):
         self.data_size = data_size
         self.port = port
-        self.server = p2p_server.P2pServer(port=port, data_size=data_size, host='0.0.0.0')
+        self.server = p2p_server.P2pServer(port=port, data_size=data_size, host=host)
         self.peer_list = []
         self.thread_list = []
         self.run = True
