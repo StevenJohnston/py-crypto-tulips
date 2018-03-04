@@ -60,3 +60,54 @@ def test_sendable_fail():
         '_hash': 'block_send_test'
     }
     assert actual != not_expected
+
+def test_sendable_json():
+    test_time = time.time()
+    transaction = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
+    actual = json.dumps(transaction.get_sendable(), sort_keys=True)
+    expected = json.dumps({
+        'signature': '',
+        'amount': 1.0,
+        'to_addr': 'to_steven_test',
+        'from_addr': 'from_matt_test',
+        '_hash': 'block_send_test',
+        'timestamp': test_time
+    }, sort_keys=True)
+    assert actual == expected
+
+def test_json_deep():
+    actual = json.dumps({
+        'a': {
+            'a': 'a',
+            'b': 'b',
+            'c': 'c'
+        },
+        'b': {
+            'a': 'a',
+            'b': 'b',
+            'c': 'c'
+        },
+        'c': {
+            'a': 'a',
+            'b': 'b',
+            'c': 'c'
+        }
+    })
+    expected = json.dumps({
+        'a': {
+            'a': 'a',
+            'c': 'c',
+            'b': 'b'
+        },
+        'c': {
+            'b': 'b',
+            'c': 'c',
+            'a': 'a'
+        },
+        'b': {
+            'c': 'c',
+            'a': 'a',
+            'b': 'b'
+        }
+    }, sort_keys=True)
+    assert actual == expected
