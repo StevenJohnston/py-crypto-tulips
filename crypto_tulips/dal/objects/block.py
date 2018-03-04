@@ -11,9 +11,6 @@ from crypto_tulips.dal.objects.signable import Signable
 
 class Block(Hashable, Sendable, Signable):
     prefix = 'block'
-
-    _hash = ''
-    signature = ''
     transactions = []
     pos_transactions = []
     contract_transactions = []

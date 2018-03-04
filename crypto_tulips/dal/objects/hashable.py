@@ -2,6 +2,7 @@ from crypto_tulips.hashing.crypt_hashing import Hashing
 import json
 
 class Hashable:
+    _hash = ''
     # Returns the object that will be used to get the hash for the blockchain.
     # Since some objects have aditional members this method allows us to remove these non-block related members
     def get_hashable(self): raise NotImplementedError

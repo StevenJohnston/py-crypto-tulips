@@ -9,13 +9,10 @@ from crypto_tulips.dal.objects.sendable import Sendable
 from crypto_tulips.dal.objects.signable import Signable
 
 class BaseTransaction(Hashable, Sendable, Signable):
-
-    _hash = ''
     to_addr = ''
     from_addr = ''
     amount = ''
     timestamp = ''
-    signature = ''
 
     def __init__(self, transaction_hash, signature, to_addr, from_addr, amount, timestamp = time.time()):
         self._hash = transaction_hash
