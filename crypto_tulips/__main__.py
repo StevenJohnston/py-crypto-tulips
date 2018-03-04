@@ -1,8 +1,5 @@
 import sys
 import json
-#from .dal.services import block_service, hash_service
-#from .dal.objects import block, transaction
-#from .hashing import crypt_hashing
 from .dal.services import redis_service
 from .dal.objects import mem_transaction
 from .node import bootstrap, node
@@ -19,7 +16,6 @@ def start_as_a_bootstrap(bootstrap_port):
     bootstrap_node.close()
 
 def regular_node_callback(data):
-    print(data)
     json_dic = json.loads(data)
     new_msg = message.Message.from_dict(json_dic)
     if new_msg.action == 'transaction':
@@ -28,6 +24,9 @@ def regular_node_callback(data):
         print(new_transaction._hash)
         rs = redis_service.RedisService()
         rs.store_object(new_transaction)
+
+def run_miner():
+    pass
 
 def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=2048, \
         socket_timeout=1):
@@ -44,6 +43,8 @@ def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, 
             msg_input = input('\t\t\tEnter a msg to send: ')
             if msg_input != '':
                 a_node.connection_manager.send_msg(msg=msg_input)
+        elif user_input == 'miner':
+            run_miner()
         elif user_input == 'trans' or user_input == 'transaction':
             to_addr = input('\t\t\tTo addr: ')
             from_addr = input('\t\t\tFrom addr: ')
@@ -61,7 +62,6 @@ def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, 
 
 if __name__ == '__main__':
     arguments = sys.argv[1:]
-    #print('\tThis is CryptoTulips Package')
     print('\tCommand line arguments are {}'.format(arguments))
     if arguments:
         print('\tGot arguments')
@@ -85,4 +85,3 @@ if __name__ == '__main__':
         print('\t\t#### -- port on which regular nodes accepts connections')
         print('\n\t\tExample:')
         print('\t\t\tregular 25252 vagrant 36363\n')
-    #print('\tEnd of the CryptoTulips Package')
