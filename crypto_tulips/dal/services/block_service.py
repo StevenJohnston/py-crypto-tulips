@@ -35,12 +35,13 @@ class BlockService:
         rs = RedisService()
 
         # key to store list of objects under
-        name = self.key_suffix + block.block_hash
+        name = self.key_suffix + block._hash
         # if block isn't in the database already
         if not r.exists(name):
             pipe = r.pipeline()
             # store timestamp first
             pipe.rpush(name, block.timestamp)
+            pipe.rpush(name, block.signature)
 
             # store string 'transactions' to help with retrieval parsing
             pipe.rpush(name, 'transactions')
@@ -62,7 +63,7 @@ class BlockService:
 
             return pipe.execute()
         else:
-            print("Block with hash: " + block.block_hash + " already exists. Unable to update.")
+            print("Block with hash: " + block._hash + " already exists. Unable to update.")
 
     def find_by_hash(self, block_hash):
         """
@@ -89,6 +90,12 @@ class BlockService:
 
         # remove for iteration
         hashes.remove(timestamp)
+
+        # timestamp will always be first
+        signature = hashes[0]
+
+        # remove for iteration
+        hashes.remove(signature)
 
         prefix = ''
         # list to hold all of the objects
@@ -128,7 +135,7 @@ class BlockService:
         temp_list.clear()
 
         # create block object and return it
-        block = Block(block_hash, transactions, pos_transactions, contract_transactions, timestamp)
+        block = Block(block_hash, signature, transactions, pos_transactions, contract_transactions, timestamp)
         return block
 
     def _connect(self):

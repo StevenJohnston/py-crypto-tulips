@@ -13,6 +13,29 @@ class Hashing:
     """
     The Hashing Class that has static methods to help with different type of hashing
     """
+    @staticmethod
+    def hash_string(str_to_hash):
+        """ Generates and returns a sha256 hash
+
+        Keyword arugments:
+        str_to_hash -- string to hash
+
+        Returns:
+        string -- Returns the sha256 hash of the string provided
+        """
+        return hashlib.sha256(str_to_hash.encode('utf-8')).hexdigest()
+
+    @staticmethod
+    def hash_object(object_to_hash):
+        """ Generates and returns a sha256 hash
+
+        Keyword arugments:
+        object_to_hash -- object to hash
+
+        Returns:
+        string -- Returns the sha256 hash of the object provided
+        """
+        return hashlib.sha256((json.dumps(object_to_hash)).encode('utf-8')).hexdigest()
 
     @staticmethod
     def hashing_block(json_block):
