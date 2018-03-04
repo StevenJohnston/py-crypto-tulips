@@ -7,6 +7,7 @@ import json
 from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
+from base64 import b64encode, b64decode
 
 
 class Hashing:
@@ -35,7 +36,7 @@ class Hashing:
         Returns:
         string -- Returns the sha256 hash of the object provided
         """
-        return hashlib.sha256((json.dumps(object_to_hash)).encode('utf-8')).hexdigest()
+        return hashlib.sha256(json.dumps(object_to_hash, sort_keys=True).encode('utf-8')).hexdigest()
 
     @staticmethod
     def hashing_block(json_block):
@@ -47,7 +48,7 @@ class Hashing:
         Returns:
         string -- Returns the sha256 hash of the JSON string provided
         """
-        return hashlib.sha256((json.dumps(json_block)).encode('utf-8')).hexdigest()
+        return hashlib.sha256(json.dumps(json_block, sort_keys=True).encode('utf-8')).hexdigest()
 
     @staticmethod
     def hashing_transaction(transaction_format):
@@ -95,6 +96,13 @@ class Hashing:
 
     @staticmethod
     def signature_of_data(data, private_key):
+        final = data
+        if isinstance(data, str):
+            final = data.encode()
+        elif not isinstance(data, bytes):
+            final = json.dumps(data, sort_keys=True)
+            final = data.encode()
+
         """ Returns a signiture base on the private key and data
 
         Keyword arugments:
@@ -104,10 +112,24 @@ class Hashing:
         Returns:
         signature -- the signiture of the sign data
         """
-        hash_message = SHA256.new(data)
+        hash_message = SHA256.new(final)
         pkey = RSA.import_key(private_key)
         signature = pkcs1_15.new(pkey).sign(hash_message)
         return signature
+
+    @staticmethod
+    def str_signature_of_data(data, private_key):
+
+        """ Returns a signiture base on the private key and data
+
+        Keyword arugments:
+        data -- data that being pass to be signed
+        private_key -- Private Key
+
+        Returns:
+        signature -- the signiture of the sign data
+        """
+        return b64encode(Hashing.signature_of_data(data, private_key)).decode('utf-8')
 
     @staticmethod
     def encode_validate_signature(data, pub_key, signature):
