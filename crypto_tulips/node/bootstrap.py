@@ -14,7 +14,7 @@ class BootstrapNode:
     def __init__(self, port, data_size=1024):
         self.data_size = data_size
         self.port = port
-        self.server = p2p_server.P2pServer(port=port, data_size=data_size)
+        self.server = p2p_server.P2pServer(port=port, data_size=data_size, host='0.0.0.0')
         self.peer_list = []
         self.thread_list = []
         self.run = True

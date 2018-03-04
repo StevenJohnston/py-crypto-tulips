@@ -26,7 +26,7 @@ class P2pServer:
     keyfile = 'crypto_tulips/p2p/private.pem'
     certfile = 'crypto_tulips/p2p/cacert.pem'
 
-    def __init__(self, port, data_size=1024):
+    def __init__(self, port, data_size=1024, host=None):
         """
         Basic constructor.
 
@@ -41,7 +41,10 @@ class P2pServer:
 
         self.do_socket_creation()
         self.data_size = data_size
-        self.host = socket.gethostname()
+        if host is None:
+            self.host = socket.gethostname()
+        else:
+            self.host = host
         self.port = port
         self.do_binding()
 

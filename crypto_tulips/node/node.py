@@ -13,6 +13,7 @@ class Node:
     def __init__(self, my_port):
         self.port = my_port
         self.connection_manager = None
+        self.host = None
         print('Started a node')
 
     def __del__(self):
@@ -63,6 +64,8 @@ class Node:
             callback = Node.read_callback
         else:
             callback = read_callback
+        if self.host == peer.ip_address:
+            return
         self.connection_manager.connect_to(host=peer.ip_address, \
                 port=int(peer.port), read_callback=callback)
 
@@ -79,7 +82,8 @@ class Node:
         """
         client = p2p_client.P2pClient()
         client.connect_to(host=host, port=port)
-        host = socket.gethostname()
+        host = socket.gethostbyname(socket.getfqdn())
+        self.host = host
         client.send_msg(str(host) + ':' + str(self.port))
         recv_data = client.recv_msg(decode=False)
         known_peers = pickle.loads(recv_data)

@@ -17,7 +17,7 @@ class ConnectionManager:
     still active and remove inactive.
     """
 
-    def __init__(self, server_port=None, peer_timeout=10, recv_data_size=1024, socket_timeout=10, silent=False):
+    def __init__(self, server_port=None, peer_timeout=10, recv_data_size=1024, socket_timeout=10, silent=True):
         """
         Constructor
 
