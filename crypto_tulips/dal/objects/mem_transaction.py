@@ -8,8 +8,8 @@ from crypto_tulips.dal.objects.base_transaction import BaseTransaction
 
 class MemTransaction(BaseTransaction):
 
-    def __init__(self, mem_transaction_hash, to_addr, from_addr, amount, timestamp = time.time()):
-        BaseTransaction.__init__(self, mem_transaction_hash, to_addr, from_addr, amount, timestamp)
+    def __init__(self, mem_transaction_hash, signature, to_addr, from_addr, amount, timestamp = time.time()):
+        BaseTransaction.__init__(self, mem_transaction_hash, signature, to_addr, from_addr, amount, timestamp)
 
     @staticmethod
     def from_dict(dict_values):
@@ -18,8 +18,9 @@ class MemTransaction(BaseTransaction):
         from_addr = dict_values.get('from_addr')
         amount = dict_values.get('amount')
         timestamp = dict_values.get('timestamp')
+        signature = dict_values.get('signature')
         # print(mem_transaction_hash, to_addr, from_addr, str(amount), timestamp)
-        mem_transaction = MemTransaction(mem_transaction_hash, to_addr, from_addr, amount, timestamp)
+        mem_transaction = MemTransaction(mem_transaction_hash, signature, to_addr, from_addr, amount, timestamp)
         return mem_transaction
 
     @staticmethod

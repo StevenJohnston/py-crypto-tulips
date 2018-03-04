@@ -8,7 +8,7 @@ class BlockService():
     """
     Block Service
     """
-
+    
     @staticmethod
     def add_block_to_chain(block):
         """

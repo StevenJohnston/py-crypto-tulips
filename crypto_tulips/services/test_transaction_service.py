@@ -5,10 +5,10 @@ from crypto_tulips.dal.services.redis_service import RedisService
 from crypto_tulips.dal.objects.transaction import Transaction
 
 # create some transactions
-t1 = Transaction('ts_test_hash1', 'ts_matt', 'ts_william', 7000)
-t2 = Transaction('ts_test_hash2', 'ts_steven', 'ts_william', 7000)
-t3 = Transaction('ts_test_hash3', 'ts_steven', 'ts_william', 605)
-t4 = Transaction('ts_test_hash4', 'ts_william', 'ts_naween', 14605)
+t1 = Transaction('ts_test_hash1', '', 'ts_matt', 'ts_william', 7000)
+t2 = Transaction('ts_test_hash2', '', 'ts_steven', 'ts_william', 7000)
+t3 = Transaction('ts_test_hash3', '', 'ts_steven', 'ts_william', 605)
+t4 = Transaction('ts_test_hash4', '', 'ts_william', 'ts_naween', 14605)
 
 @pytest.mark.first
 def setup():

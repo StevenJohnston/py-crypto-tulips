@@ -7,9 +7,10 @@ from crypto_tulips.dal.objects.pos_transaction import PosTransaction
 
 def test_hashable():
     test_time = time.time()
-    pos_transaction = PosTransaction('pos_transaction_hash_test', 'steven_addr_test', 100, test_time)
+    pos_transaction = PosTransaction('pos_transaction_hash_test', '', 'steven_addr_test', 100, test_time)
     actual = pos_transaction.get_hashable()
     expected = {
+        'signature': '',
         'addr': 'steven_addr_test',
         'amount': 100,
         'timestamp': test_time
@@ -18,9 +19,10 @@ def test_hashable():
 
 def test_hashable_fail():
     test_time = time.time()
-    pos_transaction = PosTransaction('pos_transaction_hash_test', 'steven_addr_test', 100, test_time)
+    pos_transaction = PosTransaction('pos_transaction_hash_test', '', 'steven_addr_test', 100, test_time)
     actual = pos_transaction.get_hashable()
     not_expected = {
+        'signature': '',
         'addr': 'steven_addr_test_fail',
         'amount': 100,
         'timestamp': test_time
@@ -31,9 +33,10 @@ def test_hashable_fail():
 
 def test_sendable():
     test_time = time.time()
-    pos_transaction = PosTransaction('pos_transaction_hash_test', 'steven_addr_test', 100, test_time)
+    pos_transaction = PosTransaction('pos_transaction_hash_test', '', 'steven_addr_test', 100, test_time)
     actual = pos_transaction.get_sendable()
     expected = {
+        'signature': '',
         'addr': 'steven_addr_test',
         'amount': 100,
         'timestamp': test_time,
@@ -43,9 +46,10 @@ def test_sendable():
 
 def test_sendable_fail():
     test_time = time.time()
-    pos_transaction = PosTransaction('pos_transaction_hash_test', 'steven_addr_test', 100, test_time)
+    pos_transaction = PosTransaction('pos_transaction_hash_test', '', 'steven_addr_test', 100, test_time)
     actual = pos_transaction.get_hashable()
     not_expected = {
+        'signature': '',
         'addr': 'steven_addr_test_fail',
         'amount': 100,
         'timestamp': test_time,

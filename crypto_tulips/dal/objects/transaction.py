@@ -8,8 +8,8 @@ from crypto_tulips.dal.objects.base_transaction import BaseTransaction
 
 class Transaction(BaseTransaction):
 
-    def __init__(self, transaction_hash, to_addr, from_addr, amount, timestamp = time.time()):
-        BaseTransaction.__init__(self, transaction_hash, to_addr, from_addr, amount, timestamp)
+    def __init__(self, transaction_hash, signature, to_addr, from_addr, amount, timestamp = time.time()):
+        BaseTransaction.__init__(self, transaction_hash, signature, to_addr, from_addr, amount, timestamp)
 
     @staticmethod
     def from_dict(dict_values):
@@ -18,7 +18,8 @@ class Transaction(BaseTransaction):
         from_addr = dict_values.get('from_addr')
         amount = dict_values.get('amount')
         timestamp = dict_values.get('timestamp')
-        new_transaction = Transaction(transaction_hash, to_addr, from_addr, amount, timestamp)
+        signature = dict_values.get('signature')
+        new_transaction = Transaction(transaction_hash, signature, to_addr, from_addr, amount, timestamp)
         return new_transaction
 
     @staticmethod
