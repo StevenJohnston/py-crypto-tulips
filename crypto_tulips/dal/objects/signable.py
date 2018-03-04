@@ -2,6 +2,7 @@ from crypto_tulips.hashing.crypt_hashing import Hashing
 import json
 
 class Signable:
+    signature = ''
     def get_signable(self): raise NotImplementedError
 
     # updates the _hash of the object
