@@ -1,0 +1,37 @@
+from crypto_tulips.services.genesis_block_service import GenesisBlockService
+import pytest
+import json
+
+_priv = """-----BEGIN RSA PRIVATE KEY-----
+MIIEoQIBAAKCAQBtxQbESKGGw1uYw113TkyhXfMHy2jq/iXJ+17oEzjGk6qzT39e
+vE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme7wQEW5bM1lt5/LemQshRtKY9pcg3
+xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLjTORn0ssrBlFi+bjG/eF/qyO9H0lj
+OPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWidbUoMxnJCOFKK5Dmvgku/Ca3eVXTV
+85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8ixWTW+67XNB0A12QFYMhjw4pvQ2m
+wosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZAgMBAAECggEACuaB4YQE5kkIE4dz
+BKH14iBePevpI0zRm9kmd41RGgcX8G54i4PPoLTGkUa9JHok659buCrGyv83jEj5
+5Ql8/NdnYrdlpjmzI84AvrXrBpIV4BFSbJd80P1EPXdTV5I/SJRuBi2gz5Nhq1fk
+tc9N4dyE4fqAymj6NAXwX3JerjrDKqjfWt076CLOIqoG2m7pcOcr00DVNTJcb7rj
+fd2isAVhv2mJDJkOmO5/aOwX6FjywBkt0Vfs4wvByA2e9rc1D/3UeL0SHT4JliAj
+VBQuodlMwLMqwaWbsMOuN3559p7kbd4oFBk8zkQb1KZ66RS/gTI2WLDcCfURaEbd
+dxETwQKBgQCnxiMG2ws41v70iafQhmbSAv0DmS5PwCOvu8Y2n1QTboI84GOCDI7I
+okxWT3vsfB1mXte26PFkAnkIE9DSQkx3iFtn7RNrAeOtvzIYG33t6tB3axK6fm2+
+MqdXpO/r53PZb70+8dAEEobC0Q0POKR/z1nHopfw3idxEOo1oV9B/QKBgQCnfkzm
+BggBdvnEoAzfmYXe18SsWH9Q93CZtXkfxeehHZuF01uGY9a6cyvHY/phmrANPUB1
+mvapC3M53tcgEbDrO8Ue2VkyXpLlCLCXZxpTC2YFdElh/kvaJbEHhkL09hmDNjMu
+wXuyYw4CXLjzRwuA8A+b6P0Z6LiMKn1lWWXFjQKBgA1TyfiDcfLD8WDPhoskAgrw
+vdSJWIpxQuR00BwKsA0THDllwcHU6Yq6icHZcoiom1VEd3JKMtK095RSrqXlKlnc
+dRZeWMqJTeLBa2NK28gIfSLfWI+D94fCUlS9/2kH68X8AFZ9sv5/0kCrhpQM9dRJ
+TmJzYgp6OzvaEiDMftqpAoGAJid2OvvqvPKuSOUwqYreXPoH2j66meYT51/YfK1n
+a2NEN0MDWWTK2GQ998jFk5BaRFnMoj2vrKhoEim6FZsSEzPlXnaig//ZNIU7PPIG
+pB43mkx4HvN/sezeG9mwzP52p1YkaKU4mVVJLq6SjxCDBVcqJxj29vz1dTCEqh6o
+OU0CgYAfixcS5l4bdAOuvv8QvEt+ACfoDuDdBds5j7Se3M+M0kS6VtbE3mnTSPxf
+06GC2cu14VtSiXfKv59b95vBz/LRhKIUsJ/Q+TdVE7DJRI4S+tlZio0i9lvO1SHb
+wPhY4P/Zsoe8tswOJyFbSBRNmXCPZ7UBOZcn9jVhg5SQBFIW7Q==
+-----END RSA PRIVATE KEY-----"""
+def test_generate_from_priv():
+    block = GenesisBlockService.generate_from_priv(_priv)
+    print(json.dumps(block.get_sendable()))
+
+    print(_priv)
+    assert 1 == 2

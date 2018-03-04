@@ -3,22 +3,25 @@ from crypto_tulips.dal.objects.transaction import Transaction
 from crypto_tulips.dal.objects.pos_transaction import PosTransaction
 from crypto_tulips.hashing.crypt_hashing import Hashing
 import time
+import json
 class GenesisBlockService():
     @staticmethod
     def generate_from_priv(private_key):
+        time_now = 1520135639.4713802
         public = Hashing.get_public_key(private_key)
         transcations = [
-            new Transaction('', '', public, '', 1, time.time()),
-            new Transaction('', '', public, '', 10, time.time()),
-            new Transaction('', '', public, '', 100, time.time()),
-            new Transaction('', '', public, '', 1000, time.time()),
+            Transaction('', '', public, '', 1, time_now),
+            Transaction('', '', public, '', 10, time_now),
+            Transaction('', '', public, '', 100, time_now),
+            Transaction('', '', public, '', 1000, time_now),
         ]
+
         for tranaction in transcations:
             tranaction.update_signature(private_key)
             tranaction.update_hash()
 
         pos_transactions = [
-                new PosTransaction('', '',public, 100, time.time())
+                PosTransaction('', '',public, 100, time_now)
             ]
 
         for pos_transaction in pos_transactions:
@@ -26,19 +29,17 @@ class GenesisBlockService():
             pos_transaction.update_hash()
             
         
-        block = new Block('', '',transactions, pos_transactions)
+        block = Block('', '', transcations, pos_transactions, [], time_now)
         block.update_signature(private_key)
         block.update_hash()
         return block
 
-        @staticmethod
+    @staticmethod
     def generate_from_file():
-        data = json.load(open('crypto_tulips/config/genesis_block.json'))
+        # data = json.load(open('crypto_tulips/config/genesis_block.json'))
         with open('crypto_tulips/config/genesis_block.json', 'r') as myfile:
             private_key = myfile.read()
-        public = Hashing.get_public_key(private_key)
-        block = new Block('', '',transactions, pos_transactions)
-        block.update_hash()
+        block = GenesisBlockService.generate_from_priv(private_key)
         return block
 
 
