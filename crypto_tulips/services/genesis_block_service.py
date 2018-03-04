@@ -35,9 +35,8 @@ class GenesisBlockService():
         return block
 
     @staticmethod
-    def generate_from_file():
-        # data = json.load(open('crypto_tulips/config/genesis_block.json'))
-        with open('crypto_tulips/config/genesis_block.json', 'r') as myfile:
+    def generate_from_file(filename = 'priv_rsa'):
+        with open('crypto_tulips/config/'+filename, 'r') as myfile:
             private_key = myfile.read()
         block = GenesisBlockService.generate_from_priv(private_key)
         return block
