@@ -29,7 +29,7 @@ class GenesisBlockService():
             pos_transaction.update_hash()
             
         
-        block = Block('', '', transcations, pos_transactions, [], time_now)
+        block = Block('', '', public, 0, transcations, pos_transactions, [], time_now)
         block.update_signature(private_key)
         block.update_hash()
         return block

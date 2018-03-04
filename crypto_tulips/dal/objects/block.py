@@ -15,23 +15,30 @@ class Block(Hashable, Sendable, Signable):
     pos_transactions = []
     contract_transactions = []
     timestamp = ''
+    owner = ''
+    height = 0
 
-    def __init__(self, block_hash, signature, transactions, pos_transactions, contract_transactions, timestamp = time.time()):
+    def __init__(self, block_hash, signature, owner, height, transactions, pos_transactions, contract_transactions, timestamp = time.time()):
         self._hash = block_hash
         self.signature = signature
+        self.owner = owner
+        self.height = int(height)
         self.transactions = transactions
         self.pos_transactions = pos_transactions
         self.contract_transactions = contract_transactions
-        self.timestamp = float(timestamp)
+        self.timestamp = int(timestamp)
 
     @staticmethod
     def from_dict(dict_values):
         block_hash = dict_values.get('block_hash')
-        transactions = dict_values.get('transactions')
-        pos_transactions = dict_values.get('pos_transactions')
+        signature = dict_values.get('signature')
+        owner = dict_values.get('owner')
+        height = dict_values.get('height')
+        transactions = list(map(Transaction.from_dict, dict_values.get('transactions')))
+        pos_transactions = list(map(PosTransaction.from_dict, dict_values.get('pos_transactions')))
         contract_transactions = dict_values.get('contract_transactions')
         timestamp = dict_values.get('timestamp')
-        new_block = Block(block_hash, transactions, pos_transactions, contract_transactions, timestamp)
+        new_block = Block(block_hash, signature, owner, height, transactions, pos_transactions, contract_transactions, timestamp)
         return new_block
 
     def to_string(self):
@@ -46,15 +53,18 @@ class Block(Hashable, Sendable, Signable):
 
     def get_signable(self):
         return {
+            'height': self.height,
             'transactions': list(map(Signable.get_signable_callback, self.transactions)),
             'pos_transactions': list(map(Signable.get_signable_callback, self.pos_transactions)),
-            'contract_transactions': list(map(Signable.get_signable_callback, self.contract_transactions)),
-            'timestamp': self.timestamp,
+            'contract_transactions': [], #list(map(Signable.get_signable_callback, self.contract_transactions)),
+            'timestamp': self.timestamp
         }
     # Returns the object that will be hashed into blockchain
     def get_hashable(self):
         return {
             'signature': self.signature,
+            'owner': self.owner,
+            'height': self.height,
             'transactions': list(map(Sendable.get_sendable_callback, self.transactions)),
             'pos_transactions': list(map(Sendable.get_sendable_callback, self.pos_transactions)),
             'contract_transactions': list(map(Sendable.get_sendable_callback, self.contract_transactions)),
@@ -65,6 +75,8 @@ class Block(Hashable, Sendable, Signable):
     def get_sendable(self):
         return {
             'signature': self.signature,
+            'owner': self.owner,
+            'height': self.height,
             'transactions': list(map(Sendable.get_sendable_callback, self.transactions)),
             'pos_transactions': list(map(Sendable.get_sendable_callback, self.pos_transactions)),
             'contract_transactions': list(map(Sendable.get_sendable_callback, self.contract_transactions)),

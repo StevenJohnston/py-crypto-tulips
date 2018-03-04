@@ -6,7 +6,7 @@ from crypto_tulips.dal.objects.pos_transaction import PosTransaction
 ##### Hashable tests #####
 
 def test_hashable():
-    test_time = time.time()
+    test_time = int(time.time())
     pos_transaction = PosTransaction('pos_transaction_hash_test', '', 'steven_addr_test', 100, test_time)
     actual = pos_transaction.get_hashable()
     expected = {
@@ -18,7 +18,7 @@ def test_hashable():
     assert actual == expected
 
 def test_hashable_fail():
-    test_time = time.time()
+    test_time = int(time.time())
     pos_transaction = PosTransaction('pos_transaction_hash_test', '', 'steven_addr_test', 100, test_time)
     actual = pos_transaction.get_hashable()
     not_expected = {
@@ -32,7 +32,7 @@ def test_hashable_fail():
 ##### Sendable tests #####
 
 def test_sendable():
-    test_time = time.time()
+    test_time = int(time.time())
     pos_transaction = PosTransaction('pos_transaction_hash_test', '', 'steven_addr_test', 100, test_time)
     actual = pos_transaction.get_sendable()
     expected = {
@@ -45,7 +45,7 @@ def test_sendable():
     assert actual == expected
 
 def test_sendable_fail():
-    test_time = time.time()
+    test_time = int(time.time())
     pos_transaction = PosTransaction('pos_transaction_hash_test', '', 'steven_addr_test', 100, test_time)
     actual = pos_transaction.get_hashable()
     not_expected = {
