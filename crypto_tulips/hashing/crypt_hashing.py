@@ -101,7 +101,7 @@ class Hashing:
             final = data.encode()
         elif not isinstance(data, bytes):
             final = json.dumps(data, sort_keys=True)
-            final = data.encode()
+            final = final.encode()
 
         """ Returns a signiture base on the private key and data
 
@@ -132,6 +132,20 @@ class Hashing:
         return b64encode(Hashing.signature_of_data(data, private_key)).decode('utf-8')
 
     @staticmethod
+    def reverse_str_signature_of_data(signature_str):
+
+        """ Returns a signiture base on the private key and data
+
+        Keyword arugments:
+        data -- data that being pass to be signed
+        private_key -- Private Key
+
+        Returns:
+        signature -- the signiture of the sign data
+        """
+        return b64decode(signature_str)
+
+    @staticmethod
     def encode_validate_signature(data, pub_key, signature):
         """ A wrapper function that Validate the signiture base on the data, public key and a signiture
         but you can provide a string for this function
@@ -151,6 +165,12 @@ class Hashing:
 
     @staticmethod
     def validate_signature(data, pub_key, signature):
+        final = data
+        if isinstance(data, str):
+            final = data.encode()
+        elif not isinstance(data, bytes):
+            final = json.dumps(data, sort_keys=True)
+            final = final.encode()
         """ Validate the signiture base on the data, public key and a signiture
 
         Keyword arugments:
@@ -162,7 +182,7 @@ class Hashing:
         bool -- If the signiture is valided or not
         """
         rsakey = RSA.importKey(pub_key)
-        hash_data = SHA256.new(data)
+        hash_data = SHA256.new(final)
         try:
             pkcs1_15.new(rsakey).verify(hash_data, signature)
             print("The signature is valid.")

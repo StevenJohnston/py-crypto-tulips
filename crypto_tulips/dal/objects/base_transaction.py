@@ -20,7 +20,7 @@ class BaseTransaction(Hashable, Sendable, Signable):
         self.to_addr = to_addr
         self.from_addr = from_addr
         self.amount = float(amount)
-        self.timestamp = float(timestamp)
+        self.timestamp = int(timestamp)
 
     def to_string(self):
         return json.dumps(self.__dict__)

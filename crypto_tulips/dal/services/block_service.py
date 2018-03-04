@@ -40,8 +40,10 @@ class BlockService:
         if not r.exists(name):
             pipe = r.pipeline()
             # store timestamp first
-            pipe.rpush(name, block.timestamp)
+            pipe.rpush(name, block.height)
+            pipe.rpush(name, block.owner)
             pipe.rpush(name, block.signature)
+            pipe.rpush(name, block.timestamp)
 
             # store string 'transactions' to help with retrieval parsing
             pipe.rpush(name, 'transactions')
@@ -85,17 +87,26 @@ class BlockService:
         # get all of the fields in the list
         hashes = r.lrange(name, 0, -1)
 
-        # timestamp will always be first
-        timestamp = hashes[0]
 
+        # timestamp will always be first
+        height = hashes[0]
         # remove for iteration
-        hashes.remove(timestamp)
+        hashes.remove(height)
+
+        # timestamp will always be first
+        owner = hashes[0]
+        # remove for iteration
+        hashes.remove(owner)
 
         # timestamp will always be first
         signature = hashes[0]
-
         # remove for iteration
         hashes.remove(signature)
+
+        # timestamp will always be first
+        timestamp = hashes[0]
+        # remove for iteration
+        hashes.remove(timestamp)
 
         prefix = ''
         # list to hold all of the objects
@@ -135,7 +146,7 @@ class BlockService:
         temp_list.clear()
 
         # create block object and return it
-        block = Block(block_hash, signature, transactions, pos_transactions, contract_transactions, timestamp)
+        block = Block(block_hash, signature, owner, height, transactions, pos_transactions, contract_transactions, timestamp)
         return block
 
     def _connect(self):

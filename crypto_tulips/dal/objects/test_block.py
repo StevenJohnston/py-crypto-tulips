@@ -17,42 +17,48 @@ def test_map_test():
 ##### Hashable tests #####
 
 def test_hashable():
-    curr_time = time.time()
-    block = Block('block_hash_test', '', [], [], [], curr_time)
+    test_time = int(time.time())
+    block = Block('block_hash_test', '', '', 0, [], [], [], test_time)
     actual = block.get_hashable()
     expected = {
+        'owner': '',
+        'height': 0,
         'signature': '',
         'transactions': [],
         'pos_transactions': [],
         'contract_transactions': [],
-        'timestamp': curr_time
+        'timestamp': test_time
     }
     assert actual == expected
 
 def test_hashable_fail():
-    curr_time = time.time()
-    block = Block('block_hash_test', '', [], [], [], curr_time)
+    test_time = int(time.time())
+    block = Block('block_hash_test', '', '', 0, [], [], [], test_time)
     actual = block.get_hashable()
     not_expected = {
+        'owner': '',
+        'height': 1,
         'signature': '',
         'transactions': [],
         'pos_transactions': [],
         'contract_transactions': [],
-        'timestamp': time.time()
+        'timestamp': test_time
     }
     assert actual != not_expected
 
 def test_transaction_hashable_fail():
-    test_time = time.time()
-    block_time = time.time()
+    test_time = int(time.time())
+    block_time = int(time.time())
     transaction_1 = Transaction('block_hash_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
     transaction_2 = Transaction('block_hash_test2', '', 'to_matt_test', 'from_steven_test', 1, test_time)
-    block = Block('_hash_test', '',[
+    block = Block('_hash_test', '','', 0, [
         transaction_1,
         transaction_2
     ], [], [], block_time)
     actual = block.get_hashable()
     expected = {
+        'owner': '',
+        'height': 0,
         'signature': '',
         'transactions': [
             transaction_1.get_sendable(),
@@ -68,24 +74,28 @@ def test_transaction_hashable_fail():
 ##### Sendable tests #####
 
 def test_sendable():
-    curr_time = time.time()
-    block = Block('block_send_test', '', [], [], [], curr_time)
+    test_time = int(time.time())
+    block = Block('block_send_test', '', '', 0, [], [], [], test_time)
     actual = block.get_sendable()
     expected = {
+        'owner': '',
+        'height': 0,
         'signature': '',
         'transactions': [],
         'pos_transactions': [],
         'contract_transactions': [],
-        'timestamp': curr_time,
+        'timestamp': test_time,
         '_hash': 'block_send_test'
     }
     assert actual == expected
 
 def test_sendable_fail():
-    curr_time = time.time()
-    block = Block('block_send_test', '', [], [], [], curr_time)
+    test_time = int(time.time())
+    block = Block('block_send_test', '', '', 0, [], [], [], test_time)
     actual = block.get_sendable()
     not_expected = {
+        'owner': '',
+        'height': 0,
         'signature': '',
         'transactions': [],
         'pos_transactions': [],
@@ -96,16 +106,18 @@ def test_sendable_fail():
     assert actual != not_expected
 
 def test_transaction_sendable_fail():
-    test_time = time.time()
-    block_time = time.time()
+    test_time = int(time.time())
+    block_time = int(time.time())
     transaction_1 = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
     transaction_2 = Transaction('block_send_test2', '', 'to_matt_test', 'from_steven_test', 1, test_time)
-    block = Block('block_send_test', '', [
+    block = Block('block_send_test', '', '', 0, [
         transaction_1,
         transaction_2
     ], [], [], block_time)
     actual = block.get_sendable()
     expected = {
+        'owner': '',
+        'height': 0,
         'signature': '',
         'transactions': [
             transaction_1.get_sendable(),

@@ -6,7 +6,7 @@ import time
 ##### Hashable Tests #####
 
 def test_hashable():
-    test_time = time.time()
+    test_time = int(time.time())
     transaction = Transaction('block_hash_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
     actual = transaction.get_hashable()
     expected = {
@@ -19,7 +19,7 @@ def test_hashable():
     assert actual == expected
 
 def test_hashable_fail():
-    test_time = time.time()
+    test_time = int(time.time())
     transaction = Transaction('block_hash_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
     actual = transaction.get_hashable()
     not_expected = {
@@ -34,7 +34,7 @@ def test_hashable_fail():
 ##### Sendable Tests #####
 
 def test_sendable():
-    test_time = time.time()
+    test_time = int(time.time())
     transaction = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
     actual = transaction.get_sendable()
     expected = {
@@ -48,7 +48,7 @@ def test_sendable():
     assert actual == expected
 
 def test_sendable_fail():
-    test_time = time.time()
+    test_time = int(time.time())
     transaction = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
     actual = transaction.get_sendable()
     not_expected = {
@@ -62,7 +62,7 @@ def test_sendable_fail():
     assert actual != not_expected
 
 def test_sendable_json():
-    test_time = time.time()
+    test_time = int(time.time())
     transaction = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
     actual = json.dumps(transaction.get_sendable(), sort_keys=True)
     expected = json.dumps({
@@ -74,40 +74,4 @@ def test_sendable_json():
         'timestamp': test_time
     }, sort_keys=True)
     assert actual == expected
-
-def test_json_deep():
-    actual = json.dumps({
-        'a': {
-            'a': 'a',
-            'b': 'b',
-            'c': 'c'
-        },
-        'b': {
-            'a': 'a',
-            'b': 'b',
-            'c': 'c'
-        },
-        'c': {
-            'a': 'a',
-            'b': 'b',
-            'c': 'c'
-        }
-    })
-    expected = json.dumps({
-        'a': {
-            'a': 'a',
-            'c': 'c',
-            'b': 'b'
-        },
-        'c': {
-            'b': 'b',
-            'c': 'c',
-            'a': 'a'
-        },
-        'b': {
-            'c': 'c',
-            'a': 'a',
-            'b': 'b'
-        }
-    }, sort_keys=True)
-    assert actual == expected
+    
