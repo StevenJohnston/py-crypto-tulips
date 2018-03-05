@@ -14,10 +14,11 @@ class Node:
         self.port = my_port
         self.connection_manager = None
         self.host = None
-        print('Started a node')
+        #print('Started a node')
 
     def __del__(self):
-        print('Ended node')
+        #print('Ended node')
+        pass
 
     @staticmethod
     def read_callback(data):
@@ -64,7 +65,7 @@ class Node:
             callback = Node.read_callback
         else:
             callback = read_callback
-        if self.host == peer.ip_address:
+        if self.host == peer.ip_address and self.port == peer.port:
             return
         self.connection_manager.connect_to(host=peer.ip_address, \
                 port=int(peer.port), read_callback=callback)
