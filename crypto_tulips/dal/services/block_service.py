@@ -155,6 +155,8 @@ class BlockService:
 
     def get_max_block_height(self):
         r = self._connect()
+        if not r.exists(self.max_block_height):
+            r.set(self.max_block_height, 0)
         return r.get(self.max_block_height)
 
     def _connect(self):
