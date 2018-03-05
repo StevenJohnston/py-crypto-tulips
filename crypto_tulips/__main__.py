@@ -1,10 +1,19 @@
 import sys
 import json
+import time
 from .dal.services import redis_service
 from .node import bootstrap, node
 from .p2p import message
 from .hashing.crypt_hashing import Hashing
 from crypto_tulips.dal.objects.transaction import Transaction
+from crypto_tulips.dal.objects.block import Block
+from crypto_tulips.p2p.message import Message
+
+from crypto_tulips.services.transaction_service import TransactionService
+from crypto_tulips.services.block_service import BlockService
+
+
+from crypto_tulips.services.base_transaction_service import BaseTransactionService
 
 denys_private_key = """-----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEAzjo14F/L8Yu009jtTR4BYi28UCoBTA/zOoweOI9vK3BBB4lw
@@ -166,11 +175,36 @@ def regular_node_callback(data):
         print(new_transaction._hash)
         rs = redis_service.RedisService()
         rs.store_object(new_transaction)
+    elif new_msg.action == 'block':
+        block_service = BlockService()
+        new_msg.data = Block.from_dict(new_msg.data)
+        new_block = new_msg.data
+        block_service.add_block_to_chain(new_block)
+        print(new_block._hash)
 
-def run_miner():
-    pass
+def run_miner(a_node):
+    block_service = BlockService()
+    steven_pub = Hashing.get_public_key(steven_private_key)
+    print('Creating new block')
+    time_now = int(time.time())
+    height = int(BlockService.get_max_height()) + 1
+    ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
+    block = Block('', '', steven_pub, height, ten_transactions, [], [], time_now)
+    block.update_signature(steven_private_key)
+    block.update_hash()
+    block_service.add_block_to_chain(block)
+    # TODO Test if worked block was added. Might fail due to same hash
+    for trabs in ten_transactions:
+        BaseTransactionService.remove_from_mem_pool(trabs)
+    print('Created Block hash: ' + block._hash)
 
-def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=2048, \
+    block_msg = message.Message('block', block)
+    sendable_block = block_msg.to_json()
+    block_json = json.dumps(sendable_block, sort_keys=True)
+    a_node.connection_manager.send_msg(msg=block_json)
+    print('Broadcasting block')
+
+def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=10000, \
         socket_timeout=1):
     print('\t\tStarting as a regular node')
     a_node = node.Node(node_port)
@@ -186,7 +220,7 @@ def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, 
             if msg_input != '':
                 a_node.connection_manager.send_msg(msg=msg_input)
         elif user_input == 'miner':
-            run_miner()
+            run_miner(a_node)
         elif user_input == 'trans' or user_input == 'transaction':
             secret = input('\t\t\tSecret : ')
             if secret == 'denys':
@@ -222,7 +256,7 @@ def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, 
             new_transaction.update_hash()
             transaction_msg = message.Message('transaction', new_transaction)
             transaction_json = transaction_msg.to_json()
-            transaction_json = json.dumps(transaction_json)
+            transaction_json = json.dumps(transaction_json, sort_keys=True)
             a_node.connection_manager.send_msg(msg=transaction_json)
             print('Transaction hash : {}'.format(new_transaction._hash))
             rs = redis_service.RedisService()

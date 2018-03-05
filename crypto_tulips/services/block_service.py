@@ -1,7 +1,7 @@
 """
 Block Service Module
 """
-
+from crypto_tulips.dal.services.block_service import BlockService as BlockServiceDal
 from crypto_tulips.dal.objects.block import Block
 
 class BlockService():
@@ -14,7 +14,17 @@ class BlockService():
         """
         Method Comment
         """
+        block_service_dal = BlockServiceDal()
+        block_service_dal.store_block(block)
         pass
+
+    @staticmethod
+    def get_max_height():
+        """
+        Method Comment
+        """
+        block_service_dal = BlockServiceDal()
+        return block_service_dal.get_max_block_height()
 
     @staticmethod
     def verfiy_rsa(block):
@@ -33,3 +43,4 @@ class BlockService():
         todo check blockchain for each validation
         """
         pass
+    
