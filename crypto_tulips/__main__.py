@@ -172,14 +172,14 @@ def regular_node_callback(data):
     if new_msg.action == 'transaction':
         new_msg.data = Transaction.from_dict(new_msg.data)
         new_transaction = new_msg.data
-        print(new_transaction._hash)
+        print('Transaction : {}'.format(new_transaction._hash))
         rs = redis_service.RedisService()
         rs.store_object(new_transaction)
     elif new_msg.action == 'block':
         block_service = BlockService()
         new_block = Block.from_dict(new_msg.data)
         block_service.add_block_to_chain(new_block)
-        print(new_block._hash)
+        print('Block : {}'.format(new_block._hash))
 
 def run_miner(a_node):
     block_service = BlockService()
@@ -203,7 +203,7 @@ def run_miner(a_node):
     a_node.connection_manager.send_msg(msg=block_json)
     print('Broadcasting block')
 
-def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=10000, \
+def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=20000, \
         socket_timeout=1):
     print('\t\tStarting as a regular node')
     a_node = node.Node(node_port)

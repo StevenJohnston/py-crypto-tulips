@@ -65,7 +65,7 @@ class Node:
             callback = Node.read_callback
         else:
             callback = read_callback
-        if self.host == peer.ip_address and self.port == peer.port:
+        if self.host == peer.ip_address and self.port == int(peer.port):
             return
         self.connection_manager.connect_to(host=peer.ip_address, \
                 port=int(peer.port), read_callback=callback)
