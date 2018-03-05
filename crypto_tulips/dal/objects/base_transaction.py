@@ -13,13 +13,17 @@ class BaseTransaction(Hashable, Sendable, Signable):
     from_addr = ''
     amount = ''
     timestamp = ''
+    is_mempool = ''
 
-    def __init__(self, transaction_hash, signature, to_addr, from_addr, amount, timestamp = time.time()):
+    def __init__(self, transaction_hash, signature, to_addr, from_addr, amount, is_mempool = 1, timestamp = time.time()):
         self._hash = transaction_hash
         self.signature = signature
         self.to_addr = to_addr
         self.from_addr = from_addr
         self.amount = float(amount)
+        if is_mempool == None:
+            is_mempool = 1
+        self.is_mempool = int(is_mempool)
         self.timestamp = int(timestamp)
 
     def to_string(self):
@@ -30,7 +34,7 @@ class BaseTransaction(Hashable, Sendable, Signable):
 
     @staticmethod
     def _to_index():
-        return ['from_addr', 'to_addr']
+        return ['from_addr', 'is_mempool']
 
     def get_signable(self):
         return {

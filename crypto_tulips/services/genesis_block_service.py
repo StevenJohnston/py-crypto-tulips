@@ -10,10 +10,10 @@ class GenesisBlockService():
         time_now = 1520135639.4713802
         public = Hashing.get_public_key(private_key)
         transcations = [
-            Transaction('', '', public, '', 1, time_now),
-            Transaction('', '', public, '', 10, time_now),
-            Transaction('', '', public, '', 100, time_now),
-            Transaction('', '', public, '', 1000, time_now),
+            Transaction('', '', public, '', 1, 1, time_now),
+            Transaction('', '', public, '', 10, 1, time_now),
+            Transaction('', '', public, '', 100, 1, time_now),
+            Transaction('', '', public, '', 1000, 1, time_now),
         ]
 
         for tranaction in transcations:
@@ -21,14 +21,14 @@ class GenesisBlockService():
             tranaction.update_hash()
 
         pos_transactions = [
-                PosTransaction('', '',public, 100, time_now)
+                PosTransaction('', '',public, 100, 1, time_now)
             ]
 
         for pos_transaction in pos_transactions:
             pos_transaction.update_signature(private_key)
             pos_transaction.update_hash()
-            
-        
+
+
         block = Block('', '', public, 0, transcations, pos_transactions, [], time_now)
         block.update_signature(private_key)
         block.update_hash()
@@ -42,4 +42,3 @@ class GenesisBlockService():
         return block
 
 
-        

@@ -158,6 +158,21 @@ class BaseTransactionService():
 
         return transactions, balance
 
+    @staticmethod
+    def get_from_mem_pool(obj):
+        r = BaseTransactionService._connect()
+        rs = RedisService()
+
+        # key to retrieve all transaction hashes in the mempool (ie transaction:is_mempool:1)
+        name = obj._to_index()[-1] + ':is_mempool:1'
+        transaction_list = r.srandmember(name, 10)
+
+        transactions = list()
+        for transaction_hash in transaction_list:
+            t = rs.get_object_by_full_key(transaction_hash, obj)
+            transactions.append(t)
+
+        return transactions
 
     @staticmethod
     def _connect():

@@ -42,3 +42,7 @@ class TransactionService(BaseTransactionService):
     @staticmethod
     def get_transactions_by_public_key(public_key):
         return super(TransactionService, TransactionService).get_transactions_by_public_key(public_key, Transaction)
+
+    @staticmethod
+    def get_10_transactions_from_mem_pool():
+        return super(TransactionService, TransactionService).get_from_mem_pool(Transaction)
