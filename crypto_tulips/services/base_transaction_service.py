@@ -7,13 +7,6 @@ import json
 from enum import Enum
 from crypto_tulips.dal.services.redis_service import RedisService
 
-class TransactionType(Enum):
-    """
-    Enumerator to specify transaction type
-    """
-    TRANSACTION     = 0
-    MEM_TRANSACTION = 1
-
 class RequestType(Enum):
     """
     Enumerator to specify to get either to or from

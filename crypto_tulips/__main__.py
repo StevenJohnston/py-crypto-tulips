@@ -1,10 +1,10 @@
 import sys
 import json
 from .dal.services import redis_service
-from .dal.objects import mem_transaction
 from .node import bootstrap, node
 from .p2p import message
 from .hashing.crypt_hashing import Hashing
+from crypto_tulips.dal.objects.transaction import Transaction
 
 denys_private_key = """-----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEAzjo14F/L8Yu009jtTR4BYi28UCoBTA/zOoweOI9vK3BBB4lw
@@ -161,7 +161,7 @@ def regular_node_callback(data):
     json_dic = json.loads(data)
     new_msg = message.Message.from_dict(json_dic)
     if new_msg.action == 'transaction':
-        new_msg.data = mem_transaction.MemTransaction.from_dict(new_msg.data)
+        new_msg.data = Transaction.from_dict(new_msg.data)
         new_transaction = new_msg.data
         print(new_transaction._hash)
         rs = redis_service.RedisService()
@@ -217,7 +217,7 @@ def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, 
                 continue
             from_addr = public_key
             amount = input('\t\t\tAmount: ')
-            new_transaction = mem_transaction.MemTransaction('', '', to_addr, from_addr, amount)
+            new_transaction = Transaction('', '', to_addr, from_addr, amount, 1)
             new_transaction.update_signature(private_key)
             new_transaction.update_hash()
             transaction_msg = message.Message('transaction', new_transaction)
