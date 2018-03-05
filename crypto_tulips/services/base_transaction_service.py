@@ -169,6 +169,8 @@ class BaseTransactionService():
 
     @staticmethod
     def remove_from_mem_pool(obj):
+        print('remove')
+        print(json.dumps(obj.get_sendable()))
         r = BaseTransactionService._connect()
         pipe = r.pipeline()
 

@@ -19,6 +19,14 @@ class BlockService():
         pass
 
     @staticmethod
+    def get_max_height():
+        """
+        Method Comment
+        """
+        block_service_dal = BlockServiceDal()
+        return block_service_dal.get_max_block_height()
+
+    @staticmethod
     def verfiy_rsa(block):
         """
         Method Comment
@@ -35,3 +43,4 @@ class BlockService():
         todo check blockchain for each validation
         """
         pass
+    

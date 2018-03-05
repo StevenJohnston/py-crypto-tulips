@@ -12,6 +12,9 @@ from crypto_tulips.p2p.message import Message
 from crypto_tulips.services.transaction_service import TransactionService
 from crypto_tulips.services.block_service import BlockService
 
+
+from crypto_tulips.services.base_transaction_service import BaseTransactionService
+
 denys_private_key = """-----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEAzjo14F/L8Yu009jtTR4BYi28UCoBTA/zOoweOI9vK3BBB4lw
 7eDywVuZuTesUHKC2Se3sqGjh6Oiju7xszoevR2zf1bpb0znT1HlYlCx+jVo/cBY
@@ -183,19 +186,23 @@ def run_miner(a_node):
     steven_pub = Hashing.get_public_key(steven_private_key)
     print('Creating new block')
     time_now = int(time.time())
+    height = int(BlockService.get_max_height()) + 1
     ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
-    block = Block('', '', steven_pub, 0, ten_transactions, [], [], time_now)
+    block = Block('', '', steven_pub, height, ten_transactions, [], [], time_now)
     block.update_signature(steven_private_key)
     block.update_hash()
     block_service.add_block_to_chain(block)
     # TODO Test if worked block was added. Might fail due to same hash
-    map(TransactionService.remove_from_mem_pool, ten_transactions)
+    print('sdf')
+    print(ten_transactions)
+    for trabs in ten_transactions:
+        BaseTransactionService.remove_from_mem_pool(trabs)
     print('Created Block hash: ' + block._hash)
 
     block_msg = message.Message('block', block)
     sendable_block = block_msg.to_json()
     block_json = json.dumps(sendable_block, sort_keys=True)
-    a_node.connection_manager.send_msg(msg=block_json)
+    #a_node.connection_manager.send_msg(msg=block_json)
     print('Broadcasting block')
 
 def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=2048, \
