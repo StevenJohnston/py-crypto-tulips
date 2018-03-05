@@ -1,6 +1,7 @@
 from crypto_tulips.services.genesis_block_service import GenesisBlockService
 from crypto_tulips.dal.objects.block import Block
 from crypto_tulips.hashing.crypt_hashing import Hashing
+from crypto_tulips.dal.objects.transaction import Transaction
 import pytest
 import json
 
@@ -35,9 +36,9 @@ wPhY4P/Zsoe8tswOJyFbSBRNmXCPZ7UBOZcn9jVhg5SQBFIW7Q==
 def test_generate_from_priv():
     block = GenesisBlockService.generate_from_priv(_priv)
 
-    expected = {  
-        "pos_transactions":[  
-            {  
+    expected = {
+        "pos_transactions":[
+            {
                 "amount":100,
                 "_hash":"2ca410f9e510fe13407c39a3e5c47083a46a2cb03ee1280a75b2bf4268035a22",
                 "timestamp":1520135639.4713802,
@@ -47,13 +48,13 @@ def test_generate_from_priv():
         ],
         "timestamp":1520135639,
         "signature":"Ggwyy98QpexFpfwhXGaV+bY+49sIptebTt+gWDKvOa5V2x7gBmVy8n/yTcX9BAtvwwcBKVK0GFVp2eXxdPqYeg5nCg2DJd86D/Q+jaFPjLtsWw56N4lZQKKygOKXanexDmFdc90oIZjakt90039qC0S+7pWfT0jaGtUVzF4zuf2PPRyXDCkHv9VqORAMGELAgTHaU+y4pJY47MPuyPxy1/4VmwQJYtazBoOdZhkAhRig1jgwzXA0B//byvWrW2gI1KJsEMEMui1Td2Fo/irw+fTvvMW1T3iJzN3n4GG0qbqAFtkOAfp/Ffk4mWO/PsDY3LcchLem/kIUNqV9tr57LQ==",
-        "contract_transactions":[  
+        "contract_transactions":[
 
         ],
         "height":0,
         "_hash":"b663cd85dab5964be29084d7fbc9b7f40b597c3b0d3d77e7d0c394e3a7c6e174",
-        "transactions":[  
-            {  
+        "transactions":[
+            {
                 "amount":1.0,
                 "to_addr":"-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----",
                 "signature":"JLhYlCLqb1hhKamCbKWfGh4Ja6eqYYCzXEUKu0uIxj5y/uyZzfu6VSexLBukUAn9+/7qvRqRmTFIWWB1qhQ4vo8tkPpGGR7TcUMi55fgZeRccBndYjso/5ZWOwdiymSkXCbeW7VppzUbLwSrm9rIDFz52p2v7xZIJcY4UruJFlNPEpbkG0tOZRnFXmice/qu8hZJ4l/l55B834jM8DxeI4sI0myk5CXJOiy6vvupjQS8HAcbpFsKnhKKF/xXIYYSGUU123Mty2u5bjhKjpTVBVL53b4WV1fBDVOfg5mMlI+PY4AssUkYBIirrxeBVuXwl+DHwwc4ZHfXKTUH9G5h0Q==",
@@ -61,7 +62,7 @@ def test_generate_from_priv():
                 "timestamp":1520135639,
                 "from_addr":""
             },
-            {  
+            {
                 "amount":10.0,
                 "to_addr":"-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----",
                 "signature":"UG6PAQhWjOSfTIo6g8EAe4fdyh1EcqPTx+1YaOE02+AABrmph4lhnIjL+RYEl6dF8mUZPs8ekV6dx/uVP58KnelYrciukZ6HKnd4k+jOF0K5Le3UlObADs7WJ5N4QzJaPOEvp5VMNOYF0YR/5QU7dxDVoTAdPGaooiYt8YemLl4qEmNTpOznLMZsal3PMiorp/H82JrQN2c2yAvWFXDFs9hyDL1I9Ul4iMtmjT2y9TpGF2MXF+JDwurqLS+2su3L8gx5scbe+TyrdpggeigVw173qgsoEbQkzxdZUGw6Fl6Ek2drCh1oDC7KKX6APmsOnCF+5y2x7rXYzTgca84y3g==",
@@ -69,7 +70,7 @@ def test_generate_from_priv():
                 "timestamp":1520135639,
                 "from_addr":""
             },
-            {  
+            {
                 "amount":100.0,
                 "to_addr":"-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----",
                 "signature":"FHXNlrfLsNznUZ1xc6gwgCXVaHZ2Ja0299UX6iDxpkO9ZXKkMvJ2Yl3qmW2MO2U9DzDrM/gohQZ2hCWEPTPEWFFS7pNO3t9PBOCWLusSwD/FBoJDAh3qhcSkQuvD+He8zUOp+7tb6839qqrecgWQ4pPnG5diFt2HfdM6kTUO/VnEcgbcGbHeAiOkjVbhAXnKzQSR/V6rQCQxNaEBSoLbq15LuMiVRMEj6xV97aFAno1gPI2yWehfyg+yUmgcojyLPMxlOVS0wI9SWMip8S9smIEijIjePdmKTT+Dqa1lspHIV9GTJGLd1qfamKPZG3rvsvbXP+k+0Chon0jxsvl9zA==",
@@ -77,7 +78,7 @@ def test_generate_from_priv():
                 "timestamp":1520135639,
                 "from_addr":""
             },
-            {  
+            {
                 "amount":1000.0,
                 "to_addr":"-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----",
                 "signature":"WXMkix4a6MkAEIzT+RVCu6SAXm5Rt0nPe5jqvHVGvMD5z2p4JX0RglrfRhYgRlCZfsG/VeFKZXQ5xOq4JYoHsSDN6HGFS0P3NDkGzlZy+CzBP1gelrqR/s94/vi0uXKFQqgxj1zZWE8ScHPjtFzv9dIgrnuO6eUUjCLl2sp9iPCn6scqDGss8/Oi/nu8FFa02y5QWWC0bdjuzDSfNrSSFAnSqxWZqhCQlxFxvHW9GJxt9ErcqrEMSrw19HNGsQf2ANIfCs6dQXl/00AAp897fwoCl5y2O85zD5bRFT8Hp7lwLvSAqVwkWa8I+QZZEZRTv3aUTUnAFXiYo/fffrjCqQ==",
@@ -93,9 +94,9 @@ def test_generate_from_priv():
 
 def test_validate_rsa_block():
 
-    genesis_block = {  
-        "pos_transactions":[  
-            {  
+    genesis_block = {
+        "pos_transactions":[
+            {
                 "amount":100,
                 "_hash":"2ca410f9e510fe13407c39a3e5c47083a46a2cb03ee1280a75b2bf4268035a22",
                 "timestamp":1520135639.4713802,
@@ -105,13 +106,13 @@ def test_validate_rsa_block():
         ],
         "timestamp":1520135639,
         "signature":"Ggwyy98QpexFpfwhXGaV+bY+49sIptebTt+gWDKvOa5V2x7gBmVy8n/yTcX9BAtvwwcBKVK0GFVp2eXxdPqYeg5nCg2DJd86D/Q+jaFPjLtsWw56N4lZQKKygOKXanexDmFdc90oIZjakt90039qC0S+7pWfT0jaGtUVzF4zuf2PPRyXDCkHv9VqORAMGELAgTHaU+y4pJY47MPuyPxy1/4VmwQJYtazBoOdZhkAhRig1jgwzXA0B//byvWrW2gI1KJsEMEMui1Td2Fo/irw+fTvvMW1T3iJzN3n4GG0qbqAFtkOAfp/Ffk4mWO/PsDY3LcchLem/kIUNqV9tr57LQ==",
-        "contract_transactions":[  
+        "contract_transactions":[
 
         ],
         "height":0,
         "_hash":"b663cd85dab5964be29084d7fbc9b7f40b597c3b0d3d77e7d0c394e3a7c6e174",
-        "transactions":[  
-            {  
+        "transactions":[
+            {
                 "amount":1.0,
                 "to_addr":"-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----",
                 "signature":"JLhYlCLqb1hhKamCbKWfGh4Ja6eqYYCzXEUKu0uIxj5y/uyZzfu6VSexLBukUAn9+/7qvRqRmTFIWWB1qhQ4vo8tkPpGGR7TcUMi55fgZeRccBndYjso/5ZWOwdiymSkXCbeW7VppzUbLwSrm9rIDFz52p2v7xZIJcY4UruJFlNPEpbkG0tOZRnFXmice/qu8hZJ4l/l55B834jM8DxeI4sI0myk5CXJOiy6vvupjQS8HAcbpFsKnhKKF/xXIYYSGUU123Mty2u5bjhKjpTVBVL53b4WV1fBDVOfg5mMlI+PY4AssUkYBIirrxeBVuXwl+DHwwc4ZHfXKTUH9G5h0Q==",
@@ -119,7 +120,7 @@ def test_validate_rsa_block():
                 "timestamp":1520135639,
                 "from_addr":""
             },
-            {  
+            {
                 "amount":10.0,
                 "to_addr":"-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----",
                 "signature":"UG6PAQhWjOSfTIo6g8EAe4fdyh1EcqPTx+1YaOE02+AABrmph4lhnIjL+RYEl6dF8mUZPs8ekV6dx/uVP58KnelYrciukZ6HKnd4k+jOF0K5Le3UlObADs7WJ5N4QzJaPOEvp5VMNOYF0YR/5QU7dxDVoTAdPGaooiYt8YemLl4qEmNTpOznLMZsal3PMiorp/H82JrQN2c2yAvWFXDFs9hyDL1I9Ul4iMtmjT2y9TpGF2MXF+JDwurqLS+2su3L8gx5scbe+TyrdpggeigVw173qgsoEbQkzxdZUGw6Fl6Ek2drCh1oDC7KKX6APmsOnCF+5y2x7rXYzTgca84y3g==",
@@ -127,7 +128,7 @@ def test_validate_rsa_block():
                 "timestamp":1520135639,
                 "from_addr":""
             },
-            {  
+            {
                 "amount":100.0,
                 "to_addr":"-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----",
                 "signature":"FHXNlrfLsNznUZ1xc6gwgCXVaHZ2Ja0299UX6iDxpkO9ZXKkMvJ2Yl3qmW2MO2U9DzDrM/gohQZ2hCWEPTPEWFFS7pNO3t9PBOCWLusSwD/FBoJDAh3qhcSkQuvD+He8zUOp+7tb6839qqrecgWQ4pPnG5diFt2HfdM6kTUO/VnEcgbcGbHeAiOkjVbhAXnKzQSR/V6rQCQxNaEBSoLbq15LuMiVRMEj6xV97aFAno1gPI2yWehfyg+yUmgcojyLPMxlOVS0wI9SWMip8S9smIEijIjePdmKTT+Dqa1lspHIV9GTJGLd1qfamKPZG3rvsvbXP+k+0Chon0jxsvl9zA==",
@@ -135,7 +136,7 @@ def test_validate_rsa_block():
                 "timestamp":1520135639,
                 "from_addr":""
             },
-            {  
+            {
                 "amount":1000.0,
                 "to_addr":"-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----",
                 "signature":"WXMkix4a6MkAEIzT+RVCu6SAXm5Rt0nPe5jqvHVGvMD5z2p4JX0RglrfRhYgRlCZfsG/VeFKZXQ5xOq4JYoHsSDN6HGFS0P3NDkGzlZy+CzBP1gelrqR/s94/vi0uXKFQqgxj1zZWE8ScHPjtFzv9dIgrnuO6eUUjCLl2sp9iPCn6scqDGss8/Oi/nu8FFa02y5QWWC0bdjuzDSfNrSSFAnSqxWZqhCQlxFxvHW9GJxt9ErcqrEMSrw19HNGsQf2ANIfCs6dQXl/00AAp897fwoCl5y2O85zD5bRFT8Hp7lwLvSAqVwkWa8I+QZZEZRTv3aUTUnAFXiYo/fffrjCqQ==",
@@ -150,5 +151,22 @@ def test_validate_rsa_block():
     block_signable = block.get_signable()
     block_signature_bytes = Hashing.reverse_str_signature_of_data(block.signature)
     actual = Hashing.validate_signature(block_signable, block.owner, block_signature_bytes)
+    expected = True
+    assert actual == expected
+
+def test_transaction():
+    firstTransaction = {
+        "amount":1.0,
+        "to_addr":"-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----",
+        "signature":"JLhYlCLqb1hhKamCbKWfGh4Ja6eqYYCzXEUKu0uIxj5y/uyZzfu6VSexLBukUAn9+/7qvRqRmTFIWWB1qhQ4vo8tkPpGGR7TcUMi55fgZeRccBndYjso/5ZWOwdiymSkXCbeW7VppzUbLwSrm9rIDFz52p2v7xZIJcY4UruJFlNPEpbkG0tOZRnFXmice/qu8hZJ4l/l55B834jM8DxeI4sI0myk5CXJOiy6vvupjQS8HAcbpFsKnhKKF/xXIYYSGUU123Mty2u5bjhKjpTVBVL53b4WV1fBDVOfg5mMlI+PY4AssUkYBIirrxeBVuXwl+DHwwc4ZHfXKTUH9G5h0Q==",
+        "_hash":"5719d7850b6128e5cc783087f48390d86993eda2acaa6905098597e3272a6884",
+        "timestamp":1520135639,
+        "from_addr":""
+    }
+
+    trans = Transaction.from_dict(firstTransaction)
+    trans_signable = trans.get_signable()
+    block_signature_bytes = Hashing.reverse_str_signature_of_data(trans.signature)
+    actual = Hashing.validate_signature(trans_signable, trans.to_addr, block_signature_bytes)
     expected = True
     assert actual == expected
