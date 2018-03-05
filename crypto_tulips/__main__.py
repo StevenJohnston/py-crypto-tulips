@@ -193,8 +193,6 @@ def run_miner(a_node):
     block.update_hash()
     block_service.add_block_to_chain(block)
     # TODO Test if worked block was added. Might fail due to same hash
-    print('sdf')
-    print(ten_transactions)
     for trabs in ten_transactions:
         BaseTransactionService.remove_from_mem_pool(trabs)
     print('Created Block hash: ' + block._hash)
@@ -202,7 +200,8 @@ def run_miner(a_node):
     block_msg = message.Message('block', block)
     sendable_block = block_msg.to_json()
     block_json = json.dumps(sendable_block, sort_keys=True)
-    #a_node.connection_manager.send_msg(msg=block_json)
+    print(block_json)
+    a_node.connection_manager.send_msg(msg=block_json)
     print('Broadcasting block')
 
 def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=2048, \
