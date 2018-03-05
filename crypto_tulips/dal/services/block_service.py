@@ -11,6 +11,7 @@ class BlockService:
     _port = ''
 
     key_suffix = 'block:'
+    max_block_height = 'max_block_height'
 
     def __init__(self):
         settings = json.load(open('crypto_tulips/config/db_settings.json'))
@@ -63,6 +64,10 @@ class BlockService:
                 pipe.rpush(name, contract_transaction._hash)
                 rs.store_object(contract_transaction, r, pipe)
 
+            pipe.zadd('blocks', block.height, block._hash)
+
+            # TODO max block height will not always be this, will change
+            pipe.set(self.max_block_height, block.height)
             return pipe.execute()
         else:
             print("Block with hash: " + block._hash + " already exists. Unable to update.")
@@ -86,7 +91,6 @@ class BlockService:
 
         # get all of the fields in the list
         hashes = r.lrange(name, 0, -1)
-
 
         # timestamp will always be first
         height = hashes[0]
@@ -148,6 +152,10 @@ class BlockService:
         # create block object and return it
         block = Block(block_hash, signature, owner, height, transactions, pos_transactions, contract_transactions, timestamp)
         return block
+
+    def get_max_block_height(self):
+        r = self._connect()
+        return r.get(self.max_block_height)
 
     def _connect(self):
         # charset and decode_responses will need to be removed if we want this to be actually stored

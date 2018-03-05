@@ -168,6 +168,25 @@ class BaseTransactionService():
         return transactions
 
     @staticmethod
+    def remove_from_mem_pool(obj):
+        r = BaseTransactionService._connect()
+        pipe = r.pipeline()
+
+        # change is_mempool to 0
+        name = obj._to_index()[-1] + ':' + obj._hash
+        pipe.hset(name, 'is_mempool', 0)
+
+        # remove from list of mempool objects
+        set_name = obj._to_index()[-1] + ":is_mempool:1"
+        pipe.srem(set_name, name)
+
+        # add to list of not-mempool objects
+        new_set_name = obj._to_index()[-1] + ":is_mempool:0"
+        pipe.sadd(new_set_name, name)
+
+        res = pipe.execute()
+
+    @staticmethod
     def _connect():
         """
         Connect to the redis instance.
