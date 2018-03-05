@@ -30,7 +30,7 @@ class Block(Hashable, Sendable, Signable):
 
     @staticmethod
     def from_dict(dict_values):
-        block_hash = dict_values.get('block_hash')
+        block_hash = dict_values.get('_hash')
         signature = dict_values.get('signature')
         owner = dict_values.get('owner')
         height = dict_values.get('height')

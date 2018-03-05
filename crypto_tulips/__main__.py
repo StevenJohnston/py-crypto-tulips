@@ -177,8 +177,7 @@ def regular_node_callback(data):
         rs.store_object(new_transaction)
     elif new_msg.action == 'block':
         block_service = BlockService()
-        new_msg.data = Block.from_dict(new_msg.data)
-        new_block = new_msg.data
+        new_block = Block.from_dict(new_msg.data)
         block_service.add_block_to_chain(new_block)
         print(new_block._hash)
 
