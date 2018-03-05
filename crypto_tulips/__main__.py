@@ -1,10 +1,15 @@
 import sys
 import json
+import time
 from .dal.services import redis_service
 from .node import bootstrap, node
 from .p2p import message
 from .hashing.crypt_hashing import Hashing
 from crypto_tulips.dal.objects.transaction import Transaction
+from crypto_tulips.dal.objects.block import Block
+
+from crypto_tulips.services.transaction_service import TransactionService
+from crypto_tulips.services.block_service import BlockService
 
 denys_private_key = """-----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEAzjo14F/L8Yu009jtTR4BYi28UCoBTA/zOoweOI9vK3BBB4lw
@@ -168,7 +173,18 @@ def regular_node_callback(data):
         rs.store_object(new_transaction)
 
 def run_miner():
-    pass
+    block_service = BlockService()
+    steven_pub = Hashing.get_public_key(steven_private_key)
+    print('Creating new block')
+    time_now = int(time.time())
+    ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
+    block = Block('', '', steven_pub, 0, ten_transactions, [], [], time_now)
+    block.update_signature(steven_private_key)
+    block.update_hash()
+    block_service.add_block_to_chain(block)
+    # TODO Test if worked block was added. Might fail due to same hash
+    map(TransactionService.remove_from_mem_pool, ten_transactions)
+    print('Created Block hash: ' + block._hash)
 
 def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=2048, \
         socket_timeout=1):
