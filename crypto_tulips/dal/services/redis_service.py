@@ -74,7 +74,7 @@ class RedisService:
                 # if we want the field to be indexed:
                 if (k != self._hash) and (obj._to_index().__contains__(k)):
                     # index the field as 'prefix:field_name:field_value', and the transaction key
-                    pipe.sadd(prefix + ":" + k + ":" + v, name)
+                    pipe.sadd(prefix + ":" + k + ":" + str(v), name)
         return pipe.execute()
 
     def _get_attributes(self, obj):

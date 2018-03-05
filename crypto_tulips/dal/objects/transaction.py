@@ -8,8 +8,8 @@ from crypto_tulips.dal.objects.base_transaction import BaseTransaction
 
 class Transaction(BaseTransaction):
 
-    def __init__(self, transaction_hash, signature, to_addr, from_addr, amount, timestamp = time.time()):
-        BaseTransaction.__init__(self, transaction_hash, signature, to_addr, from_addr, amount, timestamp)
+    def __init__(self, transaction_hash, signature, to_addr, from_addr, amount, is_mempool, timestamp = time.time()):
+        BaseTransaction.__init__(self, transaction_hash, signature, to_addr, from_addr, amount, is_mempool, timestamp)
 
     @staticmethod
     def from_dict(dict_values):
@@ -17,13 +17,15 @@ class Transaction(BaseTransaction):
         to_addr = dict_values.get('to_addr')
         from_addr = dict_values.get('from_addr')
         amount = dict_values.get('amount')
-        timestamp = dict_values.get('timestamp')
+        timestamp = int(dict_values.get('timestamp'))
         signature = dict_values.get('signature')
-        new_transaction = Transaction(transaction_hash, signature, to_addr, from_addr, amount, timestamp)
+        is_mempool = dict_values.get('is_mempool')
+        new_transaction = Transaction(transaction_hash, signature, to_addr, from_addr, amount, is_mempool, timestamp)
         return new_transaction
 
     @staticmethod
     def _to_index():
-        fields = super(Transaction, Transaction)._to_index()
-        fields.append('transaction')
-        return fields
+        index = super(Transaction, Transaction)._to_index()
+        index.append('to_addr')
+        index.append('transaction')
+        return index
