@@ -207,14 +207,32 @@ a_node = None
 
 def wallet_callback(wallet_sock):
         print("Enter The Wallet Callback")
+        pending = []
+        transaction = []
         data = a_node.connection_manager.server.recv_msg(client_socket=wallet_sock)
         json_dic = json.loads(data)
         new_msg = message.Message.from_dict(json_dic)
         if new_msg.action == 'tx_by_public_key':
-            user_trans_history, user_balance = BaseTransactionService.get_transactions_by_public_key(new_msg.data, False)
-            print(user_balance)
-        a_node.connection_manager.server.send_msg(data="Response from Node", client_socket=wallet_sock)
-        a_node.connection_manager.server.close_client(client_socket=wallet_sock)
+            user_trans_history, user_balance = TransactionService.get_transactions_by_public_key(new_msg.data, True)
+            for trans in user_trans_history:
+                if(trans.is_mempool == 1):
+                    pending.append(trans.get_sendable())
+                else:
+                    transaction.append(trans.get_sendable())
+            user_info = {
+                "pending" : pending,
+                "transaction": transaction,
+                "amount": user_balance
+            }
+            string_json_user_info = json.dumps(user_info)
+            a_node.connection_manager.server.send_msg(data=string_json_user_info, client_socket=wallet_sock)
+            a_node.connection_manager.server.close_client(client_socket=wallet_sock)
+        elif new_msg.action == 'tx':
+            pass
+        else:
+            pass
+
+
 
 def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=20000, \
         socket_timeout=1):
