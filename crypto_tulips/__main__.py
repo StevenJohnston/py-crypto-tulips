@@ -207,16 +207,12 @@ a_node = None
 
 def wallet_callback(wallet_sock):
         print("Enter The Wallet Callback")
-<<<<<<< HEAD
         pending = []
         transaction = []
-=======
->>>>>>> f9a696c5af1fcf1875f78c2bea7c0546e925b49e
         data = a_node.connection_manager.server.recv_msg(client_socket=wallet_sock)
         json_dic = json.loads(data)
         new_msg = message.Message.from_dict(json_dic)
         if new_msg.action == 'tx_by_public_key':
-<<<<<<< HEAD
             user_trans_history, user_balance = TransactionService.get_transactions_by_public_key(new_msg.data, True)
             for trans in user_trans_history:
                 if(trans.is_mempool == 1):
@@ -239,14 +235,6 @@ def wallet_callback(wallet_sock):
 
 
 def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=20000, \
-=======
-            user_trans_history, user_balance = BaseTransactionService.get_transactions_by_public_key(new_msg.data, False)
-            print(user_balance)
-        a_node.connection_manager.server.send_msg(data="Response from Node", client_socket=wallet_sock)
-        a_node.connection_manager.server.close_client(client_socket=wallet_sock)
-
-def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=2048, \
->>>>>>> f9a696c5af1fcf1875f78c2bea7c0546e925b49e
         socket_timeout=1):
     print('\t\tStarting as a regular node')
     global a_node
