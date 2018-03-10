@@ -207,6 +207,12 @@ a_node = None
 
 def wallet_callback(wallet_sock):
         print("Enter The Wallet Callback")
+        data = a_node.connection_manager.server.recv_msg(client_socket=wallet_sock)
+        json_dic = json.loads(data)
+        new_msg = message.Message.from_dict(json_dic)
+        if new_msg.action == 'tx_by_public_key':
+            user_trans_history, user_balance = BaseTransactionService.get_transactions_by_public_key(new_msg.data, False)
+            print(user_balance)
         a_node.connection_manager.server.send_msg(data="Response from Node", client_socket=wallet_sock)
         a_node.connection_manager.server.close_client(client_socket=wallet_sock)
 
