@@ -4,6 +4,7 @@ Module with node class and its functionality
 import socket
 import pickle
 from crypto_tulips.p2p import p2p_client, connection_manager
+from crypto_tulips.node.bootstrap import BootstrapNode
 
 class Node:
     """
@@ -14,7 +15,21 @@ class Node:
         self.port = my_port
         self.connection_manager = None
         self.host = None
+        self.bootstrap_node = None
+        self.bootstrap_node_running = False
         #print('Started a node')
+
+    def start_bootstrap(self, port=25252):
+        """
+        Start a bootstrap node together with a regular node
+
+        Arguments"
+        port=25252 -- port on which to run a bootstrap node
+        """
+        if not self.bootstrap_node_running:
+            self.bootstrap_node = BootstrapNode(port=port)
+            self.bootstrap_node.accept(True)
+            self.bootstrap_node_running = True
 
     def __del__(self):
         #print('Ended node')
@@ -30,7 +45,8 @@ class Node:
     def make_silent(self, silent):
         self.connection_manager.silent = silent
 
-    def join_network(self, bootstrap_host, bootstrap_port, peer_timeout=10, recv_data_size=1024, socket_timeout=10, read_callback=None, wallet_callback = None):
+    def join_network(self, bootstrap_host, bootstrap_port=25252, peer_timeout=10, recv_data_size=1024, \
+            socket_timeout=10, read_callback=None, wallet_callback=None, start_bootstrap=False):
         """
         Join the network and start communications
 
@@ -41,7 +57,11 @@ class Node:
         recv_data_size=1024 -- default read size
         socket_timeout=10 -- timeout on socket recv
         read_callback=None -- callback to which redirect recv msgs
+        wallet_callback=None -- callback to which redirect wallet connection
+        start_bootstrap=False -- do we need to start a bootstrap node
         """
+        if not self.bootstrap_node_running and start_bootstrap:
+            self.start_bootstrap()
         if read_callback is None:
             callback = Node.read_callback
         else:
@@ -96,3 +116,5 @@ class Node:
         Clean up and end node
         """
         self.connection_manager.close_all()
+        if self.bootstrap_node_running:
+            self.bootstrap_node.close()
