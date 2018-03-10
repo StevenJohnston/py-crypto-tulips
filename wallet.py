@@ -40,5 +40,8 @@ if __name__ == '__main__':
     transaction_json = transaction_msg.to_json(is_object=False)
     transaction_json = json.dumps(transaction_json, sort_keys=True)
     data = p2p.send_msg(transaction_json)
+<<<<<<< HEAD
     print(json.loads(data))
+=======
+>>>>>>> f9a696c5af1fcf1875f78c2bea7c0546e925b49e
     p2p.close_socket()
