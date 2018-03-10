@@ -111,7 +111,7 @@ class P2pServer:
             send_data = data.encode()
         else:
             send_data = data
-        socket_to_use.send(send_data)
+        socket_to_use.sendall(send_data)
 
     def recv_msg(self, client_pair=None, client_socket=None, decode=True):
         """
@@ -128,9 +128,21 @@ class P2pServer:
             socket_to_use = client_socket
         else:
             socket_to_use = client_pair.socket
-        data = socket_to_use.recv(self.data_size)
+        data = self.recv_all(socket_to_use, self.data_size)
         if decode:
             return data.decode('utf-8')
+        return data
+
+    def recv_all(self, sock, data_read_length):
+        """
+        Method for socket to read all data
+        """
+        data = b''
+        while True:
+            part = sock.recv(data_read_length)
+            data += part
+            if len(part) < data_read_length:
+                break
         return data
 
     def close_client(self, client_pair=None, client_socket=None):

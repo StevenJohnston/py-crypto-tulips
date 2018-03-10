@@ -216,7 +216,7 @@ def wallet_callback(wallet_sock):
         a_node.connection_manager.server.send_msg(data="Response from Node", client_socket=wallet_sock)
         a_node.connection_manager.server.close_client(client_socket=wallet_sock)
 
-def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=20000, \
+def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=2048, \
         socket_timeout=1):
     print('\t\tStarting as a regular node')
     global a_node
