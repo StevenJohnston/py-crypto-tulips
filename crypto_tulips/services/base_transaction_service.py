@@ -20,16 +20,17 @@ class BaseTransactionService():
     """
 
     @staticmethod
-    def _get_transactions_to_from_public_key(public_key, to_from, obj, redis_conn = None, pipe = None, rs = None):
+    def _get_transactions_to_from_public_key(public_key, to_from, include_mempool, obj, redis_conn = None, pipe = None, rs = None):
         """
         Get all transactions to or from a given public key
 
         Arguments:
-        public_key  -- string of the public key to query the blockchain with
-        to_from     -- RequestType enum: either TO or FROM (defaults as 'TO')
-        obj         -- either Transacion or MemTransaction class
-        redis_conn  -- redis connection if already established
-        pipe        -- pipeline if already established
+        public_key      -- string of the public key to query the blockchain with
+        to_from         -- RequestType enum: either TO or FROM (defaults as 'TO')
+        include_mempool -- True if want results in the mempool as well, False otherwise
+        obj             -- either Transacion or MemTransaction class
+        redis_conn      -- redis connection if already established
+        pipe            -- pipeline if already established
 
         Returns:
         list        -- list containing transactions to the given public key
@@ -48,6 +49,7 @@ class BaseTransactionService():
             direction = "to_addr"
 
         index_key = obj._to_index()[-1] + ":" + direction + public_key
+        mempool_set = obj._to_index()[-1] + ":is_mempool:1"
 
         if redis_conn == None:
             redis_conn = BaseTransactionService._connect()
@@ -58,8 +60,13 @@ class BaseTransactionService():
         # if pipe is not established already, pipe should be executed within this method
         if pipe == None:
             pipe = redis_conn.pipeline()
-            pipe.smembers(index_key)
-            # get all of the transactions that were sent TO the given public key
+            if include_mempool:
+                # get all of the transactions that were sent TO/FROM the given public key
+                pipe.smembers(index_key)
+            elif not include_mempool:
+                # get all of the transactions that were sent TO/FROM the given public key without transactions in the mempool
+                pipe.sdiff(index_key, mempool_set)
+
             results = pipe.execute()
             for transaction_hash in results[0]:
                 t = rs.get_object_by_full_key(transaction_hash, obj)
@@ -68,55 +75,63 @@ class BaseTransactionService():
 
         # otherwise, just queue the query and return the pipe
         else:
-            pipe.smembers(index_key)
+            if include_mempool:
+                # get all of the transactions that were sent TO/FROM the given public key
+                pipe.smembers(index_key)
+            elif not include_mempool:
+                # get all of the transactions that were sent TO/FROM the given public key without transactions in the mempool
+                pipe.sdiff(index_key, mempool_set)
             return pipe
 
     @staticmethod
-    def get_transactions_from_public_key(public_key, obj, redis_conn = None, pipe = None, rs = None):
+    def get_transactions_from_public_key(public_key, include_mempool, obj, redis_conn = None, pipe = None, rs = None):
         """
-        Get all transactions from a given public key
+        Get all transactions sent FROM a given public key
 
         Arguments:
-        public_key  -- string of the public key to query the blockchain with
-        obj         -- either a Transaction or a MemTransaction empty object (doesn't need to be instantiated)
-        redis_conn  -- redis connection if already established
-        pipe        -- pipeline if already established
-        rs          -- RedisService instance if established
+        public_key      -- string of the public key to query the blockchain with
+        include_mempool -- True if want results in the mempool as well, False otherwise
+        obj             -- either a Transaction or a MemTransaction empty object (doesn't need to be instantiated)
+        redis_conn      -- redis connection if already established
+        pipe            -- pipeline if already established
+        rs              -- RedisService instance if established
 
         Returns:
         list        -- list containing transactions from the given public key
             OR
         pipe        -- pipe with the query queued for continued use outside this method
         """
-        return BaseTransactionService._get_transactions_to_from_public_key(public_key, RequestType.FROM, obj, redis_conn, pipe, rs)
+        return BaseTransactionService._get_transactions_to_from_public_key(public_key, RequestType.FROM, include_mempool, obj, redis_conn, pipe, rs)
 
     @staticmethod
-    def get_transactions_to_public_key(public_key, obj, redis_conn = None, pipe = None, rs = None):
+    def get_transactions_to_public_key(public_key, include_mempool, obj, redis_conn = None, pipe = None, rs = None):
         """
-        Get all transactions to a given public key
+        Get all transactions sent TO a given public key
 
         Arguments:
-        public_key  -- string of the public key to query the blockchain with
-        obj         -- either a Transaction or a MemTransaction empty object (doesn't need to be instantiated)
-        redis_conn  -- redis connection if already established
-        pipe        -- pipeline if already established
-        rs          -- RedisService instance if established
+        public_key      -- string of the public key to query the blockchain with
+        include_mempool -- True if want results in the mempool as well, False otherwise
+        obj             -- either a Transaction or a MemTransaction empty object (doesn't need to be instantiated)
+        redis_conn      -- redis connection if already established
+        pipe            -- pipeline if already established
+        rs              -- RedisService instance if established
 
         Returns:
         list        -- list containing transactions to the given public key
             OR
         pipe        -- pipe with the query queued for continued use outside this method
         """
-        return BaseTransactionService._get_transactions_to_from_public_key(public_key, RequestType.TO, obj, redis_conn, pipe, rs)
+        return BaseTransactionService._get_transactions_to_from_public_key(public_key, RequestType.TO, include_mempool, obj, redis_conn, pipe, rs)
 
     @staticmethod
-    def get_transactions_by_public_key(public_key, obj):
+    def get_transactions_by_public_key(public_key, include_mempool, obj):
         """
         Get all transactions (to and from) a given public key
 
         Arguments:
-        public_key  -- string of the public key to query the blockchain with
-        obj         -- either a Transaction or a MemTransaction empty object (doesn't need to be instantiated)
+        public_key      -- string of the public key to query the blockchain with
+        include_mempool -- True if want results in the mempool as well, False otherwise
+        obj             -- either a Transaction or a MemTransaction empty object (doesn't need to be instantiated)
 
         Returns:
         list        -- list containing all transactions that a given public key was a part of
@@ -129,8 +144,8 @@ class BaseTransactionService():
         rs = RedisService()
 
         # get indexes for to_addr and from_addr
-        pipe = BaseTransactionService.get_transactions_to_public_key(public_key, obj, pipe = pipe, rs = rs)
-        pipe = BaseTransactionService.get_transactions_from_public_key(public_key, obj, pipe = pipe, rs = rs)
+        pipe = BaseTransactionService.get_transactions_to_public_key(public_key, include_mempool, obj, pipe = pipe, rs = rs)
+        pipe = BaseTransactionService.get_transactions_from_public_key(public_key, include_mempool, obj, pipe = pipe, rs = rs)
         results = pipe.execute()
 
         transactions = list()
