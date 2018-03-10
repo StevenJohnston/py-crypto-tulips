@@ -203,16 +203,24 @@ def run_miner(a_node):
     a_node.connection_manager.send_msg(msg=block_json)
     print('Broadcasting block')
 
+a_node = None
+
+def wallet_callback(wallet_sock):
+        print("Enter The Wallet Callback")
+        a_node.connection_manager.server.send_msg(data="Response from Node", client_socket=wallet_sock)
+        a_node.connection_manager.server.close_client(client_socket=wallet_sock)
+
 def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=20000, \
         socket_timeout=1):
     print('\t\tStarting as a regular node')
+    global a_node
     a_node = node.Node(node_port)
     a_node.join_network(bootstrap_host, bootstrap_port, peer_timeout=peer_timeout, recv_data_size=recv_data_size, \
-            socket_timeout=socket_timeout, read_callback=regular_node_callback)
+            socket_timeout=socket_timeout, read_callback=regular_node_callback, wallet_callback=wallet_callback)
     a_node.make_silent(True)
     while True:
         user_input = input('\t\t\tEnter a command: ')
-        if user_input == 'quit':
+        if user_input == 'quit' or user_input == 'q':
             break
         elif user_input == 'msg':
             msg_input = input('\t\t\tEnter a msg to send: ')

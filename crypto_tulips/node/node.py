@@ -30,7 +30,7 @@ class Node:
     def make_silent(self, silent):
         self.connection_manager.silent = silent
 
-    def join_network(self, bootstrap_host, bootstrap_port, peer_timeout=10, recv_data_size=1024, socket_timeout=10, read_callback=None):
+    def join_network(self, bootstrap_host, bootstrap_port, peer_timeout=10, recv_data_size=1024, socket_timeout=10, read_callback=None, wallet_callback = None):
         """
         Join the network and start communications
 
@@ -49,7 +49,7 @@ class Node:
         known_peers = self.connect_to_bootstrap(host=bootstrap_host, port=bootstrap_port)
         self.connection_manager = connection_manager.ConnectionManager(server_port=self.port, \
                 peer_timeout=peer_timeout, recv_data_size=recv_data_size, socket_timeout=socket_timeout)
-        self.connection_manager.accept_connection(read_callback=callback, run_as_a_thread=True)
+        self.connection_manager.accept_connection(read_callback=callback, run_as_a_thread=True, wallet_callback=wallet_callback)
         for peer in known_peers:
             self.peer_connection(peer, read_callback=read_callback)
 
