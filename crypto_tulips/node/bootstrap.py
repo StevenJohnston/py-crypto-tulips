@@ -11,7 +11,7 @@ class BootstrapNode:
     Class to work as a bootstrap node and be an entry point to the network
     """
 
-    def __init__(self, port, data_size=1024, host='0.0.0.0'):
+    def __init__(self, port, data_size=1024, host='0.0.0.0', silent=True):
         self.data_size = data_size
         self.port = port
         self.server = p2p_server.P2pServer(port=port, data_size=data_size, host=host)
@@ -20,7 +20,18 @@ class BootstrapNode:
         self.run = True
         self.accepting_thread_running = False
         self.unblocking_msg = '\x05'
-        print('Created BootstrapNode')
+        self.silent = silent
+        self.print_check('Created BootstrapNode')
+
+    def print_check(self, msg):
+        """
+        Print a given msg if not silent mode
+
+        Arguments:
+        msg -- msg to print
+        """
+        if not self.silent:
+            print(msg)
 
     def close(self):
         """
@@ -31,12 +42,12 @@ class BootstrapNode:
             self.unblock_accept()
         for a_thread in self.thread_list:
             a_thread.join()
-        print('All threads are joined')
+        self.print_check('All threads are joined')
         self.server.close_socket()
 
     def __del__(self):
-        print('Length of peer list is {}'.format(len(self.peer_list)))
-        print('BootstrapNode ended')
+        self.print_check('Length of peer list is {}'.format(len(self.peer_list)))
+        self.print_check('BootstrapNode ended')
 
     def accept(self, run_as_a_thread=False):
         """
@@ -58,10 +69,10 @@ class BootstrapNode:
         """
         Thread method that accepst nodes until boostrap node is closed
         """
-        print('Started accepting thread')
+        self.print_check('Started accepting thread')
         while self.run:
             self.accept_one()
-        print('Ended accepting thread')
+        self.print_check('Ended accepting thread')
 
     def accept_one(self):
         """
@@ -94,7 +105,7 @@ class BootstrapNode:
         """
         connection_info = self.server.recv_msg(client_pair=client_pair)
         if ':' not in connection_info:
-            print('Ignoring connection, did not provide correct first msg format')
+            self.print_check('Ignoring connection, did not provide correct first msg format')
             return
         # incomming msg should be in the format '127.0.0.1:25255'
         ip_addr, port = connection_info.split(':')

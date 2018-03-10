@@ -1,6 +1,8 @@
 import sys
 import json
 import time
+import threading
+import socket
 from .dal.services import redis_service
 from .node import bootstrap, node
 from .p2p import message
@@ -156,35 +158,25 @@ CpjNK8bI1U/5SIte6XlQt7blePAEF7KTm2YqkJT+IM3wZxPwP4U=
 -----END RSA PRIVATE KEY-----"""
 
 
-def start_as_a_bootstrap(bootstrap_port):
-    print('\t\tStarting as a bootstrap node at port {}'.format(bootstrap_port))
-    bootstrap_node = bootstrap.BootstrapNode(port=bootstrap_port)
-    bootstrap_node.accept(True)
-    while True:
-        user_input = input('\t\t\tEnter a command: ')
-        if user_input == 'quit':
-            break
-    bootstrap_node.close()
-
 def regular_node_callback(data):
     json_dic = json.loads(data)
     new_msg = message.Message.from_dict(json_dic)
     if new_msg.action == 'transaction':
         new_msg.data = Transaction.from_dict(new_msg.data)
         new_transaction = new_msg.data
-        print('Transaction : {}'.format(new_transaction._hash))
+        print('\nTransaction : {}'.format(new_transaction._hash))
         rs = redis_service.RedisService()
         rs.store_object(new_transaction)
     elif new_msg.action == 'block':
         block_service = BlockService()
         new_block = Block.from_dict(new_msg.data)
         block_service.add_block_to_chain(new_block)
-        print('Block : {}'.format(new_block._hash))
+        print('\nBlock : {}'.format(new_block._hash))
 
 def run_miner(a_node):
     block_service = BlockService()
     steven_pub = Hashing.get_public_key(steven_private_key)
-    print('Creating new block')
+    #print('Creating new block')
     time_now = int(time.time())
     height = int(BlockService.get_max_height()) + 1
     ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
@@ -195,13 +187,12 @@ def run_miner(a_node):
     # TODO Test if worked block was added. Might fail due to same hash
     for trabs in ten_transactions:
         BaseTransactionService.remove_from_mem_pool(trabs)
-    print('Created Block hash: ' + block._hash)
-
+    print('\nCreated Block hash: ' + block._hash)
     block_msg = message.Message('block', block)
     sendable_block = block_msg.to_json()
     block_json = json.dumps(sendable_block, sort_keys=True)
     a_node.connection_manager.send_msg(msg=block_json)
-    print('Broadcasting block')
+    #print('Broadcasting block')
 
 a_node = None
 
@@ -233,51 +224,46 @@ def wallet_callback(wallet_sock):
         else:
             pass
 
-
-
-def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=20000, \
+def start_as_regular(bootstrap_host, node_port, peer_timeout=0, recv_data_size=20000, \
         socket_timeout=1):
     print('\t\tStarting as a regular node')
     global a_node
     a_node = node.Node(node_port)
-    a_node.join_network(bootstrap_host, bootstrap_port, peer_timeout=peer_timeout, recv_data_size=recv_data_size, \
-            socket_timeout=socket_timeout, read_callback=regular_node_callback, wallet_callback=wallet_callback)
+    a_node.join_network(bootstrap_host, peer_timeout=peer_timeout, recv_data_size=recv_data_size, \
+            socket_timeout=socket_timeout, read_callback=regular_node_callback, wallet_callback=wallet_callback, \
+            start_bootstrap=True)
     a_node.make_silent(True)
     while True:
         user_input = input('\t\t\tEnter a command: ')
         if user_input == 'quit' or user_input == 'q':
             break
-        elif user_input == 'msg':
-            msg_input = input('\t\t\tEnter a msg to send: ')
-            if msg_input != '':
-                a_node.connection_manager.send_msg(msg=msg_input)
-        elif user_input == 'miner':
+        elif user_input == 'miner' or user_input == 'm':
             run_miner(a_node)
-        elif user_input == 'trans' or user_input == 'transaction':
-            secret = input('\t\t\tSecret : ')
-            if secret == 'denys':
+        elif user_input == 'trans' or user_input == 'transaction' or user_input == 't':
+            secret = input('\t\t\tFrom : ')
+            if secret == 'denys' or secret == 'd':
                 private_key = denys_private_key
-            elif secret == 'william':
+            elif secret == 'william' or secret == 'will' or secret == 'w':
                 private_key = william_private_key
-            elif secret == 'matt':
+            elif secret == 'matt' or secret == 'm':
                 private_key = matt_private_key
-            elif secret == 'steven':
+            elif secret == 'steven' or secret == 's':
                 private_key = steven_private_key
-            elif secret == 'naween':
+            elif secret == 'naween' or secret == 'n':
                 private_key = naween_private_key
             else:
                 continue
             public_key = Hashing.get_public_key(private_key)
             to_addr = input('\t\t\tTo addr: ')
-            if to_addr == 'denys':
+            if to_addr == 'denys' or to_addr == 'd':
                 to_addr = Hashing.get_public_key(denys_private_key)
-            elif to_addr == 'william':
+            elif to_addr == 'william' or to_addr == 'w' or to_addr == 'will':
                 to_addr = Hashing.get_public_key(william_private_key)
-            elif to_addr == 'matt':
+            elif to_addr == 'matt' or to_addr == 'm':
                 to_addr = Hashing.get_public_key(matt_private_key)
-            elif to_addr == 'steven':
+            elif to_addr == 'steven' or to_addr == 's':
                 to_addr = Hashing.get_public_key(steven_private_key)
-            elif to_addr == 'naween':
+            elif to_addr == 'naween' or to_addr == 'n':
                 to_addr = Hashing.get_public_key(naween_private_key)
             else:
                 continue
@@ -290,7 +276,7 @@ def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, 
             transaction_json = transaction_msg.to_json()
             transaction_json = json.dumps(transaction_json, sort_keys=True)
             a_node.connection_manager.send_msg(msg=transaction_json)
-            print('Transaction hash : {}'.format(new_transaction._hash))
+            print('\nTransaction hash : {}'.format(new_transaction._hash))
             rs = redis_service.RedisService()
             rs.store_object(new_transaction)
     a_node.close()
@@ -300,23 +286,16 @@ if __name__ == '__main__':
     print('\tCommand line arguments are {}'.format(arguments))
     if arguments:
         print('\tGot arguments')
-        if arguments[0] == 'bootstrap':
-            port = int(arguments[1])
-            start_as_a_bootstrap(port)
-        elif arguments[0] == 'regular':
-            port = int(arguments[1])
-            host = arguments[2]
-            port_node = int(arguments[3])
-            start_as_regular(port, host, port_node)
+        port_node = int(arguments[0])
+        if len(arguments) == 1:
+            host = socket.gethostbyname(socket.getfqdn())
+        else:
+            host = arguments[1]
+        start_as_regular(host, port_node)
     else:
         print('Arguments:')
-        print('\tbootstrap -- bootstrap mode')
-        print('\t\t#### -- port on which run')
+        print('\t#### -- port on which node accepts connections')
+        print('\t(optional)$$$$ -- ip address of the bootstrap node to connect to')
         print('\n\t\tExample:')
-        print('\t\t\tbootstrap 25252\n')
-        print('\tregural -- regular mode')
-        print('\t\t#### -- port on which bootstrap runs')
-        print('\t\t$$$$ -- host name of the bootstrap')
-        print('\t\t#### -- port on which regular nodes accepts connections')
-        print('\n\t\tExample:')
-        print('\t\t\tregular 25252 vagrant 36363\n')
+        print('\t\t\t36363 -- this will start a regular node and will accept connections on port 36363')
+        print('\t\t\t36363 192.168.33.10 -- this will start a regular port on given port and will connect to a bootstrap node on given ip address')
