@@ -90,7 +90,7 @@ class P2pClient:
             send_data = data.encode()
         else:
             send_data = data
-        self.sock.send(send_data)
+        self.sock.sendall(send_data)
 
     def recv_msg(self, decode=True):
         """
@@ -99,9 +99,21 @@ class P2pClient:
         Returns:
         String that was read
         """
-        data = self.sock.recv(self.data_size)
+        data = self.recv_all(self.sock, self.data_size)
         if decode:
             return data.decode('utf-8')
+        return data
+
+    def recv_all(self, sock, data_read_length):
+        """
+        Method for socket to read all data
+        """
+        data = b''
+        while True:
+            part = sock.recv(data_read_length)
+            data += part
+            if len(part) < data_read_length:
+                break
         return data
 
     def close_socket(self):

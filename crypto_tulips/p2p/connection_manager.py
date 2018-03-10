@@ -40,6 +40,8 @@ class ConnectionManager:
         self.socket_timeout = 10
         self.ok_response = '\x03'
         self.client_connection_msg = '\x01'
+        self.wallet_connection_msg = 'wallet'
+
         self.silent = silent
 
         self.socket_timeout = socket_timeout
@@ -114,7 +116,7 @@ class ConnectionManager:
         self.runnings_threads.append(a_thread)
         a_thread.start()
 
-    def accept_connection(self, read_callback, run_as_a_thread=False):
+    def accept_connection(self, read_callback, run_as_a_thread=False, wallet_callback = None):
         """
         Accept client connection
 
@@ -123,14 +125,14 @@ class ConnectionManager:
         run_as_a_thread=False -- accept clients until server is closed in a thread
         """
         if not run_as_a_thread:
-            self.accept_connection_one(read_callback)
+            self.accept_connection_one(read_callback, wallet_callback = None)
         else:
-            a_thread = threading.Thread(target=self.accept_connection_threading, args=(read_callback,))
+            a_thread = threading.Thread(target=self.accept_connection_threading, args=(read_callback,wallet_callback))
             self.runnings_threads.append(a_thread)
             a_thread.start()
             self.blocking_accept = True
 
-    def accept_connection_one(self, read_callback):
+    def accept_connection_one(self, read_callback, wallet_callback = None):
         """
         Method to accept one client connection
 
@@ -141,6 +143,12 @@ class ConnectionManager:
         response = self.server.recv_msg(client_pair=client_pair)
         if response != self.client_connection_msg:
             pass
+        if response == self.wallet_connection_msg:
+            print("Inisde wallet")
+            a_thread = threading.Thread(target=wallet_callback, args=(client_pair.socket,))
+            self.runnings_threads.append(a_thread)
+            a_thread.start()
+            return
         self.server.send_msg(self.ok_response, client_pair=client_pair)
         self.server.set_timeout(self.socket_timeout, client_pair=client_pair)
         peer = p2p_peer.Peer(socket=client_pair.socket, ip_address=client_pair.address, mode=p2p_peer.PeerMode.Server)
@@ -149,7 +157,7 @@ class ConnectionManager:
         self.start_recv_thread(peer=peer, callback=read_callback, target=self.recv_msg_server)
         self.print_check('Server got a connection and started to recv')
 
-    def accept_connection_threading(self, read_callback):
+    def accept_connection_threading(self, read_callback, wallet_callback):
         """
         Method to run as a thread and accept clients until server is stopped
 
@@ -157,7 +165,7 @@ class ConnectionManager:
         read_callback -- callback to call when msg is received
         """
         while self.run:
-            self.accept_connection_one(read_callback)
+            self.accept_connection_one(read_callback, wallet_callback=wallet_callback)
 
     def auto_remove_peers(self):
         """
