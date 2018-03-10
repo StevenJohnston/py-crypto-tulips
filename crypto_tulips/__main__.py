@@ -228,6 +228,7 @@ def wallet_callback(wallet_sock):
             a_node.connection_manager.server.send_msg(data=string_json_user_info, client_socket=wallet_sock)
             a_node.connection_manager.server.close_client(client_socket=wallet_sock)
         elif new_msg.action == 'tx':
+            print(new_msg.data)
             pass
         else:
             pass

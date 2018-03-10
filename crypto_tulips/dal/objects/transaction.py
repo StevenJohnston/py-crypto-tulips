@@ -17,7 +17,7 @@ class Transaction(BaseTransaction):
         to_addr = dict_values.get('to_addr')
         from_addr = dict_values.get('from_addr')
         amount = dict_values.get('amount')
-        timestamp = int(dict_values.get('timestamp'))
+        timestamp = dict_values.get('timestamp')
         signature = dict_values.get('signature')
         is_mempool = dict_values.get('is_mempool')
         new_transaction = Transaction(transaction_hash, signature, to_addr, from_addr, amount, is_mempool, timestamp)
