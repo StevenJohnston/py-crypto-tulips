@@ -223,14 +223,14 @@ def wallet_callback(wallet_sock):
     else:
         pass
 
-def start_as_regular(bootstrap_host, node_port, peer_timeout=0, recv_data_size=20000, \
+def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         socket_timeout=1):
     print('\t\tStarting as a regular node')
     global a_node
-    a_node = node.Node(node_port)
+    a_node = node.Node()
     a_node.join_network(bootstrap_host, peer_timeout=peer_timeout, recv_data_size=recv_data_size, \
             socket_timeout=socket_timeout, read_callback=regular_node_callback, wallet_callback=wallet_callback, \
-            start_bootstrap=True)
+            start_bootstrap=True, start_gossiping=True)
     a_node.make_silent(True)
     while True:
         user_input = input('\t\t\tEnter a command: ')
@@ -282,19 +282,8 @@ def start_as_regular(bootstrap_host, node_port, peer_timeout=0, recv_data_size=2
 
 if __name__ == '__main__':
     arguments = sys.argv[1:]
-    print('\tCommand line arguments are {}'.format(arguments))
-    if arguments:
-        print('\tGot arguments')
-        port_node = int(arguments[0])
-        if len(arguments) == 1:
-            host = socket.gethostbyname(socket.getfqdn())
-        else:
-            host = arguments[1]
-        start_as_regular(host, port_node)
+    if not arguments:
+        host = socket.gethostbyname(socket.getfqdn())
     else:
-        print('Arguments:')
-        print('\t#### -- port on which node accepts connections')
-        print('\t(optional)$$$$ -- ip address of the bootstrap node to connect to')
-        print('\n\t\tExample:')
-        print('\t\t\t36363 -- this will start a regular node and will accept connections on port 36363')
-        print('\t\t\t36363 192.168.33.10 -- this will start a regular port on given port and will connect to a bootstrap node on given ip address')
+        host = arguments[0]
+    start_as_regular(host)
