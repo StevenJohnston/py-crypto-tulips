@@ -49,6 +49,11 @@ class Peer:
         """
         self.last_message_time = time.time()
 
+    def get_ip_address(self):
+        if self.mode == PeerMode.Server:
+            return self.ip_address[0]
+        return self.ip_address
+
     def give_time_difference(self):
         """
         Return the difference between current time and the last_message_time of a peer
