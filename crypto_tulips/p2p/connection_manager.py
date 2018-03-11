@@ -41,6 +41,7 @@ class ConnectionManager:
         self.ok_response = '\x03'
         self.client_connection_msg = '\x01'
         self.wallet_connection_msg = 'wallet'
+        self.need_to_check_for_duplicate = True
 
         self.silent = silent
 
@@ -118,7 +119,7 @@ class ConnectionManager:
         self.runnings_threads.append(a_thread)
         a_thread.start()
 
-    def accept_connection(self, read_callback, run_as_a_thread=False, wallet_callback = None):
+    def accept_connection(self, read_callback, run_as_a_thread=False, wallet_callback=None):
         """
         Accept client connection
 
@@ -135,6 +136,8 @@ class ConnectionManager:
             self.blocking_accept = True
 
     def check_for_peer_duplicate(self, peer):
+        if not self.need_to_check_for_duplicate:
+            return False
         already_exists = False
         for a_peer in self.peer_list:
             if a_peer.ip_address == peer.ip_address:

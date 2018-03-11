@@ -103,7 +103,10 @@ def test_multiple_client_send():
     CallbackStore.increment_ports()
 
     server_connection, client_connection = set_up_server_client(server_port, client_port)
+    server_connection.need_to_check_for_duplicate = False
+    client_connection.need_to_check_for_duplicate = False
     second_client = connection_manager.ConnectionManager(server_port=22222, peer_timeout=0, socket_timeout=0.1)
+    second_client.need_to_check_for_duplicate = False
 
     server_connection.accept_connection(read_callback=callback_server, run_as_a_thread=True)
     client_connection.connect_to(socket.gethostname(), server_port, read_callback=callback_client)
@@ -127,8 +130,11 @@ def test_peer_timeout():
     CallbackStore.increment_ports()
 
     server_connection = connection_manager.ConnectionManager(server_port=server_port, peer_timeout=0.5, socket_timeout=0.1)
+    server_connection.need_to_check_for_duplicate = False
     client_connection = connection_manager.ConnectionManager(server_port=client_port, peer_timeout=0, socket_timeout=0.1)
+    client_connection.need_to_check_for_duplicate = False
     second_client = connection_manager.ConnectionManager(server_port=22322, peer_timeout=0, socket_timeout=1)
+    second_client.need_to_check_for_duplicate = False
 
     time.sleep(0.1)
     server_connection.accept_connection(read_callback=callback_server, run_as_a_thread=True)
@@ -146,14 +152,3 @@ def test_peer_timeout():
     assert CallbackStore.return_result_server == ''
     assert CallbackStore.return_result_client == ''
     assert CallbackStore.return_result_second_client == 'test data'
-
-if __name__ == '__main__':
-    test_connection()
-    print('*'*100)
-    test_client_send()
-    print('*'*100)
-    test_server_send()
-    print('*'*100)
-    test_multiple_client_send()
-    print('*'*100)
-    test_peer_timeout()
