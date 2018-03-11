@@ -127,6 +127,9 @@ class RedisService:
         values = pipe.execute()
 
         # instantiate object from dictionary with keys and values
+        for field in values:
+            if field is None:
+                return None
         obj = obj.from_dict(dict(zip(keys, values)))
         return obj
 
