@@ -1,10 +1,12 @@
+"""
+Script that is getting executed when running crypto_tulips
+"""
 import sys
 import json
 import time
-import threading
 import socket
 from .dal.services import redis_service
-from .node import bootstrap, node
+from .node import node
 from .p2p import message
 from .hashing.crypt_hashing import Hashing
 from crypto_tulips.dal.objects.transaction import Transaction
@@ -205,7 +207,7 @@ def wallet_callback(wallet_sock):
     if new_msg.action == 'tx_by_public_key':
         user_trans_history, user_balance = TransactionService.get_transactions_by_public_key(new_msg.data, True)
         for trans in user_trans_history:
-            if(trans.is_mempool == 1):
+            if trans.is_mempool == 1:
                 pending.append(trans.get_sendable())
             else:
                 transaction.append(trans.get_sendable())
