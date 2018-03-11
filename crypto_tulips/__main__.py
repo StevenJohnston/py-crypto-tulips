@@ -156,6 +156,7 @@ CpjNK8bI1U/5SIte6XlQt7blePAEF7KTm2YqkJT+IM3wZxPwP4U=
 -----END RSA PRIVATE KEY-----"""
 
 
+
 def start_as_a_bootstrap(bootstrap_port):
     print('\t\tStarting as a bootstrap node at port {}'.format(bootstrap_port))
     bootstrap_node = bootstrap.BootstrapNode(port=bootstrap_port)
@@ -209,9 +210,6 @@ def wallet_callback(wallet_sock):
     print("Enter The Wallet Callback")
     while True:
         data = a_node.connection_manager.server.recv_msg(client_socket=wallet_sock)
-        if data =="exit":
-            a_node.connection_manager.server.close_client(client_socket=wallet_sock)
-
         json_dic = json.loads(data)
         new_msg = message.Message.from_dict(json_dic)
         print(new_msg.action)
@@ -232,11 +230,14 @@ def wallet_callback(wallet_sock):
             string_json_user_info = json.dumps(user_info)
             a_node.connection_manager.server.send_msg(data=string_json_user_info, client_socket=wallet_sock)
         elif new_msg.action == 'tx':
-            print(new_msg.data)
-            pass
-        else:
+            t = Transaction.from_dict(new_msg.data)
+            trans_signable = t.get_signable()
+            trans_signature_bytes = Hashing.reverse_str_signature_of_data(t.signature)
+            status = Hashing.validate_signature(trans_signable, t.to_addr, trans_signature_bytes)
+            #rs = redis_service.RedisService()
+            #rs.store_object(t)
             a_node.connection_manager.server.close_client(client_socket=wallet_sock)
-
+            break
 
 
 

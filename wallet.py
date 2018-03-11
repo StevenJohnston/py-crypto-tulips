@@ -2,6 +2,7 @@ from crypto_tulips.p2p.p2p_client import P2pClient
 from crypto_tulips.p2p import message
 from crypto_tulips.hashing.crypt_hashing import Hashing
 import json
+from crypto_tulips.dal.objects.transaction import Transaction
 
 william_private_key = """-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEApDDm3fScenXUABItek4rBidvh3rsKBJeQ2BQzNqPgcaCArBL
@@ -114,27 +115,12 @@ if __name__ == '__main__':
 
     #start a transaction
     amount = 100
-    json_trans_to_sign = {
-        "from_addr": william_public_key,
-        "to_addr": denys_public_key,
-        "amount": amount
-    }
-    trans_json_str = json.dumps(json_trans_to_sign, sort_keys=True)
-    sig = Hashing.str_signature_of_data(trans_json_str, temp)
-
-    json_transaction_req = {
-        "from_addr": william_public_key,
-        "signature": sig,
-        "to_addr": denys_private_key,
-        "amount": amount
-    }
-    one_transaction_msg = message.Message('tx', json_transaction_req)
-    one_transaction_json = one_transaction_msg.to_json(is_object=False)
-    one_transaction_json = json.dumps(one_transaction_json, sort_keys=True)
-    p2p.send_msg(one_transaction_json)
-
-
-    p2p.send_msg("exit")
-
+    new_transaction = Transaction('', '', denys_public_key, william_public_key, amount, 1)
+    new_transaction.update_signature(denys_private_key)
+    new_transaction.update_hash()
+    transaction_msg = message.Message('tx', new_transaction)
+    transaction_json = transaction_msg.to_json()
+    transaction_json = json.dumps(transaction_json, sort_keys=True)
+    p2p.send_msg(transaction_json)
     p2p.close_socket()
 
