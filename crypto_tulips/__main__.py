@@ -5,6 +5,7 @@ import sys
 import json
 import time
 import socket
+import threading
 from .dal.services import redis_service
 from .node import node
 from .p2p import message
@@ -159,6 +160,16 @@ Y8guc2tJ/Ypm4LbCJbW2Iax8HPTMkzXMnL11UxvfK+4S10Y5GQFceBbQAjbH/Bly
 CpjNK8bI1U/5SIte6XlQt7blePAEF7KTm2YqkJT+IM3wZxPwP4U=
 -----END RSA PRIVATE KEY-----"""
 
+transaction_lock = threading.Lock()
+block_lock = threading.Lock()
+
+def check_if_object_exist(obj_hash, obj_type):
+    rs = redis_service.RedisService()
+    obj = rs.get_object_by_hash(obj_hash=obj_hash, obj=obj_type)
+    #obj = rs.get_object_by_full_key(obj_key=obj_hash, obj=obj_type)
+    if obj is None:
+        return False
+    return True
 
 def regular_node_callback(data):
     json_dic = json.loads(data)
@@ -166,35 +177,58 @@ def regular_node_callback(data):
     if new_msg.action == 'transaction':
         new_msg.data = Transaction.from_dict(new_msg.data)
         new_transaction = new_msg.data
+        need_to_send = False
+        transaction_lock.acquire()
         print('\nTransaction : {}'.format(new_transaction._hash))
-        rs = redis_service.RedisService()
-        rs.store_object(new_transaction)
+        if not check_if_object_exist(new_transaction._hash, Transaction):
+            rs = redis_service.RedisService()
+            rs.store_object(new_transaction)
+            need_to_send = True
+            print('All good')
+        else:
+            print('Duplicate transaction')
+        transaction_lock.release()
+        if need_to_send:
+            send_a_transaction(new_transaction)
     elif new_msg.action == 'block':
         block_service = BlockService()
         new_block = Block.from_dict(new_msg.data)
-        block_service.add_block_to_chain(new_block)
+        need_to_send = False
+        block_lock.acquire()
         print('\nBlock : {}'.format(new_block._hash))
+        result_list = block_service.add_block_to_chain(new_block)
+        if result_list:
+            need_to_send = True
+            print('All good')
+        else:
+            print('Duplicate block')
+        block_lock.release()
+        if need_to_send:
+            send_a_block(new_block)
 
-def run_miner(a_node):
+def run_miner():
     block_service = BlockService()
     steven_pub = Hashing.get_public_key(steven_private_key)
-    #print('Creating new block')
     time_now = int(time.time())
     height = int(BlockService.get_max_height()) + 1
     ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
     block = Block('', '', steven_pub, height, ten_transactions, [], [], time_now)
     block.update_signature(steven_private_key)
     block.update_hash()
+    block_lock.acquire()
     block_service.add_block_to_chain(block)
     # TODO Test if worked block was added. Might fail due to same hash
     for trabs in ten_transactions:
         BaseTransactionService.remove_from_mem_pool(trabs)
     print('\nCreated Block hash: ' + block._hash)
-    block_msg = message.Message('block', block)
+    block_lock.release()
+    send_a_block(block)
+
+def send_a_block(new_block):
+    block_msg = message.Message('block', new_block)
     sendable_block = block_msg.to_json()
     block_json = json.dumps(sendable_block, sort_keys=True, separators=(',', ':'))
     a_node.connection_manager.send_msg(msg=block_json)
-    #print('Broadcasting block')
 
 a_node = None
 
@@ -225,6 +259,12 @@ def wallet_callback(wallet_sock):
     else:
         pass
 
+def send_a_transaction(new_transaction):
+    transaction_msg = message.Message('transaction', new_transaction)
+    transaction_json = transaction_msg.to_json()
+    transaction_json = json.dumps(transaction_json, sort_keys=True)
+    a_node.connection_manager.send_msg(msg=transaction_json)
+
 def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         socket_timeout=1):
     print('\t\tStarting as a regular node')
@@ -239,7 +279,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         if user_input == 'quit' or user_input == 'q':
             break
         elif user_input == 'miner' or user_input == 'm':
-            run_miner(a_node)
+            run_miner()
         elif user_input == 'trans' or user_input == 'transaction' or user_input == 't':
             secret = input('\t\t\tFrom : ')
             if secret == 'denys' or secret == 'd':
@@ -273,13 +313,20 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             new_transaction = Transaction('', '', to_addr, from_addr, amount, 1)
             new_transaction.update_signature(private_key)
             new_transaction.update_hash()
+<<<<<<< HEAD
             transaction_msg = message.Message('transaction', new_transaction)
             transaction_json = transaction_msg.to_json()
             transaction_json = json.dumps(transaction_json, sort_keys=True, separators=(',', ':'))
             a_node.connection_manager.send_msg(msg=transaction_json)
+=======
+            #transaction_lock.acquire()
+            send_a_transaction(new_transaction)
+            transaction_lock.acquire()
+>>>>>>> Added resending of transaction and blocks when one if recv. Duplicated
             print('\nTransaction hash : {}'.format(new_transaction._hash))
             rs = redis_service.RedisService()
             rs.store_object(new_transaction)
+            transaction_lock.release()
     a_node.close()
 
 if __name__ == '__main__':

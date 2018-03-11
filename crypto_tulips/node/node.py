@@ -103,16 +103,12 @@ class Node:
             # need to catch exceptions because peer might be closed
             try:
                 mini_client.connect_to(peer_ip_address, self.gossip_port)
-            except:
-                mini_client.close_socket()
-                continue
-            try:
                 pickled_list = mini_client.recv_msg(decode=False)
+                new_known_peers = pickle.loads(pickled_list)
+                mini_client.close_socket()
             except:
                 mini_client.close_socket()
                 continue
-            new_known_peers = pickle.loads(pickled_list)
-            mini_client.close_socket()
             for a_new_peer in new_known_peers:
                 found_new = True
                 # checking if any of current peers has the same ip
