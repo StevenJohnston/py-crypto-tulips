@@ -3,9 +3,9 @@ Contract Transaction Service Module
 """
 
 from crypto_tulips.dal.objects.contract_transaction import ContractTransaction
-from crypto_tulips.services.base_transaction_service import BaseTransactionService
+from crypto_tulips.services.base_object_service import BaseObjectService
 
-class ContractTransactionService(BaseTransactionService):
+class ContractTransactionService(BaseObjectService):
     """
     Contract Transaction Service
     """

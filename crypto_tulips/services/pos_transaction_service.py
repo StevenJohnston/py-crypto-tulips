@@ -3,9 +3,9 @@ Pos Transaction Service Module
 """
 
 from crypto_tulips.dal.objects.pos_transaction import PosTransaction
-from crypto_tulips.services.base_transaction_service import BaseTransactionService
+from crypto_tulips.services.base_object_service import BaseObjectService
 
-class PosTransactionService(BaseTransactionService):
+class PosTransactionService(BaseObjectService):
     """
     Pos Transaction Service
     """
