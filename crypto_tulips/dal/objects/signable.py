@@ -9,14 +9,11 @@ class Signable:
     # updates the _hash of the object
     def update_signature(self, private_key):
         self.signature = self.get_signature(private_key)
-        print("Sig")
-        print(self.signature)
 
     # updates the _hash of the object
     def get_signature(self, private_key):
         signable = self.get_signable()
-        signable_string = json.dumps(signable, sort_keys=True)
-        print(signable_string)
+        signable_string = json.dumps(signable, sort_keys=True, separators=(',', ':'))
         return Hashing.str_signature_of_data(signable_string, private_key)
 
     # Used to get the hashable version of an object.

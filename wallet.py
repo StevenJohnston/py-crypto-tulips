@@ -113,7 +113,7 @@ if __name__ == '__main__':
     #start a transaction
     amount = 100
     new_transaction = Transaction('', '', denys_public_key, william_public_key, amount, 1)
-    new_transaction.update_signature(temp_key)
+    new_transaction.update_signature(william_private_key)
     new_transaction.update_hash()
 
     transaction_msg = message.Message('tx', new_transaction)
