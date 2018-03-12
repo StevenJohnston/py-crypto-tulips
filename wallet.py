@@ -95,7 +95,7 @@ if __name__ == '__main__':
     william_public_key = Hashing.get_public_key(william_private_key)
     transaction_msg = message.Message('tx_by_public_key', public_key)
     transaction_json = transaction_msg.to_json(is_object=False)
-    transaction_json = json.dumps(transaction_json, sort_keys=True)
+    transaction_json = json.dumps(transaction_json, sort_keys=True, separators=(',', ':'))
     p2p.send_msg(transaction_json)
     data = p2p.recv_msg()
     p2p.send_msg(transaction_json)

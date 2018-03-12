@@ -64,7 +64,7 @@ def test_sendable_fail():
 def test_sendable_json():
     test_time = int(time.time())
     transaction = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
-    actual = json.dumps(transaction.get_sendable(), sort_keys=True)
+    actual = json.dumps(transaction.get_sendable(), sort_keys=True, separators=(',', ':'))
     expected = json.dumps({
         'signature': '',
         'amount': 1.0,
@@ -72,6 +72,6 @@ def test_sendable_json():
         'from_addr': 'from_matt_test',
         '_hash': 'block_send_test',
         'timestamp': test_time
-    }, sort_keys=True)
+    }, sort_keys=True, separators=(',', ':'))
     assert actual == expected
     

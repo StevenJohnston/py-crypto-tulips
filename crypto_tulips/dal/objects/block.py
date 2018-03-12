@@ -42,7 +42,7 @@ class Block(Hashable, Sendable, Signable):
         return new_block
 
     def to_string(self):
-        return json.dumps(self.__dict__)
+        return json.dumps(self.__dict__, sort_keys=True, separators=(',', ':'))
         #return str(self.block_hash) + "->" + str(self.block_data)
 
     def __eq__(self, other):
