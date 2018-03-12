@@ -20,11 +20,11 @@ def test_hashing_string():
 
 def test_hashing_json():
     hash = hashing_string(jsonTest)
-    assert hash == "08f04b54179fffeea74ebcef9c799562f478150d40b5abba1a8cd36ae53f2b0a"
+    assert hash == "4f85d59ad01d93f08439ad9ad0f92a5c1cfd7b6d28da1c55c4404e73d7dee5be"
 
 def test_hashing_invalid_json():
     hash = hashing_string(jsonTestInvalid)
-    assert hash == "d1908ea7bb037ceb78352064cff27baa70db25c69beeaf9918155d9ce95c0958"
+    assert hash == "3d71d29af7d10fab0fe7d87e763ba4e2f8ac94a9b20ce066f7579958475ebc28"
 
 def hashing_string(string_to_hash):
     return crypt_hashing.Hashing.hashing_block(string_to_hash)
