@@ -272,7 +272,7 @@ def wallet_callback(wallet_sock):
 def send_a_transaction(new_transaction):
     transaction_msg = message.Message('transaction', new_transaction)
     transaction_json = transaction_msg.to_json()
-    transaction_json = json.dumps(transaction_json, sort_keys=True)
+    transaction_json = json.dumps(transaction_json, sort_keys=True, separators=(',', ':'))
     a_node.connection_manager.send_msg(msg=transaction_json)
 
 def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
