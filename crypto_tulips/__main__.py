@@ -258,7 +258,7 @@ def wallet_callback(wallet_sock):
             t = Transaction.from_dict(new_msg.data)
             trans_signable = t.get_signable()
             trans_signature_bytes = Hashing.reverse_str_signature_of_data(t.signature)
-            status = Hashing.validate_signature(trans_signable, t.to_addr, trans_signature_bytes)
+            status = Hashing.validate_signature(trans_signable, t.from_addr, trans_signature_bytes)
             if status == True:
                 rs = redis_service.RedisService()
                 rs.store_object(t)
