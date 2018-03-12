@@ -35,59 +35,49 @@ wPhY4P/Zsoe8tswOJyFbSBRNmXCPZ7UBOZcn9jVhg5SQBFIW7Q==
 
 def test_generate_from_priv():
     block = GenesisBlockService.generate_from_priv(_priv)
-
     expected = {
-        'owner':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-        'transactions':[
-            {
-                'from_addr':'',
-                'amount':1.0,
-                'timestamp':1520135639,
-                'signature':'JLhYlCLqb1hhKamCbKWfGh4Ja6eqYYCzXEUKu0uIxj5y/uyZzfu6VSexLBukUAn9+/7qvRqRmTFIWWB1qhQ4vo8tkPpGGR7TcUMi55fgZeRccBndYjso/5ZWOwdiymSkXCbeW7VppzUbLwSrm9rIDFz52p2v7xZIJcY4UruJFlNPEpbkG0tOZRnFXmice/qu8hZJ4l/l55B834jM8DxeI4sI0myk5CXJOiy6vvupjQS8HAcbpFsKnhKKF/xXIYYSGUU123Mty2u5bjhKjpTVBVL53b4WV1fBDVOfg5mMlI+PY4AssUkYBIirrxeBVuXwl+DHwwc4ZHfXKTUH9G5h0Q==',
-                'to_addr':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-                '_hash':'5719d7850b6128e5cc783087f48390d86993eda2acaa6905098597e3272a6884'
-            },
-            {
-                'from_addr':'',
-                'amount':10.0,
-                'timestamp':1520135639,
-                'signature':'UG6PAQhWjOSfTIo6g8EAe4fdyh1EcqPTx+1YaOE02+AABrmph4lhnIjL+RYEl6dF8mUZPs8ekV6dx/uVP58KnelYrciukZ6HKnd4k+jOF0K5Le3UlObADs7WJ5N4QzJaPOEvp5VMNOYF0YR/5QU7dxDVoTAdPGaooiYt8YemLl4qEmNTpOznLMZsal3PMiorp/H82JrQN2c2yAvWFXDFs9hyDL1I9Ul4iMtmjT2y9TpGF2MXF+JDwurqLS+2su3L8gx5scbe+TyrdpggeigVw173qgsoEbQkzxdZUGw6Fl6Ek2drCh1oDC7KKX6APmsOnCF+5y2x7rXYzTgca84y3g==',
-                'to_addr':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-                '_hash':'cc2f9b562d42c97b7708a9d2a5e74d8f11dc3d7840b700a49caaeb1b55072618'
-            },
-            {
-                'from_addr':'',
-                'amount':100.0,
-                'timestamp':1520135639,
-                'signature':'FHXNlrfLsNznUZ1xc6gwgCXVaHZ2Ja0299UX6iDxpkO9ZXKkMvJ2Yl3qmW2MO2U9DzDrM/gohQZ2hCWEPTPEWFFS7pNO3t9PBOCWLusSwD/FBoJDAh3qhcSkQuvD+He8zUOp+7tb6839qqrecgWQ4pPnG5diFt2HfdM6kTUO/VnEcgbcGbHeAiOkjVbhAXnKzQSR/V6rQCQxNaEBSoLbq15LuMiVRMEj6xV97aFAno1gPI2yWehfyg+yUmgcojyLPMxlOVS0wI9SWMip8S9smIEijIjePdmKTT+Dqa1lspHIV9GTJGLd1qfamKPZG3rvsvbXP+k+0Chon0jxsvl9zA==',
-                'to_addr':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-                '_hash':'50ef5c63eb31de177cb3ff7013b1f27855ca08ee8a82258ae49fd55d9d58d531'
-            },
-            {
-                'from_addr':'',
-                'amount':1000.0,
-                'timestamp':1520135639,
-                'signature':'WXMkix4a6MkAEIzT+RVCu6SAXm5Rt0nPe5jqvHVGvMD5z2p4JX0RglrfRhYgRlCZfsG/VeFKZXQ5xOq4JYoHsSDN6HGFS0P3NDkGzlZy+CzBP1gelrqR/s94/vi0uXKFQqgxj1zZWE8ScHPjtFzv9dIgrnuO6eUUjCLl2sp9iPCn6scqDGss8/Oi/nu8FFa02y5QWWC0bdjuzDSfNrSSFAnSqxWZqhCQlxFxvHW9GJxt9ErcqrEMSrw19HNGsQf2ANIfCs6dQXl/00AAp897fwoCl5y2O85zD5bRFT8Hp7lwLvSAqVwkWa8I+QZZEZRTv3aUTUnAFXiYo/fffrjCqQ==',
-                'to_addr':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-                '_hash':'85ccd39b76976efe4e201635cec939b16b1aca696249ef0e1ad454c3e7188b47'
-            }
-        ],
-        'timestamp':1520135639,
-        '_hash':'1027b1cba972122fbf1b5452c2281e9b20437d5ddd848c06628eb72fc3d74ae0',
-        'signature':'Hb5gadPe7aCTgFFWDINo5t+Qs5LuOojog3WkQq86lGPRhvuseDIXblGGsvMLGPnh6Ix6Hc/8PoD2+fW9W1A1ekOw8+xIN/Xx3gvQoOf1mC+f/08Mrm3BzPNHL+h+y2h/f2kOxq8a80TK12HnSF3ClSmfpcGqZkYyrpPkjBN6dmGbf+hrDTItRXrhMZW3KewB9mnGWJnfq5wwpAVdygHVHznVdjU64ALBsszknmSQ+ivhhoGqW0YHvfmy9oC4VVYHTjUQ7nB/+19TdIHPvErtNMkJlnltfsaK9euf+mx+VgmxFR6SH+ioMLxsmIqRF6u2CEKf/wiRdNHhFW+QkJTMeA==',
-        'pos_transactions':[
-            {
-                'from_addr':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-                'amount':100.0,
-                'timestamp':1520135639,
-                '_hash':'6a6e42224a94f3baad484073ce95f92cf59c2ec468ec8acaa3ccc65db48f6057',
-                'signature':'PCp46BHA9wIkkRbLdMz4vuuUcFxH/h94lpjrNnSIyVgmpclaiRDwZq8CpRQUXr4tT8aSBymVD110Yfpizoj/POITe+2ji8ggHUcwv6ScIQ7VFmunsl1mRHfOtVtbdOqXCBZ6IsKbpwpjtAck3fGk14D5kIVKoC2/6W2s0wYgi5riVs79BzGbbj0TdKx7SLItiiHLYi8e+t+LFH6GBY03ciiLU8C0GIuPA4nl5bPrOwadkzmv9zb9q/CluNfJaNx/kJ1S9/2YXXFtIMY26kaSlKzdFjWRVgNep7I7Y5XOyGlcSWNl8NTrCf4HPgyW4pgqFB53HB9uTKmLueyjTOqcPA=='
-            }
-        ],
-        'height':0,
-        'contract_transactions':[
-
-        ]
+        'contract_transactions': [],
+        '_hash': 'c77403ba2eebdaba55ca6bbc21aa828935d218f705f90782b461833f2faab161',
+        'timestamp': 1520135639,
+        'transactions': [{
+            'from_addr': '',
+            '_hash': '2cb0c5c1b1a5df13a08e831fdb3d5a9fbe1be556b23681591bdf3a5371133074',
+            'to_addr': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
+            'timestamp': 1520135639,
+            'amount': 1.0,
+            'signature': 'CnDOs1IZIXXZD85WYWbs5pkxh23FGKLgeA/13qb8br4qUTJSrpxnamBD6xZALD6XucyX/qSfj9jzB4beF2B4BV2OJtyc4BWYlR+dbANHCuLyIlXrKGxZN0sh0tJcV/ODPDd6w8oqCwumIkTrqjMQfjtPpUvZFkVVh2jKEwM4vwvAycRxoyxWbFFfS+C7xk+z7FidiCVYlSYJaTJ6+GQPqRAMx+Ey2ibpU3UIzR9i2cOqEDk9nUg+N43VcYIezbx7W81T9znN+F7RBP3X2Ww5BJ4dFlc71aE4HZrOJ/uJ/G76FjCl7FHvRcDHkLZ8MMG9H41XoS8Idn4/NqFqLKQpdA=='
+        }, {
+            'from_addr': '',
+            '_hash': 'a0cb0f7c00771e4eed4547dbce4e0789c5fd556eaac0f611e14c1103354605c1',
+            'to_addr': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
+            'timestamp': 1520135639,
+            'amount': 10.0,
+            'signature': 'WI7tfdIVczyzqLl+HmEqLm5kQwRN1tLG63kGdlrdoZq0NlMj8mdqXsVytSgGV5JG0jRIPNs3HyCInT7niSxvD0BpACevli8M68754VeGsTbTuRras6r4ud0n0l8SOVBgj6ujlXBwNSdVCbsKSToDD7dc685uLsUw/9ZroC1pVGnnHiz2E6DimdJuBylfNkjOr5pIaOQxmL8g+1bIilPayUhLYTy2SeItSZofbj0ICspJ871sUggyHhxJrrfJUQR7xLWAXGo3qAnHczsolspHf4n3hjqswtC16GpKkqn5ilZzclk2ssG8I0Njy85PFpGwYhlyyfZaa+hNmXRZYU2UfA=='
+        }, {
+            'from_addr': '',
+            '_hash': '665cb4816b5963dc977bce8ca29f0b535965797a779d0ccf2080f85a8a30ff18',
+            'to_addr': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
+            'timestamp': 1520135639,
+            'amount': 100.0,
+            'signature': 'URF079sLoTlQ3TjedN1DQy5gyby695GLe4UDvseMb4UDYbJPst/IdUfXomyfH0y8vYf6GmEay1egPRrY/9HlCjRObah6mQpYNRvWjNF3L0tDuJfFiz74o2weyFYfv4wS8IWkDry7GPYpoYDf8uMm9dqCrrfS9EYvIanYQZdq9e72Q9w7Q3xBSGWO8jrK14vCCXD7PYXN9BynoboO1OgfvpI4VIgKgO7wZHiCqqwkzXqwf04MwHcXilOrpmVgO4mivsRTV5uc8nMKGNp2Ozn8I0O8IC8zPv9YzKCKm/O6qMz89jEVekVrHDT2aBAXTQE8xlDdlm308kUuzmpSSw9muA=='
+        }, {
+            'from_addr': '',
+            '_hash': '92c45afc5e07459c04adb6fa6c2bb28819bd27b6c66e4a998e03b0d0c7d6b82d',
+            'to_addr': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
+            'timestamp': 1520135639,
+            'amount': 1000.0,
+            'signature': 'PMhB1f4SWi/ZdArthq7WstOOku8R6g7GZcDMhBZC8QT0ZRMf1p6ugYJEzvxNjd0qjZoufRLzyxos50mI7esffObSaMB0wQHVcLs7x99B+PNhdA2lwiA/klzr2D1yp1bo8xXrcrL3kafxX6T4odCV6Pb4ZQRxjN9N6iL57MC8B/Nb5iN90FznvefLQb1BqtBGq0zg3+fUgn9QFd7ZP4dmzeDkYvQeU2qQ97MdFdsIe7KT30/anxkURudCxS8tlNTIo1P5tnvHYrrNyFrzmYbDKlb2sYSaqLSY+XFlAQ38wCzG724ABn37lYuMEtJvdNnK2g49foFsbxBBFONkz7dNkQ=='
+        }],
+        'height': 0,
+        'pos_transactions': [{
+            'from_addr': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
+            'amount': 100.0,
+            'timestamp': 1520135639,
+            'signature': 'S+BT1QrOSW55bJiKdxvVKophPX/QXhSC7JfqgzRzTsEWWL301PHWH5lKVKFXXDk3gjAv2V8SR3SSaeMnrxzRuSYwzICTi9yd454ddXkRcFOJzf+BUx+3b3vTsRliFrhnL1N3X2QP0ksN3UzBS/aKaMXDk2QYE1pqabizk+x0q0EQZwXpGHDVJCewm4GG/oUGgnX2BQHhFOuGwMCfRacuoI7r4cKh8bORlTPNlUeJjnsaNd7rJbzbKnp8mN8//7uToWhSY+8Oh/Us3J+X75DkPP1ZPuaK+Lobyg5KnMeUuhyHH2GFaCIfvmDI0JWOMbByHzJcIcFUHnzy5auwg9S4JQ==',
+            '_hash': '9dd6aa857df1fe049e31c2f3f5b46f70d739f7fd8b39b9eccbb6391f05087f3c'
+        }],
+        'signature': 'YI3Jq6GYNVZ//azs0bDPuJKwjY4X44Aw5okulsRAUE00+kezJ1SvwUzzWZ58RItSzlvai/9oCQ+mm+Ded8gJ7ZK88jq7/2Un5Vh+qP/ZJC5lk3iO6SdeJZC02/fyxxBxOEgK/1+2+6dPxCx3+SjpUvuZ+OV/IqT40cii9YmMirlKwmwkhwEWgGexDVwU4U1WB3mgZYONQrCZbga0tRugha6cs4n+NrBSM144sKxgUScBKZKbhABsM9up+M7mJyY503Fqf70+p+yxPspjaqK5iw7052cO7MFg6e0tCBVehRv60c0HR6kIAUaZXVoc5vzcYOPZpaa4gCAM9jD6TGuAjw==',
+        'owner': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----'
     }
     actual = block.get_sendable()
     print(str(actual))
@@ -95,73 +85,65 @@ def test_generate_from_priv():
 
 def test_validate_rsa_block():
     genesis_block = {
-        'owner':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-        'transactions':[
-            {
-                'from_addr':'',
-                'amount':1.0,
-                'timestamp':1520135639,
-                'signature':'JLhYlCLqb1hhKamCbKWfGh4Ja6eqYYCzXEUKu0uIxj5y/uyZzfu6VSexLBukUAn9+/7qvRqRmTFIWWB1qhQ4vo8tkPpGGR7TcUMi55fgZeRccBndYjso/5ZWOwdiymSkXCbeW7VppzUbLwSrm9rIDFz52p2v7xZIJcY4UruJFlNPEpbkG0tOZRnFXmice/qu8hZJ4l/l55B834jM8DxeI4sI0myk5CXJOiy6vvupjQS8HAcbpFsKnhKKF/xXIYYSGUU123Mty2u5bjhKjpTVBVL53b4WV1fBDVOfg5mMlI+PY4AssUkYBIirrxeBVuXwl+DHwwc4ZHfXKTUH9G5h0Q==',
-                'to_addr':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-                '_hash':'5719d7850b6128e5cc783087f48390d86993eda2acaa6905098597e3272a6884'
-            },
-            {
-                'from_addr':'',
-                'amount':10.0,
-                'timestamp':1520135639,
-                'signature':'UG6PAQhWjOSfTIo6g8EAe4fdyh1EcqPTx+1YaOE02+AABrmph4lhnIjL+RYEl6dF8mUZPs8ekV6dx/uVP58KnelYrciukZ6HKnd4k+jOF0K5Le3UlObADs7WJ5N4QzJaPOEvp5VMNOYF0YR/5QU7dxDVoTAdPGaooiYt8YemLl4qEmNTpOznLMZsal3PMiorp/H82JrQN2c2yAvWFXDFs9hyDL1I9Ul4iMtmjT2y9TpGF2MXF+JDwurqLS+2su3L8gx5scbe+TyrdpggeigVw173qgsoEbQkzxdZUGw6Fl6Ek2drCh1oDC7KKX6APmsOnCF+5y2x7rXYzTgca84y3g==',
-                'to_addr':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-                '_hash':'cc2f9b562d42c97b7708a9d2a5e74d8f11dc3d7840b700a49caaeb1b55072618'
-            },
-            {
-                'from_addr':'',
-                'amount':100.0,
-                'timestamp':1520135639,
-                'signature':'FHXNlrfLsNznUZ1xc6gwgCXVaHZ2Ja0299UX6iDxpkO9ZXKkMvJ2Yl3qmW2MO2U9DzDrM/gohQZ2hCWEPTPEWFFS7pNO3t9PBOCWLusSwD/FBoJDAh3qhcSkQuvD+He8zUOp+7tb6839qqrecgWQ4pPnG5diFt2HfdM6kTUO/VnEcgbcGbHeAiOkjVbhAXnKzQSR/V6rQCQxNaEBSoLbq15LuMiVRMEj6xV97aFAno1gPI2yWehfyg+yUmgcojyLPMxlOVS0wI9SWMip8S9smIEijIjePdmKTT+Dqa1lspHIV9GTJGLd1qfamKPZG3rvsvbXP+k+0Chon0jxsvl9zA==',
-                'to_addr':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-                '_hash':'50ef5c63eb31de177cb3ff7013b1f27855ca08ee8a82258ae49fd55d9d58d531'
-            },
-            {
-                'from_addr':'',
-                'amount':1000.0,
-                'timestamp':1520135639,
-                'signature':'WXMkix4a6MkAEIzT+RVCu6SAXm5Rt0nPe5jqvHVGvMD5z2p4JX0RglrfRhYgRlCZfsG/VeFKZXQ5xOq4JYoHsSDN6HGFS0P3NDkGzlZy+CzBP1gelrqR/s94/vi0uXKFQqgxj1zZWE8ScHPjtFzv9dIgrnuO6eUUjCLl2sp9iPCn6scqDGss8/Oi/nu8FFa02y5QWWC0bdjuzDSfNrSSFAnSqxWZqhCQlxFxvHW9GJxt9ErcqrEMSrw19HNGsQf2ANIfCs6dQXl/00AAp897fwoCl5y2O85zD5bRFT8Hp7lwLvSAqVwkWa8I+QZZEZRTv3aUTUnAFXiYo/fffrjCqQ==',
-                'to_addr':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-                '_hash':'85ccd39b76976efe4e201635cec939b16b1aca696249ef0e1ad454c3e7188b47'
-            }
-        ],
-        'timestamp':1520135639,
-        '_hash':'1027b1cba972122fbf1b5452c2281e9b20437d5ddd848c06628eb72fc3d74ae0',
-        'signature':'Hb5gadPe7aCTgFFWDINo5t+Qs5LuOojog3WkQq86lGPRhvuseDIXblGGsvMLGPnh6Ix6Hc/8PoD2+fW9W1A1ekOw8+xIN/Xx3gvQoOf1mC+f/08Mrm3BzPNHL+h+y2h/f2kOxq8a80TK12HnSF3ClSmfpcGqZkYyrpPkjBN6dmGbf+hrDTItRXrhMZW3KewB9mnGWJnfq5wwpAVdygHVHznVdjU64ALBsszknmSQ+ivhhoGqW0YHvfmy9oC4VVYHTjUQ7nB/+19TdIHPvErtNMkJlnltfsaK9euf+mx+VgmxFR6SH+ioMLxsmIqRF6u2CEKf/wiRdNHhFW+QkJTMeA==',
-        'pos_transactions':[
-            {
-                'from_addr':'-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
-                'amount':100.0,
-                'timestamp':1520135639,
-                '_hash':'6a6e42224a94f3baad484073ce95f92cf59c2ec468ec8acaa3ccc65db48f6057',
-                'signature':'PCp46BHA9wIkkRbLdMz4vuuUcFxH/h94lpjrNnSIyVgmpclaiRDwZq8CpRQUXr4tT8aSBymVD110Yfpizoj/POITe+2ji8ggHUcwv6ScIQ7VFmunsl1mRHfOtVtbdOqXCBZ6IsKbpwpjtAck3fGk14D5kIVKoC2/6W2s0wYgi5riVs79BzGbbj0TdKx7SLItiiHLYi8e+t+LFH6GBY03ciiLU8C0GIuPA4nl5bPrOwadkzmv9zb9q/CluNfJaNx/kJ1S9/2YXXFtIMY26kaSlKzdFjWRVgNep7I7Y5XOyGlcSWNl8NTrCf4HPgyW4pgqFB53HB9uTKmLueyjTOqcPA=='
-            }
-        ],
-        'height':0,
-        'contract_transactions':[
-
-        ]
+        'contract_transactions': [],
+        '_hash': 'c77403ba2eebdaba55ca6bbc21aa828935d218f705f90782b461833f2faab161',
+        'timestamp': 1520135639,
+        'transactions': [{
+            'from_addr': '',
+            '_hash': '2cb0c5c1b1a5df13a08e831fdb3d5a9fbe1be556b23681591bdf3a5371133074',
+            'to_addr': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
+            'timestamp': 1520135639,
+            'amount': 1.0,
+            'signature': 'CnDOs1IZIXXZD85WYWbs5pkxh23FGKLgeA/13qb8br4qUTJSrpxnamBD6xZALD6XucyX/qSfj9jzB4beF2B4BV2OJtyc4BWYlR+dbANHCuLyIlXrKGxZN0sh0tJcV/ODPDd6w8oqCwumIkTrqjMQfjtPpUvZFkVVh2jKEwM4vwvAycRxoyxWbFFfS+C7xk+z7FidiCVYlSYJaTJ6+GQPqRAMx+Ey2ibpU3UIzR9i2cOqEDk9nUg+N43VcYIezbx7W81T9znN+F7RBP3X2Ww5BJ4dFlc71aE4HZrOJ/uJ/G76FjCl7FHvRcDHkLZ8MMG9H41XoS8Idn4/NqFqLKQpdA=='
+        }, {
+            'from_addr': '',
+            '_hash': 'a0cb0f7c00771e4eed4547dbce4e0789c5fd556eaac0f611e14c1103354605c1',
+            'to_addr': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
+            'timestamp': 1520135639,
+            'amount': 10.0,
+            'signature': 'WI7tfdIVczyzqLl+HmEqLm5kQwRN1tLG63kGdlrdoZq0NlMj8mdqXsVytSgGV5JG0jRIPNs3HyCInT7niSxvD0BpACevli8M68754VeGsTbTuRras6r4ud0n0l8SOVBgj6ujlXBwNSdVCbsKSToDD7dc685uLsUw/9ZroC1pVGnnHiz2E6DimdJuBylfNkjOr5pIaOQxmL8g+1bIilPayUhLYTy2SeItSZofbj0ICspJ871sUggyHhxJrrfJUQR7xLWAXGo3qAnHczsolspHf4n3hjqswtC16GpKkqn5ilZzclk2ssG8I0Njy85PFpGwYhlyyfZaa+hNmXRZYU2UfA=='
+        }, {
+            'from_addr': '',
+            '_hash': '665cb4816b5963dc977bce8ca29f0b535965797a779d0ccf2080f85a8a30ff18',
+            'to_addr': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
+            'timestamp': 1520135639,
+            'amount': 100.0,
+            'signature': 'URF079sLoTlQ3TjedN1DQy5gyby695GLe4UDvseMb4UDYbJPst/IdUfXomyfH0y8vYf6GmEay1egPRrY/9HlCjRObah6mQpYNRvWjNF3L0tDuJfFiz74o2weyFYfv4wS8IWkDry7GPYpoYDf8uMm9dqCrrfS9EYvIanYQZdq9e72Q9w7Q3xBSGWO8jrK14vCCXD7PYXN9BynoboO1OgfvpI4VIgKgO7wZHiCqqwkzXqwf04MwHcXilOrpmVgO4mivsRTV5uc8nMKGNp2Ozn8I0O8IC8zPv9YzKCKm/O6qMz89jEVekVrHDT2aBAXTQE8xlDdlm308kUuzmpSSw9muA=='
+        }, {
+            'from_addr': '',
+            '_hash': '92c45afc5e07459c04adb6fa6c2bb28819bd27b6c66e4a998e03b0d0c7d6b82d',
+            'to_addr': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
+            'timestamp': 1520135639,
+            'amount': 1000.0,
+            'signature': 'PMhB1f4SWi/ZdArthq7WstOOku8R6g7GZcDMhBZC8QT0ZRMf1p6ugYJEzvxNjd0qjZoufRLzyxos50mI7esffObSaMB0wQHVcLs7x99B+PNhdA2lwiA/klzr2D1yp1bo8xXrcrL3kafxX6T4odCV6Pb4ZQRxjN9N6iL57MC8B/Nb5iN90FznvefLQb1BqtBGq0zg3+fUgn9QFd7ZP4dmzeDkYvQeU2qQ97MdFdsIe7KT30/anxkURudCxS8tlNTIo1P5tnvHYrrNyFrzmYbDKlb2sYSaqLSY+XFlAQ38wCzG724ABn37lYuMEtJvdNnK2g49foFsbxBBFONkz7dNkQ=='
+        }],
+        'height': 0,
+        'pos_transactions': [{
+            'from_addr': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
+            'amount': 100.0,
+            'timestamp': 1520135639,
+            'signature': 'S+BT1QrOSW55bJiKdxvVKophPX/QXhSC7JfqgzRzTsEWWL301PHWH5lKVKFXXDk3gjAv2V8SR3SSaeMnrxzRuSYwzICTi9yd454ddXkRcFOJzf+BUx+3b3vTsRliFrhnL1N3X2QP0ksN3UzBS/aKaMXDk2QYE1pqabizk+x0q0EQZwXpGHDVJCewm4GG/oUGgnX2BQHhFOuGwMCfRacuoI7r4cKh8bORlTPNlUeJjnsaNd7rJbzbKnp8mN8//7uToWhSY+8Oh/Us3J+X75DkPP1ZPuaK+Lobyg5KnMeUuhyHH2GFaCIfvmDI0JWOMbByHzJcIcFUHnzy5auwg9S4JQ==',
+            '_hash': '9dd6aa857df1fe049e31c2f3f5b46f70d739f7fd8b39b9eccbb6391f05087f3c'
+        }],
+        'signature': 'YI3Jq6GYNVZ//azs0bDPuJKwjY4X44Aw5okulsRAUE00+kezJ1SvwUzzWZ58RItSzlvai/9oCQ+mm+Ded8gJ7ZK88jq7/2Un5Vh+qP/ZJC5lk3iO6SdeJZC02/fyxxBxOEgK/1+2+6dPxCx3+SjpUvuZ+OV/IqT40cii9YmMirlKwmwkhwEWgGexDVwU4U1WB3mgZYONQrCZbga0tRugha6cs4n+NrBSM144sKxgUScBKZKbhABsM9up+M7mJyY503Fqf70+p+yxPspjaqK5iw7052cO7MFg6e0tCBVehRv60c0HR6kIAUaZXVoc5vzcYOPZpaa4gCAM9jD6TGuAjw==',
+        'owner': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----'
     }
     block = Block.from_dict(genesis_block)
     block_signable = block.get_signable()
     block_signature_bytes = Hashing.reverse_str_signature_of_data(block.signature)
     actual = Hashing.validate_signature(block_signable, block.owner, block_signature_bytes)
     expected = True
+    print(actual)
     assert actual == expected
 
 def test_transaction():
     firstTransaction = {
-        "amount":1.0,
-        "to_addr":"-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----",
-        "signature":"JLhYlCLqb1hhKamCbKWfGh4Ja6eqYYCzXEUKu0uIxj5y/uyZzfu6VSexLBukUAn9+/7qvRqRmTFIWWB1qhQ4vo8tkPpGGR7TcUMi55fgZeRccBndYjso/5ZWOwdiymSkXCbeW7VppzUbLwSrm9rIDFz52p2v7xZIJcY4UruJFlNPEpbkG0tOZRnFXmice/qu8hZJ4l/l55B834jM8DxeI4sI0myk5CXJOiy6vvupjQS8HAcbpFsKnhKKF/xXIYYSGUU123Mty2u5bjhKjpTVBVL53b4WV1fBDVOfg5mMlI+PY4AssUkYBIirrxeBVuXwl+DHwwc4ZHfXKTUH9G5h0Q==",
-        "_hash":"5719d7850b6128e5cc783087f48390d86993eda2acaa6905098597e3272a6884",
-        "timestamp":1520135639,
-        "from_addr":""
+        'from_addr': '',
+        '_hash': '2cb0c5c1b1a5df13a08e831fdb3d5a9fbe1be556b23681591bdf3a5371133074',
+        'to_addr': '-----BEGIN PUBLIC KEY-----\nMIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBtxQbESKGGw1uYw113Tkyh\nXfMHy2jq/iXJ+17oEzjGk6qzT39evE7Zn60o9gZrmIWnvZMZRfo/fTBxTxKlWFme\n7wQEW5bM1lt5/LemQshRtKY9pcg3xneZzsyn3qy4oMLncWQEPBDiHK+L8OWiENLj\nTORn0ssrBlFi+bjG/eF/qyO9H0ljOPExcQYpjgp1bqcXhAlpSUKMIpdAwje+LWid\nbUoMxnJCOFKK5Dmvgku/Ca3eVXTV85/5VgafFRrvsG96wsRl4A+K88YU5RpbFPo8\nixWTW+67XNB0A12QFYMhjw4pvQ2mwosrgfipELs0TlCZFkr00IwRV7Qenw8tEAlZ\nAgMBAAE=\n-----END PUBLIC KEY-----',
+        'timestamp': 1520135639,
+        'amount': 1.0,
+        'signature': 'CnDOs1IZIXXZD85WYWbs5pkxh23FGKLgeA/13qb8br4qUTJSrpxnamBD6xZALD6XucyX/qSfj9jzB4beF2B4BV2OJtyc4BWYlR+dbANHCuLyIlXrKGxZN0sh0tJcV/ODPDd6w8oqCwumIkTrqjMQfjtPpUvZFkVVh2jKEwM4vwvAycRxoyxWbFFfS+C7xk+z7FidiCVYlSYJaTJ6+GQPqRAMx+Ey2ibpU3UIzR9i2cOqEDk9nUg+N43VcYIezbx7W81T9znN+F7RBP3X2Ww5BJ4dFlc71aE4HZrOJ/uJ/G76FjCl7FHvRcDHkLZ8MMG9H41XoS8Idn4/NqFqLKQpdA=='
     }
 
     trans = Transaction.from_dict(firstTransaction)

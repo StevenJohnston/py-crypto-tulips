@@ -27,7 +27,7 @@ class BaseTransaction(Hashable, Sendable, Signable):
         self.timestamp = int(timestamp)
 
     def to_string(self):
-        return json.dumps(self.__dict__)
+        return json.dumps(self.__dict__, sort_keys=True, separators=(',', ':'))
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
