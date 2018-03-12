@@ -232,14 +232,20 @@ def wallet_callback(wallet_sock):
         elif new_msg.action == 'tx':
             t = Transaction.from_dict(new_msg.data)
             trans_signable = t.get_signable()
+            #print(trans_signable)
             trans_signature_bytes = Hashing.reverse_str_signature_of_data(t.signature)
             status = Hashing.validate_signature(trans_signable, t.to_addr, trans_signature_bytes)
-            #rs = redis_service.RedisService()
-            #rs.store_object(t)
-            a_node.connection_manager.server.close_client(client_socket=wallet_sock)
+            if status == True:
+                #rs = redis_service.RedisService()
+                #rs.store_object(t)
+                a_node.connection_manager.server.send_msg(data="Test", client_socket=wallet_sock)
+            else:
+                a_node.connection_manager.server.send_msg(data="Test", client_socket=wallet_sock)
+                #not ```valid
+            #a_node.connection_manager.server.close_client(client_socket=wallet_sock)
+        elif new_msg.action == 'exit':
             break
-
-
+    a_node.connection_manager.server.close_client(client_socket=wallet_sock)
 
 def start_as_regular(bootstrap_port, bootstrap_host, node_port, peer_timeout=0, recv_data_size=20000, \
         socket_timeout=1):

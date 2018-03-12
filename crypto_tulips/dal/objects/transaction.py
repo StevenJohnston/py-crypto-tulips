@@ -9,7 +9,7 @@ from crypto_tulips.dal.objects.base_transaction import BaseTransaction
 class Transaction(BaseTransaction):
 
     def __init__(self, transaction_hash, signature, to_addr, from_addr, amount, is_mempool, timestamp = time.time()):
-        BaseTransaction.__init__(self, transaction_hash, signature, to_addr, from_addr, amount, is_mempool, timestamp)
+        BaseTransaction.__init__(self, transaction_hash, signature, to_addr, from_addr, amount, is_mempool, 1520798160)
 
     @staticmethod
     def from_dict(dict_values):
