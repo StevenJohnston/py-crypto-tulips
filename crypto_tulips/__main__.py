@@ -313,16 +313,9 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             new_transaction = Transaction('', '', to_addr, from_addr, amount, 1)
             new_transaction.update_signature(private_key)
             new_transaction.update_hash()
-<<<<<<< HEAD
-            transaction_msg = message.Message('transaction', new_transaction)
-            transaction_json = transaction_msg.to_json()
-            transaction_json = json.dumps(transaction_json, sort_keys=True, separators=(',', ':'))
-            a_node.connection_manager.send_msg(msg=transaction_json)
-=======
             #transaction_lock.acquire()
             send_a_transaction(new_transaction)
             transaction_lock.acquire()
->>>>>>> Added resending of transaction and blocks when one if recv. Duplicated
             print('\nTransaction hash : {}'.format(new_transaction._hash))
             rs = redis_service.RedisService()
             rs.store_object(new_transaction)
