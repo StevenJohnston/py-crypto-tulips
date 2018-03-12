@@ -190,7 +190,7 @@ def run_miner(a_node):
     print('\nCreated Block hash: ' + block._hash)
     block_msg = message.Message('block', block)
     sendable_block = block_msg.to_json()
-    block_json = json.dumps(sendable_block, sort_keys=True)
+    block_json = json.dumps(sendable_block, sort_keys=True, separators=(',', ':'))
     a_node.connection_manager.send_msg(msg=block_json)
     #print('Broadcasting block')
 
@@ -214,7 +214,7 @@ def wallet_callback(wallet_sock):
             "transaction": transaction,
             "amount": user_balance
         }
-        string_json_user_info = json.dumps(user_info)
+        string_json_user_info = json.dumps(user_info, sort_keys=True, separators=(',', ':'))
         a_node.connection_manager.server.send_msg(data=string_json_user_info, client_socket=wallet_sock)
         a_node.connection_manager.server.close_client(client_socket=wallet_sock)
     elif new_msg.action == 'tx':
@@ -273,7 +273,7 @@ def start_as_regular(bootstrap_host, node_port, peer_timeout=0, recv_data_size=2
             new_transaction.update_hash()
             transaction_msg = message.Message('transaction', new_transaction)
             transaction_json = transaction_msg.to_json()
-            transaction_json = json.dumps(transaction_json, sort_keys=True)
+            transaction_json = json.dumps(transaction_json, sort_keys=True, separators=(',', ':'))
             a_node.connection_manager.send_msg(msg=transaction_json)
             print('\nTransaction hash : {}'.format(new_transaction._hash))
             rs = redis_service.RedisService()
@@ -287,6 +287,7 @@ if __name__ == '__main__':
         print('\tGot arguments')
         port_node = int(arguments[0])
         if len(arguments) == 1:
+
             host = socket.gethostbyname(socket.getfqdn())
         else:
             host = arguments[1]

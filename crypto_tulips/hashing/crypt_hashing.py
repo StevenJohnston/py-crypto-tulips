@@ -36,7 +36,7 @@ class Hashing:
         Returns:
         string -- Returns the sha256 hash of the object provided
         """
-        return hashlib.sha256(json.dumps(object_to_hash, sort_keys=True).encode('utf-8')).hexdigest()
+        return hashlib.sha256(json.dumps(object_to_hash, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
 
     @staticmethod
     def hashing_block(json_block):
@@ -48,7 +48,7 @@ class Hashing:
         Returns:
         string -- Returns the sha256 hash of the JSON string provided
         """
-        return hashlib.sha256(json.dumps(json_block, sort_keys=True).encode('utf-8')).hexdigest()
+        return hashlib.sha256(json.dumps(json_block, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
 
     @staticmethod
     def hashing_transaction(transaction_format):
@@ -100,7 +100,7 @@ class Hashing:
         if isinstance(data, str):
             final = data.encode()
         elif not isinstance(data, bytes):
-            final = json.dumps(data, sort_keys=True)
+            final = json.dumps(data, sort_keys=True, separators=(',', ':'))
             final = final.encode()
 
         """ Returns a signiture base on the private key and data
@@ -169,7 +169,7 @@ class Hashing:
         if isinstance(data, str):
             final = data.encode()
         elif not isinstance(data, bytes):
-            final = json.dumps(data, sort_keys=True)
+            final = json.dumps(data, sort_keys=True, separators=(',', ':'))
             final = final.encode()
         """ Validate the signiture base on the data, public key and a signiture
 
