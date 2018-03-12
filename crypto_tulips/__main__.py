@@ -157,15 +157,13 @@ CpjNK8bI1U/5SIte6XlQt7blePAEF7KTm2YqkJT+IM3wZxPwP4U=
 
 
 
-def start_as_a_bootstrap(bootstrap_port):
-    print('\t\tStarting as a bootstrap node at port {}'.format(bootstrap_port))
-    bootstrap_node = bootstrap.BootstrapNode(port=bootstrap_port)
-    bootstrap_node.accept(True)
-    while True:
-        user_input = input('\t\t\tEnter a command: ')
-        if user_input == 'quit':
-            break
-    bootstrap_node.close()
+def check_if_object_exist(obj_hash, obj_type):
+    rs = redis_service.RedisService()
+    obj = rs.get_object_by_hash(obj_hash=obj_hash, obj=obj_type)
+    #obj = rs.get_object_by_full_key(obj_key=obj_hash, obj=obj_type)
+    if obj is None:
+        return False
+    return True
 
 def regular_node_callback(data):
     json_dic = json.loads(data)
