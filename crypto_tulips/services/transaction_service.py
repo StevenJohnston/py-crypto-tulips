@@ -30,7 +30,7 @@ class TransactionService(BaseObjectService):
         """
         public_key = new_transaction.from_addr
         amount = new_transaction.amount
-        transactions, balance = TransactionService.get_transactions_by_public_key(public_key, True)
+        transactions, balance = TransactionService.get_objects_by_public_key(public_key, True)
         if (balance >= amount):
             # address has enough funds for the new transaction
             return True
@@ -52,7 +52,7 @@ class TransactionService(BaseObjectService):
         Returns:
         list        -- list containing transactions from the given public key
         """
-        return super(TransactionService, TransactionService).get_transactions_from_public_key(public_key, include_mempool, Transaction)
+        return super(TransactionService, TransactionService).get_objects_from_public_key(public_key, include_mempool, Transaction)
 
     @staticmethod
     def get_transactions_to_public_key(public_key, include_mempool):
@@ -66,7 +66,7 @@ class TransactionService(BaseObjectService):
         Returns:
         list    -- list containing transactions to the given public key
         """
-        return super(TransactionService, TransactionService).get_transactions_to_public_key(public_key, include_mempool, Transaction)
+        return super(TransactionService, TransactionService).get_objects_to_public_key(public_key, include_mempool, Transaction)
 
     @staticmethod
     def get_transactions_by_public_key(public_key, include_mempool):
@@ -82,7 +82,7 @@ class TransactionService(BaseObjectService):
             AND
         float       -- float containing current balance for the supplied public key
         """
-        return super(TransactionService, TransactionService).get_transactions_by_public_key(public_key, include_mempool, Transaction)
+        return super(TransactionService, TransactionService).get_objects_by_public_key(public_key, include_mempool, Transaction)
 
     @staticmethod
     def get_10_transactions_from_mem_pool():

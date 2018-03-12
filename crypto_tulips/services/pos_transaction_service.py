@@ -22,7 +22,7 @@ class PosTransactionService(BaseObjectService):
         Returns:
         list        -- list containing transactions from the given public key
         """
-        return super(PosTransactionService, PosTransactionService).get_transactions_from_public_key(public_key, include_mempool, PosTransaction)
+        return super(PosTransactionService, PosTransactionService).get_objects_from_public_key(public_key, include_mempool, PosTransaction)
 
     @staticmethod
     def get_10_pos_transactions_from_mem_pool():

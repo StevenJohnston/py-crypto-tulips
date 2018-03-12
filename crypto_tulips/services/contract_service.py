@@ -24,7 +24,7 @@ class ContractService(BaseObjectService):
         Returns:
         list        -- list containing contracts from the given public key
         """
-        return super(ContractService, ContractService).get_contracts_from_public_key(public_key, include_mempool, Contract)
+        return super(ContractService, ContractService).get_objects_from_public_key(public_key, include_mempool, Contract)
 
     @staticmethod
     def get_contracts_to_public_key(public_key, include_mempool):
@@ -38,7 +38,7 @@ class ContractService(BaseObjectService):
         Returns:
         list    -- list containing contracts to the given public key
         """
-        return super(ContractService, ContractService).get_contracts_to_public_key(public_key, include_mempool, Contract)
+        return super(ContractService, ContractService).get_objects_to_public_key(public_key, include_mempool, Contract)
 
     @staticmethod
     def get_contracts_by_public_key(public_key, include_mempool):
@@ -54,5 +54,5 @@ class ContractService(BaseObjectService):
             AND
         float       -- float containing current balance for the supplied public key
         """
-        return super(ContractService, ContractService).get_contracts_by_public_key(public_key, include_mempool, Contract)
+        return super(ContractService, ContractService).get_objects_by_public_key(public_key, include_mempool, Contract)
         
