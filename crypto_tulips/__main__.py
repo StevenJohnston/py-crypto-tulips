@@ -334,16 +334,8 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
 
 if __name__ == '__main__':
     arguments = sys.argv[1:]
-    print('\tCommand line arguments are {}'.format(arguments))
-    if arguments:
-        print('\tGot arguments')
-        port_node = int(arguments[0])
-        if len(arguments) == 1:
-
-            host = socket.gethostbyname(socket.getfqdn())
-        else:
-            host = arguments[1]
-        start_as_regular(host, port_node)
+    if not arguments:
+        host = socket.gethostbyname(socket.getfqdn())
     else:
         host = arguments[0]
     start_as_regular(host)
