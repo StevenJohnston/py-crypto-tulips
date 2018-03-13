@@ -2,6 +2,7 @@ from crypto_tulips.p2p.p2p_client import P2pClient
 from crypto_tulips.p2p import message
 from crypto_tulips.hashing.crypt_hashing import Hashing
 import json
+from crypto_tulips.dal.objects.transaction import Transaction
 
 william_private_key = """-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEApDDm3fScenXUABItek4rBidvh3rsKBJeQ2BQzNqPgcaCArBL
@@ -31,33 +32,34 @@ dR1h9GMCgYBhxLj+WN642MGMjc08CKK1mUUEpJa5yO3Mtpwiht8bD/ZxSnKhTblr
 pHLKS94V6h1Ircz8nbDYBq6Siyl+FFX34iBqBBn7Syz3R+uRDaFjCg==
 -----END RSA PRIVATE KEY-----"""
 
-temp = """-----BEGIN RSA PRIVATE KEY-----
-MIIEowIBAAKCAQEAjEZeexcxJKi/eKQ4Q1f3t+NZhsgkjRpL9iNzJLQzBCbOdIZP
-kBGY9VDvjvgTChIyph8SUncv3MtJg/+Inc2zktrjm3e09fo37RX5j2Y2i1S5Yqlc
-0xi2bZP28FygiiblEuaCZ4IqN/VJ2A0kZFLPmCupyLqejHCK/MPhBZ/oTLKit9nu
-YSyaIkd3T5MbsuDkHT54LGrFErR2evwoBhbiKG8rNVeGteY8DFahMCS1kUSQ9Fbd
-lju0nxCobIo7KkOsn2FgE9JCPZGhw5sL3mkA2hk7MfSuIaQX+E+cLwmn2HshIXzU
-Awq1m+YxjpvQ2hcrIQJMzlywkfRtPGU7LBp0ewIDAQABAoIBAQCKnbcbt+1OJpsf
-Ilie47zdMIL1l63W6deKoblU2eVYAukdaOQSn/Eg6hvwkeBuoVD/q9C1QSZA73n0
-QH3GQtFjG36z0PU35U2CsaZtODpKMS0I/AfIarFLU15AY6gZHRpdNQBEPPJvXard
-Hw+JO/P8kZkzzIaEjWorIX2pyz0JHD3icTglBiVYvNeJ6wii1m3rR5Gd8aWmwjEx
-fUIXYnIfuIKVKdwK2gGfOlRLR+yRlgA3ppuiGipbCTKVYh2bQcc+c5U7CrRF3p/v
-1JpGURJCFimzWfuHKOJzoqYvckwNZunsY8eYrQUVB2GlmiVByaLE2+I2JDV6BfLb
-zr65WkmBAoGBAMygzgaxnJyGtLv6V7Cy8rnS4pAEZZj8U+dpUN9e0KFp5ArMYbLo
-fYOQeouYhRugsmnGIlS+I0ZLpkbE5UrWfikJxA74BV+nVIur99oSxjByfwoAkrY5
-p+Zhg/PdeOajxLvs29R9FidPmtWD7oAl4OnuaanJRQ9GziJg0KXW+fNbAoGBAK99
-qQw1v2aUD9VK9cntEA3/GuSyCzbCPFGL+qD3pLTPSyKiAdz8dvEBhDx3jGgOPUjI
-JSMBe8Qz22nHoPFBM/0YxQd+m7CIVCH3FDdnrT9f9Kbnw7SHIPEVPt7WTZioa0K3
-C5nYFDxSZVftQI8GtMctLZpW0lAZboxwGgZAbu1hAoGAL3poEzmGovLGYI83ZXI/
-y0nY851xjUuOlDTlZM51Dd6p4K+HQ6GZ7brKFDWxPLXOb6hfMtZjDN5kmCr7IKAf
-6ZmweeCmLol+nmGqQlj0zyzhuQplAA7knBmoKh8K/EinTwsn/md/imN4A253Ghiv
-1NdSgOiIM4E0NtnLz47Ps90CgYAtFyWDXKAENFDpJeyHaKDyZ7S6RED7XebvsP7B
-sz+fsY+Fo4jFBh1tiU032CO8bMQ0WjCokO4DGKvsvv1MX8uC4YVmipJoRm8PlxOb
-tMjf+sC6zdwMG5hMOYBA82FWsxd0OeICMnHomecuM2ieF0QF1UbdXCeHqzErZnZZ
-Wt7loQKBgC5V4v4P0o33iYUGXeaB7zA4NmHQoKU4NBF+OogzM9w+w4n3WXPqhnD/
-FE8Fqf86qIZEtJ0Uvq3WCRHRk+OgMl3Ek1ja3IWD/a2lw56dHqICJEgJKkcQ1FX3
-JWeyK6sdW0FG9pWhPQ4eoo7SpnWRBpiplPyDgcPfr9u36bt81IFc
+temp_key = """-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEAy9vu0sGGcfk0QONk50jR4zcO/9tVmxdlbGIq+YU2SxZNYyXh
+2UkDzXDdfRGO89tAQKg1dWV7upd7U1NoqfgI81nAkUfRR0vVEb2LbFuKG4OEPn9D
+4DJrx0HV6cPNCLFrfUYWGt/lSCHcJ+LTpxml+vmDKXyUc/Cux58CRu/0IVZ/nbzb
+v0CmKQ82t0uh7E8JKbMApfZkXdNqOz4A8qLezFQ3bU2ZY/Ucqx8ryvPWoPYELWil
+c7S9tQ2vttdSTh2TwWthgRV0XCNynXlWDnL0Wfoi3dtHHVQFiFyR+DPDTu6zxWqj
+z7q1WA2VbHoBClt/7bm9x2VNXWoP1lFVJnealQIDAQABAoIBAGxR/ZGBATY4S1qb
+OTdnyxanX9H1soQJJ3wyoVEaRmIZhJ9FNr9k+59C9H2LQeEzQ+3XMyig9uCLsxzw
+efGueNsNerP3bC0tDxcxFw9JiJXcCP3IU8GiKQCka8ydnKmc1FepUP+QrlzomPmc
+ngfxKe+0eswlhSAh6EzroaMdxyOaxsSe6DtVLY0hL7ioWf3Zy1FUbiD0WnfQRQ5+
++ToPqIbd4T/cDnINi5eo8bzzwqa5TdcryUpUqTRJlOBkuUsS/HzE5eYyNnRa43IF
+OeDa/AoxPV+ar8wUCE6K70UP+LNqaYNR894qhjMXMVnZxcnGrpIHMFHRHLNyUcVs
+iP8zdrUCgYEA5wLbl+3buJ9HvpXATqfJmLyNHstUez5QFKTBo0hZxxnYiY/JeKrK
+J+175bMFYnW8qFA1d+fzGGq9cmjDo00EhzayJblCDQz4zHSzGv7Um0cGKjk3YUEn
+K9jRuH1nCe+42SPssz7GgoRxXAnCnAfH08ircenXMbjwLwaNKTwhWgsCgYEA4eku
+yYRqAFGlNIczIeEJFKCywybIYLNloMXhZinIZL54agzKh9HF8TIjy+fTwZVjCZkC
+ryxkw2q+CElSzFhwQzsxTrH4FSNEu8fVQCAlSOoKQbmklgKcIkq4/vyjtGZEVkFH
+qZgl6e6s6oTPwo2roNkBuQjd47zj4JfKPaJkYd8CgYACkdSRfxLXneX1Z8MI3PLw
+IQDM2+QnrszDPgXtZAujnFT9Sr0p+3ReN1UOfAxOSRL9KE8/8zOQDPfoguPSODQZ
+sPEQXFwwuvk1hQLNBRKmW4blB1fnXAssgK/shnCT+reqqqyiXctlfkWoiW9BvxBo
++a12iexb4DvDuiXt1H5mewKBgEe665Euyx2IzwTrvM+QDXsQP1J5mPwjWix/SD9R
+GwDp/X/mydPwRoJ8IiOXW4RG86hTfiey19e4p9gnt/OMTTD7tX9AQP4tMaDSJaLz
+0gLh1RnjYSAEeiDlSvIjs7MPGbmthpyR48/wadUZEIK8yvcKkGJ5L0MlcdGZQKzr
+SCZPAoGAHiZVGdWnG5hKC+F8F3j5XOMCPZh8M9XU7CGZw9u4YrzWkOGf808w4W5Q
+KwoZZzSM2MBlKIqheGYTgibSlMjcANq4rB4P2G8mhBKQlOWr15bhuFM3IZtQ5DlT
+blQW26Ds+9FDJnyal3i6gmLkB7hldT/TnU1VznAExM75axbFD/c=
 -----END RSA PRIVATE KEY-----"""
+
 
 denys_private_key = """-----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEAzjo14F/L8Yu009jtTR4BYi28UCoBTA/zOoweOI9vK3BBB4lw
@@ -92,11 +94,38 @@ if __name__ == '__main__':
     p2p.connect_to('vagrant', 36363)
     p2p.send_msg('wallet')
     #Start getting balance, trans history and pending trans
+    denys_public_key = Hashing.get_public_key(denys_private_key)
     william_public_key = Hashing.get_public_key(william_private_key)
-    transaction_msg = message.Message('tx_by_public_key', public_key)
+    transaction_msg = message.Message('tx_by_public_key', william_public_key)
     transaction_json = transaction_msg.to_json(is_object=False)
-    transaction_json = json.dumps(transaction_json, sort_keys=True, separators=(',', ':'))
+    transaction_json = json.dumps(transaction_json, sort_keys=True)
     p2p.send_msg(transaction_json)
     data = p2p.recv_msg()
+    #ends
+
+    #Testing user wallet key generation
+    #public_key = Hashing.get_public_key(temp)
+    # print(public_key)
+    # sig = Hashing.str_signature_of_data('message', temp)
+    # print(sig)
+    #ends user wallet testing
+
+    #start a transaction
+    amount = 100
+    new_transaction = Transaction('', '', denys_public_key, william_public_key, amount, 1)
+    new_transaction.update_signature(william_private_key)
+    new_transaction.update_hash()
+
+    transaction_msg = message.Message('tx', new_transaction)
+    transaction_json = transaction_msg.to_json()
+    transaction_json = json.dumps(transaction_json, sort_keys=True)
+    p2p.send_msg(transaction_json)
+    data = p2p.recv_msg()
+
+    #quiting
+    transaction_msg = message.Message('exit', 'quit')
+    transaction_json = transaction_msg.to_json(is_object=False)
+    transaction_json = json.dumps(transaction_json, sort_keys=True)
     p2p.send_msg(transaction_json)
     p2p.close_socket()
+    #end

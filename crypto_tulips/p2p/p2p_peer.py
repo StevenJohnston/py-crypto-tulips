@@ -49,6 +49,19 @@ class Peer:
         """
         self.last_message_time = time.time()
 
+    def get_ip_address(self):
+        """
+        In server mode when we store a pair of
+        ip and port of connected client, which
+        means that we need to tream them differently based on the mode
+
+        Returns:
+        string -- ip address
+        """
+        if self.mode == PeerMode.Server:
+            return self.ip_address[0]
+        return self.ip_address
+
     def give_time_difference(self):
         """
         Return the difference between current time and the last_message_time of a peer

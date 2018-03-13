@@ -29,21 +29,25 @@ def set_up_bootstrap(port_bootstrap):
 def test_node_bootstrap_connection():
     port_node = 25266
     port_second_node = 25277
-    port_bootstrap = 25255
+    port_bootstrap = 45255
     peer_timeout = 0
     socket_timeout = 0.1
     boot_node = set_up_bootstrap(port_bootstrap)
     boot_node.accept(True)
 
-    a_node = node.Node(port_node)
+    a_node = node.Node()
+    a_node.port = port_node
+    a_node.default_bootstrap_port = port_bootstrap
     a_node.join_network(bootstrap_host=socket.gethostname(), \
-            bootstrap_port=port_bootstrap, read_callback=callback_client, peer_timeout=peer_timeout, \
+            read_callback=callback_client, peer_timeout=peer_timeout, \
             socket_timeout=socket_timeout)
 
     time.sleep(0.1)
-    second_node = node.Node(port_second_node)
+    second_node = node.Node()
+    second_node.port = port_second_node
+    second_node.default_bootstrap_port = port_bootstrap
     second_node.join_network(bootstrap_host=socket.gethostname(), \
-            bootstrap_port=port_bootstrap, read_callback=callback_second_client, peer_timeout=peer_timeout, \
+            read_callback=callback_second_client, peer_timeout=peer_timeout, \
             socket_timeout=socket_timeout)
 
     time.sleep(0.1)
@@ -64,19 +68,23 @@ def test_node_bootstrap_send_msg():
     CallbackStore.clean()
     port_node = 25266
     port_second_node = 25277
-    port_bootstrap = 25255
+    port_bootstrap = 35255
     peer_timeout = 0
     socket_timeout = 0.1
     boot_node = set_up_bootstrap(port_bootstrap)
     boot_node.accept(True)
 
-    a_node = node.Node(port_node)
+    a_node = node.Node()
+    a_node.port = port_node
+    a_node.default_bootstrap_port = port_bootstrap
     a_node.join_network(bootstrap_host=socket.gethostname(), \
-            bootstrap_port=port_bootstrap, read_callback=callback_client, peer_timeout=peer_timeout, socket_timeout=socket_timeout)
+            read_callback=callback_client, peer_timeout=peer_timeout, socket_timeout=socket_timeout)
     time.sleep(0.1)
-    second_node = node.Node(port_second_node)
+    second_node = node.Node()
+    second_node.port = port_second_node
+    second_node.default_bootstrap_port = port_bootstrap
     second_node.join_network(bootstrap_host=socket.gethostname(), \
-            bootstrap_port=port_bootstrap, read_callback=callback_second_client, peer_timeout=peer_timeout, \
+            read_callback=callback_second_client, peer_timeout=peer_timeout, \
             socket_timeout=socket_timeout)
 
     time.sleep(0.1)

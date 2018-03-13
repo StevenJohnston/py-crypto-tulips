@@ -3,7 +3,9 @@ Module with node class and its functionality
 """
 import socket
 import pickle
-from crypto_tulips.p2p import p2p_client, connection_manager
+import threading
+import time
+from crypto_tulips.p2p import p2p_client, connection_manager, p2p_server, p2p_peer
 from crypto_tulips.node.bootstrap import BootstrapNode
 
 class Node:
@@ -11,12 +13,18 @@ class Node:
     A node in the network
     """
 
-    def __init__(self, my_port):
-        self.port = my_port
+    def __init__(self):
         self.connection_manager = None
         self.host = None
         self.bootstrap_node = None
         self.bootstrap_node_running = False
+        self.gossip_port = 14141
+        self.gossiping_run = False
+        self.gossiping_timeout = 10
+        self.gossip_threads = []
+        self.default_bootstrap_port = 25252
+        self.default_node_port = 36363
+        self.port = self.default_node_port
         #print('Started a node')
 
     def start_bootstrap(self, port=25252):
@@ -43,35 +51,157 @@ class Node:
         print('\n\t\t{}'.format(data))
 
     def make_silent(self, silent):
+        """
+        Set silent mode on connection manager for this node
+
+        Arguments:
+        silent -- True to set silent mode, False to unset it
+        """
         self.connection_manager.silent = silent
 
-    def join_network(self, bootstrap_host, bootstrap_port=25252, peer_timeout=10, recv_data_size=1024, \
-            socket_timeout=10, read_callback=None, wallet_callback=None, start_bootstrap=False):
+    def gossiping_listen(self):
+        """
+        Method to constantly listen to gossip connections and
+        tell them about known peers
+        """
+        mini_server = p2p_server.P2pServer(self.gossip_port)
+        while self.gossiping_run:
+            client_pair = mini_server.accept_client()
+            copy_list = []
+            # creating new list of known peers because we only
+            # need ip and port. Also, we cannot pickle socket object
+            for peer in self.connection_manager.peer_list:
+                new_peer = p2p_peer.Peer(ip_address=peer.get_ip_address(), port=self.default_node_port)
+                copy_list.append(new_peer)
+            pickled_list = pickle.dumps(copy_list)
+            mini_server.send_msg(data=pickled_list, client_pair=client_pair, encode=False)
+            mini_server.close_client(client_pair=client_pair)
+
+    def unblock_gossiping_listen(self):
+        """
+        Method to unblock listening part of gossiping
+        """
+        mini_client = p2p_client.P2pClient()
+        mini_client.connect_to(self.host, self.gossip_port)
+        # don't care about what we receive, because we are going to exit anyway
+        mini_client.recv_msg(decode=False)
+        mini_client.close_socket()
+
+    def gossiping_connect(self, read_callback):
+        """
+        Main gossiping method that connects to the peer and gets their known peers.
+        After connecting it checks what peers current node is not connected to and does the
+        connection.
+
+        Arguments:
+        read_callback -- callback which to call when we recv a msg from a new peer
+        """
+        new_peers = []
+        for peer in self.connection_manager.peer_list:
+            mini_client = p2p_client.P2pClient()
+            peer_ip_address = peer.get_ip_address()
+            # need to catch exceptions because peer might be closed
+            try:
+                mini_client.connect_to(peer_ip_address, self.gossip_port)
+                pickled_list = mini_client.recv_msg(decode=False)
+                new_known_peers = pickle.loads(pickled_list)
+                mini_client.close_socket()
+            except:
+                mini_client.close_socket()
+                continue
+            for a_new_peer in new_known_peers:
+                found_new = True
+                # checking if any of current peers has the same ip
+                # as each of new received peers
+                # this specific new peer does not have its ip in peer list
+                # we should connect to it
+                for an_old_peer in self.connection_manager.peer_list:
+                    an_old_peer_ip_address = an_old_peer.get_ip_address()
+                    if a_new_peer.ip_address == an_old_peer_ip_address:
+                        found_new = False
+                        break
+                if found_new:
+                    # need to also check if current peer is our ip
+                    if a_new_peer.ip_address != self.host:
+                        already_added = False
+                        # check if we already know about the peer
+                        for a_new_peer_to_add in new_peers:
+                            if a_new_peer.ip_address == a_new_peer_to_add.ip_address:
+                                already_added = True
+                                break
+                        if not already_added:
+                            new_peers.append(a_new_peer)
+        for new_peer in new_peers:
+            self.peer_connection(peer=new_peer, read_callback=read_callback)
+
+    def gossiping_connect_thread(self, read_callback):
+        """
+        Thread method to connect to other peers gossip servers and get their known peers
+
+        Arguments:
+        read_callback -- callback to which redirect msg from newly connected peers
+        """
+        gossip_sleep = 1
+        number_of_sleep_to_run = self.gossiping_timeout / gossip_sleep
+        current_increment = 0
+        actually_run = True
+        while self.gossiping_run:
+            if current_increment >= number_of_sleep_to_run:
+                actually_run = True
+            if actually_run:
+                actually_run = False
+                self.gossiping_connect(read_callback)
+            time.sleep(gossip_sleep)
+            current_increment += 1
+
+    def start_gossiping(self, read_callback):
+        """
+        Method to start gossiping threads to talk to peers and get their known peers
+
+        Arguments:
+        read_callback -- callback to which redirect msg from newly connected peers
+        """
+        if not self.gossiping_run:
+            self.gossiping_run = True
+            a_thread = threading.Thread(target=self.gossiping_listen)
+            a_thread.start()
+            b_thread = threading.Thread(target=self.gossiping_connect_thread, args=(read_callback,))
+            b_thread.start()
+            self.gossip_threads.append(a_thread)
+            self.gossip_threads.append(b_thread)
+
+    def join_network(self, bootstrap_host, peer_timeout=10, recv_data_size=1024, \
+            socket_timeout=10, read_callback=None, wallet_callback=None, \
+            start_bootstrap=False, start_gossiping=False):
         """
         Join the network and start communications
 
         Arguments:
-        bootstrap_host -- host name of the bootstrap node
-        bootstrap_port -- port of the bootstrap node
+        bootstrap_host -- host name of the bootstrap node. Can be itself
         peer_timeout=10 -- timeout on the peer before it is considered to be inactive
         recv_data_size=1024 -- default read size
         socket_timeout=10 -- timeout on socket recv
         read_callback=None -- callback to which redirect recv msgs
         wallet_callback=None -- callback to which redirect wallet connection
         start_bootstrap=False -- do we need to start a bootstrap node
+        start_gossiping=False -- do we need to start gossiping threads
         """
-        if not self.bootstrap_node_running and start_bootstrap:
-            self.start_bootstrap()
         if read_callback is None:
             callback = Node.read_callback
         else:
             callback = read_callback
-        known_peers = self.connect_to_bootstrap(host=bootstrap_host, port=bootstrap_port)
+        if not self.bootstrap_node_running and start_bootstrap:
+            self.start_bootstrap()
+            # connect to its own bootstrap so it has information about itself
+            self.connect_to_bootstrap(host=self.get_my_host(), port=self.default_bootstrap_port)
+        known_peers = self.connect_to_bootstrap(host=bootstrap_host, port=self.default_bootstrap_port)
         self.connection_manager = connection_manager.ConnectionManager(server_port=self.port, \
                 peer_timeout=peer_timeout, recv_data_size=recv_data_size, socket_timeout=socket_timeout)
         self.connection_manager.accept_connection(read_callback=callback, run_as_a_thread=True, wallet_callback=wallet_callback)
         for peer in known_peers:
             self.peer_connection(peer, read_callback=read_callback)
+        if start_gossiping:
+            self.start_gossiping(callback)
 
     def peer_connection(self, peer, read_callback=None):
         """
@@ -103,7 +233,7 @@ class Node:
         """
         client = p2p_client.P2pClient()
         client.connect_to(host=host, port=port)
-        host = socket.gethostbyname(socket.getfqdn())
+        host = self.get_my_host()
         self.host = host
         client.send_msg(str(host) + ':' + str(self.port))
         recv_data = client.recv_msg(decode=False)
@@ -111,10 +241,18 @@ class Node:
         client.close_socket()
         return known_peers
 
+    def get_my_host(self):
+        return socket.gethostbyname(socket.getfqdn())
+
     def close(self):
         """
         Clean up and end node
         """
+        if self.gossiping_run:
+            self.gossiping_run = False
+            self.unblock_gossiping_listen()
+            for a_thread in self.gossip_threads:
+                a_thread.join()
         self.connection_manager.close_all()
         if self.bootstrap_node_running:
             self.bootstrap_node.close()

@@ -15,8 +15,7 @@ class BlockService():
         Method Comment
         """
         block_service_dal = BlockServiceDal()
-        block_service_dal.store_block(block)
-        pass
+        return block_service_dal.store_block(block)
 
     @staticmethod
     def get_max_height():

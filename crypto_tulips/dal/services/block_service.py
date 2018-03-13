@@ -71,6 +71,7 @@ class BlockService:
             return pipe.execute()
         else:
             print("Block with hash: " + block._hash + " already exists. Unable to update.")
+            return []
 
     def find_by_hash(self, block_hash):
         """
