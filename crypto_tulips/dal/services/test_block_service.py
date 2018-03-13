@@ -1,5 +1,6 @@
 import pytest
 import time
+import redis
 
 from crypto_tulips.dal.services.block_service import BlockService
 from crypto_tulips.dal.objects.block import Block
@@ -33,3 +34,5 @@ def test_store_same_hash():
     new_b = bs.find_by_hash('block_service_test_1')
 
     assert b.get_sendable() != new_b.get_sendable()
+    r = redis.Redis()
+    r.flushdb()
