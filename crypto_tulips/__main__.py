@@ -18,7 +18,7 @@ from crypto_tulips.services.transaction_service import TransactionService
 from crypto_tulips.services.block_service import BlockService
 
 
-from crypto_tulips.services.base_transaction_service import BaseTransactionService
+from crypto_tulips.services.base_object_service import BaseObjectService
 
 denys_private_key = """-----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEAzjo14F/L8Yu009jtTR4BYi28UCoBTA/zOoweOI9vK3BBB4lw
@@ -212,14 +212,14 @@ def run_miner():
     time_now = int(time.time())
     height = int(BlockService.get_max_height()) + 1
     ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
-    block = Block('', '', steven_pub, height, ten_transactions, [], [], time_now)
+    block = Block('', '', steven_pub, 'LAST_BLOCK_HASH', height, ten_transactions, [], [], time_now)
     block.update_signature(steven_private_key)
     block.update_hash()
     block_lock.acquire()
     block_service.add_block_to_chain(block)
     # TODO Test if worked block was added. Might fail due to same hash
     for trabs in ten_transactions:
-        BaseTransactionService.remove_from_mem_pool(trabs)
+        BaseObjectService.remove_from_mem_pool(trabs)
     print('\nCreated Block hash: ' + block._hash)
     block_lock.release()
     send_a_block(block)

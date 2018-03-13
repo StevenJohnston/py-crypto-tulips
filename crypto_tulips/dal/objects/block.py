@@ -17,8 +17,9 @@ class Block(Hashable, Sendable, Signable):
     timestamp = ''
     owner = ''
     height = 0
+    prev_block = ''
 
-    def __init__(self, block_hash, signature, owner, height, transactions, pos_transactions, contract_transactions, timestamp = time.time()):
+    def __init__(self, block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, timestamp = time.time()):
         self._hash = block_hash
         self.signature = signature
         self.owner = owner
@@ -27,6 +28,7 @@ class Block(Hashable, Sendable, Signable):
         self.pos_transactions = pos_transactions
         self.contract_transactions = contract_transactions
         self.timestamp = int(timestamp)
+        self.prev_block = prev_block
 
     @staticmethod
     def from_dict(dict_values):
@@ -38,7 +40,8 @@ class Block(Hashable, Sendable, Signable):
         pos_transactions = list(map(PosTransaction.from_dict, dict_values.get('pos_transactions')))
         contract_transactions = dict_values.get('contract_transactions')
         timestamp = dict_values.get('timestamp')
-        new_block = Block(block_hash, signature, owner, height, transactions, pos_transactions, contract_transactions, timestamp)
+        prev_block = dict_values.get('prev_block')
+        new_block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, timestamp)
         return new_block
 
     def to_string(self):
@@ -53,6 +56,7 @@ class Block(Hashable, Sendable, Signable):
 
     def get_signable(self):
         return {
+            'prev_block': self.prev_block,
             'height': self.height,
             'transactions': list(map(Signable.get_signable_callback, self.transactions)),
             'pos_transactions': list(map(Signable.get_signable_callback, self.pos_transactions)),
@@ -64,6 +68,7 @@ class Block(Hashable, Sendable, Signable):
         return {
             'signature': self.signature,
             'owner': self.owner,
+            'prev_block': self.prev_block,
             'height': self.height,
             'transactions': list(map(Sendable.get_sendable_callback, self.transactions)),
             'pos_transactions': list(map(Sendable.get_sendable_callback, self.pos_transactions)),
@@ -76,6 +81,7 @@ class Block(Hashable, Sendable, Signable):
         return {
             'signature': self.signature,
             'owner': self.owner,
+            'prev_block': self.prev_block,
             'height': self.height,
             'transactions': list(map(Sendable.get_sendable_callback, self.transactions)),
             'pos_transactions': list(map(Sendable.get_sendable_callback, self.pos_transactions)),
