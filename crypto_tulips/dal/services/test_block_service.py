@@ -15,7 +15,7 @@ def test_get_store_block():
     t4 = Transaction('transaction_test_4', '', 'steven', 'naween', 5040, 0, test_time)
     t5 = Transaction('transaction_test_5', '', 'will', 'naween', 22, 0, test_time)
     t6 = Transaction('transaction_test_6', '', 'naween', 'matt', 588, 0, test_time)
-    b = Block('block_service_test_1', '', '', 0, [t1, t2, t3, t4, t5, t6], [], [], test_time)
+    b = Block('block_service_test_1', '', '', 'LAST_BLOCK', 0, [t1, t2, t3, t4, t5, t6], [], [], test_time)
     bs = BlockService()
 
     bs.store_block(b)
@@ -25,7 +25,7 @@ def test_get_store_block():
     assert b.get_sendable() == new_b.get_sendable()
 
 def test_store_same_hash():
-    b = Block('block_service_test_1', '', '', 0, [], [], [])
+    b = Block('block_service_test_1', '', '', 'LAST_BLOCK', 0, [], [], [])
 
     bs = BlockService()
 

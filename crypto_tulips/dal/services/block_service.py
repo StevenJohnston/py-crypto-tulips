@@ -41,6 +41,7 @@ class BlockService:
         if not r.exists(name):
             pipe = r.pipeline()
             # store timestamp first
+            pipe.rpush(name, block.prev_block)
             pipe.rpush(name, block.height)
             pipe.rpush(name, block.owner)
             pipe.rpush(name, block.signature)
@@ -92,6 +93,11 @@ class BlockService:
 
         # get all of the fields in the list
         hashes = r.lrange(name, 0, -1)
+
+        # timestamp will always be first
+        prev_block = hashes[0]
+        # remove for iteration
+        hashes.remove(prev_block)
 
         # timestamp will always be first
         height = hashes[0]
@@ -151,7 +157,7 @@ class BlockService:
         temp_list.clear()
 
         # create block object and return it
-        block = Block(block_hash, signature, owner, height, transactions, pos_transactions, contract_transactions, timestamp)
+        block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, timestamp)
         return block
 
     def get_max_block_height(self):
