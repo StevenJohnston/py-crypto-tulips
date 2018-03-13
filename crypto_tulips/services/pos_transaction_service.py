@@ -3,9 +3,9 @@ Pos Transaction Service Module
 """
 
 from crypto_tulips.dal.objects.pos_transaction import PosTransaction
-from crypto_tulips.services.base_transaction_service import BaseTransactionService
+from crypto_tulips.services.base_object_service import BaseObjectService
 
-class PosTransactionService(BaseTransactionService):
+class PosTransactionService(BaseObjectService):
     """
     Pos Transaction Service
     """
@@ -22,7 +22,7 @@ class PosTransactionService(BaseTransactionService):
         Returns:
         list        -- list containing transactions from the given public key
         """
-        return super(PosTransactionService, PosTransactionService).get_transactions_from_public_key(public_key, include_mempool, PosTransaction)
+        return super(PosTransactionService, PosTransactionService).get_objects_from_public_key(public_key, include_mempool, PosTransaction)
 
     @staticmethod
     def get_10_pos_transactions_from_mem_pool():

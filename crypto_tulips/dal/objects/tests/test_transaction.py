@@ -7,7 +7,7 @@ import time
 
 def test_hashable():
     test_time = int(time.time())
-    transaction = Transaction('block_hash_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
+    transaction = Transaction('block_hash_test', '', 'to_steven_test', 'from_matt_test', 1, 0, test_time)
     actual = transaction.get_hashable()
     expected = {
         'signature': '',
@@ -20,7 +20,7 @@ def test_hashable():
 
 def test_hashable_fail():
     test_time = int(time.time())
-    transaction = Transaction('block_hash_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
+    transaction = Transaction('block_hash_test', '', 'to_steven_test', 'from_matt_test', 1, 0, test_time)
     actual = transaction.get_hashable()
     not_expected = {
         'signature': '',
@@ -35,7 +35,7 @@ def test_hashable_fail():
 
 def test_sendable():
     test_time = int(time.time())
-    transaction = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
+    transaction = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, 0, test_time)
     actual = transaction.get_sendable()
     expected = {
         'signature': '',
@@ -49,7 +49,7 @@ def test_sendable():
 
 def test_sendable_fail():
     test_time = int(time.time())
-    transaction = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
+    transaction = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, 0, test_time)
     actual = transaction.get_sendable()
     not_expected = {
         'signature': '',
@@ -63,8 +63,8 @@ def test_sendable_fail():
 
 def test_sendable_json():
     test_time = int(time.time())
-    transaction = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, test_time)
-    actual = json.dumps(transaction.get_sendable(), sort_keys=True)
+    transaction = Transaction('block_send_test', '', 'to_steven_test', 'from_matt_test', 1, 0, test_time)
+    actual = json.dumps(transaction.get_sendable(), sort_keys=True, separators=(',', ':'))
     expected = json.dumps({
         'signature': '',
         'amount': 1.0,
@@ -72,6 +72,6 @@ def test_sendable_json():
         'from_addr': 'from_matt_test',
         '_hash': 'block_send_test',
         'timestamp': test_time
-    }, sort_keys=True)
+    }, sort_keys=True, separators=(',', ':'))
     assert actual == expected
     

@@ -4,9 +4,9 @@ Base Transaction Class
 
 import json
 import time
-from crypto_tulips.dal.objects.hashable import Hashable
-from crypto_tulips.dal.objects.sendable import Sendable
-from crypto_tulips.dal.objects.signable import Signable
+from crypto_tulips.dal.objects.base_objects.hashable import Hashable
+from crypto_tulips.dal.objects.base_objects.sendable import Sendable
+from crypto_tulips.dal.objects.base_objects.signable import Signable
 
 class BaseTransaction(Hashable, Sendable, Signable):
     to_addr = ''
@@ -27,7 +27,7 @@ class BaseTransaction(Hashable, Sendable, Signable):
         self.timestamp = int(timestamp)
 
     def to_string(self):
-        return json.dumps(self.__dict__)
+        return json.dumps(self.__dict__, sort_keys=True, separators=(',', ':'))
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__

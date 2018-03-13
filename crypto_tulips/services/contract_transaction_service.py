@@ -3,9 +3,9 @@ Contract Transaction Service Module
 """
 
 from crypto_tulips.dal.objects.contract_transaction import ContractTransaction
-from crypto_tulips.services.base_transaction_service import BaseTransactionService
+from crypto_tulips.services.base_object_service import BaseObjectService
 
-class ContractTransactionService(BaseTransactionService):
+class ContractTransactionService(BaseObjectService):
     """
     Contract Transaction Service
     """
@@ -22,7 +22,7 @@ class ContractTransactionService(BaseTransactionService):
         Returns:
         list    -- list containing transactions from the given public key
         """
-        return super(ContractTransactionService, ContractTransactionService).get_transactions_from_public_key(public_key, include_mempool, ContractTransaction)
+        return super(ContractTransactionService, ContractTransactionService).get_objects_from_public_key(public_key, include_mempool, ContractTransaction)
 
     @staticmethod
     def get_contract_transactions_to_public_key(public_key, include_mempool):
@@ -36,7 +36,7 @@ class ContractTransactionService(BaseTransactionService):
         Returns:
         list    -- list containing transactions to the given public key
         """
-        return super(ContractTransactionService, ContractTransactionService).get_transactions_to_public_key(public_key, include_mempool, ContractTransaction)
+        return super(ContractTransactionService, ContractTransactionService).get_objects_to_public_key(public_key, include_mempool, ContractTransaction)
 
     @staticmethod
     def get_contract_transactions_by_public_key(public_key, include_mempool):
@@ -52,7 +52,7 @@ class ContractTransactionService(BaseTransactionService):
             AND
         float       -- float containing current balance for the supplied public key
         """
-        return super(ContractTransactionService, ContractTransactionService).get_transactions_by_public_key(public_key, include_mempool, ContractTransaction)
+        return super(ContractTransactionService, ContractTransactionService).get_objects_by_public_key(public_key, include_mempool, ContractTransaction)
 
     @staticmethod
     def get_10_contract_transactions_from_mem_pool():

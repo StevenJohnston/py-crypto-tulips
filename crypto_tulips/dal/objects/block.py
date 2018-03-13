@@ -5,9 +5,9 @@ import time
 
 from crypto_tulips.dal.objects.transaction import Transaction
 from crypto_tulips.dal.objects.pos_transaction import PosTransaction
-from crypto_tulips.dal.objects.hashable import Hashable
-from crypto_tulips.dal.objects.sendable import Sendable
-from crypto_tulips.dal.objects.signable import Signable
+from crypto_tulips.dal.objects.base_objects.hashable import Hashable
+from crypto_tulips.dal.objects.base_objects.sendable import Sendable
+from crypto_tulips.dal.objects.base_objects.signable import Signable
 
 class Block(Hashable, Sendable, Signable):
     prefix = 'block'
@@ -42,7 +42,7 @@ class Block(Hashable, Sendable, Signable):
         return new_block
 
     def to_string(self):
-        return json.dumps(self.__dict__)
+        return json.dumps(self.__dict__, sort_keys=True, separators=(',', ':'))
         #return str(self.block_hash) + "->" + str(self.block_data)
 
     def __eq__(self, other):

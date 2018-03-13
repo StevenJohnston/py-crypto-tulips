@@ -4,7 +4,7 @@ PosTransaction Class
 
 import json
 import time
-from crypto_tulips.dal.objects.base_transaction import BaseTransaction
+from crypto_tulips.dal.objects.base_objects.base_transaction import BaseTransaction
 
 class PosTransaction(BaseTransaction):
 

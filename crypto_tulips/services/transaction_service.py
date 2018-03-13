@@ -3,9 +3,9 @@ Transaction Service Module
 """
 
 from crypto_tulips.dal.objects.transaction import Transaction
-from crypto_tulips.services.base_transaction_service import BaseTransactionService
+from crypto_tulips.services.base_object_service import BaseObjectService
 
-class TransactionService(BaseTransactionService):
+class TransactionService(BaseObjectService):
     """
     Transaction Service
     """
@@ -57,7 +57,7 @@ class TransactionService(BaseTransactionService):
         Returns:
         list        -- list containing transactions from the given public key
         """
-        return super(TransactionService, TransactionService).get_transactions_from_public_key(public_key, include_mempool, Transaction)
+        return super(TransactionService, TransactionService).get_objects_from_public_key(public_key, include_mempool, Transaction)
 
     @staticmethod
     def get_transactions_to_public_key(public_key, include_mempool):
@@ -71,7 +71,7 @@ class TransactionService(BaseTransactionService):
         Returns:
         list    -- list containing transactions to the given public key
         """
-        return super(TransactionService, TransactionService).get_transactions_to_public_key(public_key, include_mempool, Transaction)
+        return super(TransactionService, TransactionService).get_objects_to_public_key(public_key, include_mempool, Transaction)
 
     @staticmethod
     def get_transactions_by_public_key(public_key, include_mempool):
@@ -87,7 +87,7 @@ class TransactionService(BaseTransactionService):
             AND
         float       -- float containing current balance for the supplied public key
         """
-        return super(TransactionService, TransactionService).get_transactions_by_public_key(public_key, include_mempool, Transaction)
+        return super(TransactionService, TransactionService).get_objects_by_public_key(public_key, include_mempool, Transaction)
 
     @staticmethod
     def get_10_transactions_from_mem_pool():
