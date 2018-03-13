@@ -150,6 +150,7 @@ class Node:
                 actually_run = True
             if actually_run:
                 actually_run = False
+                current_increment = 0
                 self.gossiping_connect(read_callback)
             time.sleep(gossip_sleep)
             current_increment += 1
