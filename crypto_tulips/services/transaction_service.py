@@ -25,20 +25,25 @@ class TransactionService(BaseTransactionService):
         pass
 
     @staticmethod
-    def verify_ownership_of_funds(new_transaction):
+    def ensure_enough_funds(new_transaction):
         """
+        Checks a public key's TO and FROM transactions to ensure that they have enough balance remaining to create the new transaction.
+
+        Arguments:
+        new_transaction -- transaction object of the new transaction that is trying to be made
+
+        Returns:
+        boolean -- True if enough funds are present, False if not
         """
         public_key = new_transaction.from_addr
         amount = new_transaction.amount
-        transactions, balance = TransactionService.get_transactions_by_public_key(public_key, True)
+        transactions, balance = TransactionService.get_transactions_by_public_key(public_key, False)
         if (balance >= amount):
             # address has enough funds for the new transaction
             return True
         else:
             # address does not have enough funds
             return False
-
-
 
     @staticmethod
     def get_transactions_from_public_key(public_key, include_mempool):

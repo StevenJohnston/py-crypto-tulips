@@ -4,14 +4,13 @@ from crypto_tulips.services.transaction_service import TransactionService
 from crypto_tulips.dal.services.redis_service import RedisService
 from crypto_tulips.dal.objects.transaction import Transaction
 
-# create some transactions
+# create some transactions (to then from address)
 transactions = [
     Transaction('ts_test_hash1', '', 'ts_matt', 'ts_william', 7000, 0),
     Transaction('ts_test_hash2', '', 'ts_steven', 'ts_william', 7000, 0),
     Transaction('ts_test_hash3', '', 'ts_steven', 'ts_william', 605, 0),
     Transaction('ts_test_hash4', '', 'ts_william', 'ts_naween', 14605, 0),
-
-    Transaction('ts_test_hash5', '', 'ts_william', 'ts_naween', 14605, 1),
+    Transaction('ts_test_hash5', '', 'ts_william', 'ts_matt', 543, 1),
     Transaction('ts_test_hash6', '', 'ts_william', 'ts_naween', 14605, 1),
     Transaction('ts_test_hash7', '', 'ts_william', 'ts_naween', 14605, 1),
     Transaction('ts_test_hash8', '', 'ts_william', 'ts_naween', 14605, 1),
@@ -89,7 +88,6 @@ def test_get_transactions_from_public_key():
     matt_t  = ts.get_transactions_from_public_key('ts_matt', False)
     assert len(matt_t) == 0
 
-
 def test_remove_from_mempool():
     ts = TransactionService()
     rs = RedisService()
@@ -105,3 +103,5 @@ def test_remove_from_mempool():
     print(new_t.to_string())
     assert new_t.is_mempool == 0
 
+def test_ensure_enough_funds():
+    assert TransactionService.ensure_enough_funds(transactions[4])
