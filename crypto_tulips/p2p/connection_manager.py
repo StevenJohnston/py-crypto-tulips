@@ -292,7 +292,8 @@ class ConnectionManager:
             else:
                 if recv_data != '':
                     peer.make_timestamp()
-                    callback(data=recv_data)#"""
+                    a_thread = threading.Thread(target=callback, args=(recv_data,))
+                    a_thread.start()
         self.print_check('Ended a recv msg client thread, run is {}'.format(self.run))
 
     def recv_msg_server(self, peer, callback):
@@ -317,7 +318,8 @@ class ConnectionManager:
             else:
                 if recv_data != '':
                     peer.make_timestamp()
-                    callback(data=recv_data)
+                    a_thread = threading.Thread(target=callback, args=(recv_data,))
+                    a_thread.start()
         self.print_check('Ended a recv msg server thread, run is {}'.format(self.run))
 
     def close_peer(self, peer, remove_peer=True):
