@@ -5,7 +5,8 @@ import socket
 import pickle
 import threading
 import time
-from crypto_tulips.p2p import p2p_client, connection_manager, p2p_server, p2p_peer
+import json
+from crypto_tulips.p2p import p2p_client, connection_manager, p2p_server, p2p_peer, message
 from crypto_tulips.node.bootstrap import BootstrapNode
 #from crypto_tulips.dal.services import redis_service
 from crypto_tulips.services import block_service
@@ -202,8 +203,12 @@ class Node:
         self.connection_manager = connection_manager.ConnectionManager(server_port=self.port, \
                 peer_timeout=peer_timeout, recv_data_size=recv_data_size, socket_timeout=socket_timeout)
         self.connection_manager.accept_connection(read_callback=callback, run_as_a_thread=True, wallet_callback=wallet_callback)
+        first_peer = True
         for peer in known_peers:
-            self.peer_connection(peer, read_callback=read_callback)
+            connected = self.peer_connection(peer, read_callback=read_callback)
+            if first_peer and connected:
+                first_peer = False
+                self.send_sync_request(peer)
         if start_gossiping:
             self.start_gossiping(callback)
 
@@ -214,15 +219,29 @@ class Node:
         Arguments:
         peer -- peer to connect to
         read_callback=None -- callback to which redirect recv msgs
+        Returns:
+        bool -- was the connection successful
         """
         if read_callback is None:
             callback = Node.read_callback
         else:
             callback = read_callback
         if self.host == peer.ip_address and self.port == int(peer.port):
-            return
-        self.connection_manager.connect_to(host=peer.ip_address, \
+            return False
+        return self.connection_manager.connect_to(host=peer.ip_address, \
                 port=int(peer.port), read_callback=callback)
+
+    def send_sync_request(self, peer):
+        my_current_height = block_service.BlockService.get_max_height()
+        message_obj = message.Message(action='init_sync', data=my_current_height)
+        json_dic = message_obj.to_json(is_object=False)
+        json_str = json.dumps(json_dic, sort_keys=True, separators=(',', ':'))
+        id_to_send = ''
+        for a_peer in self.connection_manager.peer_list:
+            if a_peer.get_ip_address() == peer.get_ip_address():
+                id_to_send = a_peer.peer_id
+                break
+        self.connection_manager.send_msg(json_str, id_to_send)
 
     def block_chain_sync(self):
         # ask each peer to send its max height

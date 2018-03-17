@@ -190,6 +190,14 @@ def regular_node_callback(data, peer_id=None):
         transaction_lock.release()
         if need_to_send:
             send_a_transaction(new_transaction)
+    elif new_msg.action == 'init_sync':
+        print('\nGot init sync, height is {}'.format(new_msg.data))
+        peer_height = new_msg.data
+        my_height = BlockService.get_max_height()
+        if peer_height < my_height:
+            print('My height is higher')
+        else:
+            print('Same height')
     elif new_msg.action == 'block':
         block_service = BlockService()
         new_block = Block.from_dict(new_msg.data)
