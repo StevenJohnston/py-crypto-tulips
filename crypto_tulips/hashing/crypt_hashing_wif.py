@@ -1,5 +1,4 @@
 import hashlib
-import base58
 import ecdsa
 from ecdsa import VerifyingKey, SECP256k1, SigningKey, NIST384p
 from ecdsa.keys import SigningKey
@@ -32,8 +31,6 @@ class EcdsaHashing:
         """
         return hashlib.sha256(json.dumps(object_to_hash, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
 
-
-
     @staticmethod
     def recover_pubic_key(private_key):
         return private_key.get_verifying_key()
@@ -48,18 +45,20 @@ class EcdsaHashing:
     def verify_signature(public_key_hex, signature, message):
         vk = VerifyingKey.from_string(unhexlify(public_key_hex.to_string().hex()), curve=ecdsa.SECP256k1, hashfunc = hashlib.sha256)
         try:
+            print("Valid")
             return vk.verify(unhexlify(signature), message.encode('utf-8'))
         except ecdsa.BadSignatureError:
-            print("Wrong")
+            print("Not Valid")
             return False
 
     @staticmethod
     def verify_signature_hex(public_key_hex_str, signature, message):
         vk = VerifyingKey.from_string(unhexlify(public_key_hex_str), curve=ecdsa.SECP256k1, hashfunc = hashlib.sha256)
         try:
+            print("Valid")
             return vk.verify(unhexlify(signature), message.encode('utf-8'))
         except ecdsa.BadSignatureError:
-            print("Wrong")
+            print("Not Valid")
             return False
 
     @staticmethod
@@ -73,6 +72,16 @@ class EcdsaHashing:
         print(priv_string)
         print(pub_string)
         return public_key_hex, private_key_hex
+
+    @staticmethod
+    def generate_key_pair_str():
+        private_key_hex = SigningKey.generate(curve=SECP256k1, hashfunc=hashlib.sha256)
+        public_key_hex = private_key_hex.get_verifying_key()
+        open("private.pem","w").write(private_key_hex.to_pem().decode('utf-8'))
+        open("public.pem","w").write(public_key_hex.to_pem().decode('utf-8'))
+        priv_string=(private_key_hex.to_string()).hex()
+        pub_string = (public_key_hex.to_string()).hex()
+        return priv_string, pub_string
 
     @staticmethod
     def sign_message(message, private_key):
