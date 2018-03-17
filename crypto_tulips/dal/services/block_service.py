@@ -69,6 +69,8 @@ class BlockService:
 
             # TODO max block height will not always be this, will change
             pipe.set(self.max_block_height, block.height)
+
+            pipe.sadd("block:" + str(block.height), block._hash)
             return pipe.execute()
         else:
             print("Block with hash: " + block._hash + " already exists. Unable to update.")
@@ -165,6 +167,28 @@ class BlockService:
         if not r.exists(self.max_block_height):
             r.set(self.max_block_height, 0)
         return r.get(self.max_block_height)
+
+    def find_by_height(self, block_height):
+        r = self._connect()
+        hashes = r.smembers("block:" + str(block_height))
+        blocks = list()
+        for h in hashes:
+            block = self.find_by_hash(h)
+            blocks.append(block)
+        return blocks
+
+    def get_blocks_after_height(self, block_height):
+        max_height = self.get_max_block_height()
+        blocks = list()
+        if int(max_height) > int(block_height):
+            for height in range(int(block_height) + 1, int(max_height) + 1):
+                new_blocks = self.find_by_height(height)
+                blocks.extend(new_blocks)
+        return blocks
+
+    def get_blocks_after_hash(self, block_hash):
+        current_block = self.find_by_hash(block_hash)
+        return self.get_blocks_after_height(current_block.height)
 
     def _connect(self):
         # charset and decode_responses will need to be removed if we want this to be actually stored
