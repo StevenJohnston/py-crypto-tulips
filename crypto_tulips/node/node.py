@@ -7,6 +7,9 @@ import threading
 import time
 from crypto_tulips.p2p import p2p_client, connection_manager, p2p_server, p2p_peer
 from crypto_tulips.node.bootstrap import BootstrapNode
+#from crypto_tulips.dal.services import redis_service
+from crypto_tulips.services import block_service
+
 
 class Node:
     """
@@ -220,6 +223,19 @@ class Node:
             return
         self.connection_manager.connect_to(host=peer.ip_address, \
                 port=int(peer.port), read_callback=callback)
+
+    def block_chain_sync(self):
+        # ask each peer to send its max height
+        # keep the peer id and hight of the max height
+        # after done connecting and asking, request blocks from the max height peer
+        # only send blocks that are higher that my current block
+        #
+        # or only ask very first one to send its blocks
+        # need to add blocks new blocks from the network to a queue  if they are recv before sync is done
+        # after sync add queue blocks as well
+        #
+        #rs = redis_service.RedisService()
+        my_current_height = block_service.BlockService.get_max_height()
 
     def connect_to_bootstrap(self, host, port):
         """

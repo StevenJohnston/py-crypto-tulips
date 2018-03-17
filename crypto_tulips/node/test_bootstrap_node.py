@@ -13,13 +13,13 @@ class CallbackStore():
         CallbackStore.return_result_server = ''
 
 
-def callback_client(data):
+def callback_client(data, peer_id):
     CallbackStore.return_result_client = data
 
-def callback_server(data):
+def callback_server(data, peer_id):
     CallbackStore.return_result_server = data
 
-def callback_second_client(data):
+def callback_second_client(data, peer_id):
     CallbackStore.return_result_second_client = data
 
 def set_up_bootstrap(port_bootstrap):

@@ -171,7 +171,7 @@ def check_if_object_exist(obj_hash, obj_type):
         return False
     return True
 
-def regular_node_callback(data):
+def regular_node_callback(data, peer_id=None):
     json_dic = json.loads(data)
     new_msg = message.Message.from_dict(json_dic)
     if new_msg.action == 'transaction':
@@ -288,6 +288,9 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         user_input = input('\t\t\tEnter a command: ')
         if user_input == 'quit' or user_input == 'q':
             break
+        elif user_input == 'test':
+            max_height = BlockService.get_max_height()
+            print('\n{}'.format(max_height))
         elif user_input == 'miner' or user_input == 'm':
             run_miner()
         elif user_input == 'trans' or user_input == 'transaction' or user_input == 't':

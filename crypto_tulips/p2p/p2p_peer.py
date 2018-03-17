@@ -4,6 +4,7 @@ Module with classes to store information about a peer
 
 from enum import Enum
 import time
+import uuid
 
 class PeerMode(Enum):
     """
@@ -21,7 +22,7 @@ class Peer:
     Peer class that stores information about a peer required to communicate with that peer
     """
 
-    def __init__(self, socket=None, ip_address=None, port=None, mode=None):
+    def __init__(self, socket=None, ip_address=None, port=None, mode=None, peer_id=None):
         """
         Initializer for a Peer.
 
@@ -30,18 +31,29 @@ class Peer:
         ip_address -- ip address of the peer
         port -- port of the peer
         mode -- a PeerMode instance to specify how peer got connected to
+        peer_id -- id of a peer
         """
         self.socket = None
         self.ip_address = None
         self.port = None
         self.mode = None
         self.last_message_time = None
+        self.peer_id = None
 
         self.socket = socket
         self.ip_address = ip_address
         self.port = port
         self.mode = mode
         self.last_message_time = None
+        self.peer_id = peer_id
+        if peer_id is None:
+            self.generate_peer_id()
+
+    def generate_peer_id(self):
+        """
+        Generate a random id for a peer
+        """
+        self.peer_id = str(uuid.uuid4())
 
     def make_timestamp(self):
         """
