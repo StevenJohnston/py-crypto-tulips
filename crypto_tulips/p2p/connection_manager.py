@@ -250,24 +250,62 @@ class ConnectionManager:
         """
         self.server.send_msg(msg, client_socket=peer.socket)
 
-    def send_msg(self, msg):
+    def send_msg(self, msg, target_peer_id=None):
         """
         Send a data message to all peers in a peer list
 
         Arguments:
         msg -- a msg to send to all connected peers
+        target_peer=None -- if provided will send msg only to a given peer
+        Returns:
+        bool -- Was the send msg successful?
         """
         success = True
+        if target_peer_id is not None:
+            if not self.peer_list:
+                return True
+            peer = self.find_peer(target_peer_id)
+            if peer is None:
+                return False
+            success = self._send_msg_one(msg, peer)
+            return success
         for peer in self.peer_list:
-            try:
-                if peer.mode == p2p_peer.PeerMode.Client:
-                    self.send_msg_client(msg, peer)
-                elif peer.mode == p2p_peer.PeerMode.Server:
-                    self.send_msg_server(msg, peer)
-                success = True
-            except:
-                self.print_check('Failed to send a msg')
-                success = False
+            success = self._send_msg_one(msg, peer)
+        return success
+
+    def find_peer(self, target_peer_id):
+        """
+        Find a peer from given id
+
+        Arguments:
+        target_peer_id -- id of a peer to find
+        Returns:
+        Peer -- peer with given id. None if not found
+        """
+        for a_peer in self.peer_list:
+            if a_peer.peer_id == target_peer_id:
+                return a_peer
+        return None
+
+    def _send_msg_one(self, msg, peer):
+        """
+        Try to send a msg to a given peer
+
+        Arguments:
+        msg -- a msg to send
+        peer -- peer to send msg to
+        Returns:
+        bool -- Was the send msg successful?
+        """
+        try:
+            if peer.mode == p2p_peer.PeerMode.Client:
+                self.send_msg_client(msg, peer)
+            elif peer.mode == p2p_peer.PeerMode.Server:
+                self.send_msg_server(msg, peer)
+            success = True
+        except:
+            self.print_check('Failed to send a msg')
+            success = False
         return success
 
     def recv_msg_client(self, peer, callback):
@@ -292,7 +330,8 @@ class ConnectionManager:
             else:
                 if recv_data != '':
                     peer.make_timestamp()
-                    callback(data=recv_data)#"""
+                    a_thread = threading.Thread(target=callback, args=(recv_data, peer.peer_id))
+                    a_thread.start()
         self.print_check('Ended a recv msg client thread, run is {}'.format(self.run))
 
     def recv_msg_server(self, peer, callback):
@@ -317,7 +356,8 @@ class ConnectionManager:
             else:
                 if recv_data != '':
                     peer.make_timestamp()
-                    callback(data=recv_data)
+                    a_thread = threading.Thread(target=callback, args=(recv_data, peer.peer_id))
+                    a_thread.start()
         self.print_check('Ended a recv msg server thread, run is {}'.format(self.run))
 
     def close_peer(self, peer, remove_peer=True):

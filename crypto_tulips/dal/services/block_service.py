@@ -69,6 +69,8 @@ class BlockService:
 
             # TODO max block height will not always be this, will change
             pipe.set(self.max_block_height, block.height)
+
+            pipe.sadd("block:" + str(block.height), block._hash)
             return pipe.execute()
         else:
             print("Block with hash: " + block._hash + " already exists. Unable to update.")
@@ -165,6 +167,57 @@ class BlockService:
         if not r.exists(self.max_block_height):
             r.set(self.max_block_height, 0)
         return r.get(self.max_block_height)
+
+    def find_by_height(self, block_height):
+        """
+        Find a block using it's height. Will return the block object, fully populated with all of the objects encased in it.
+
+        Arguments:
+        block_height    -- height of the block to retrieve
+
+        Returns:
+        block object    -- Block object containing all of the objects included in the block
+        """
+        r = self._connect()
+        hashes = r.smembers("block:" + str(block_height))
+        blocks = list()
+        for h in hashes:
+            block = self.find_by_hash(h)
+            blocks.append(block)
+        return blocks
+
+    def get_blocks_after_height(self, block_height):
+        """
+        Get all blocks chained after a given height.
+
+        Arguments:
+        block_height    -- Block height of block to retrieve all blocks after
+
+        Returns:
+        list    -- list containing all of the blocks in the chain after the supplied block height
+        """
+        max_height = self.get_max_block_height()
+        blocks = list()
+        # want blocks between current and the max height
+        if int(max_height) > int(block_height):
+            # get blocks by height for heights between the supplied and max
+            for height in range(int(block_height) + 1, int(max_height) + 1):
+                new_blocks = self.find_by_height(height)
+                blocks.extend(new_blocks)
+        return blocks
+
+    def get_blocks_after_hash(self, block_hash):
+        """
+        Get all blocks chained after a given hash.
+
+        Arguments:
+        block_hash  -- Block hash of block to retrieve all blocks after
+
+        Returns:
+        list    -- list containing all of the blocks in the chain after the supplied block hash
+        """
+        current_block = self.find_by_hash(block_hash)
+        return self.get_blocks_after_height(current_block.height)
 
     def _connect(self):
         # charset and decode_responses will need to be removed if we want this to be actually stored
