@@ -65,8 +65,6 @@ class EcdsaHashing:
     def generate_key_pair():
         private_key_hex = SigningKey.generate(curve=SECP256k1, hashfunc=hashlib.sha256)
         public_key_hex = private_key_hex.get_verifying_key()
-        open("private.pem","w").write(private_key_hex.to_pem().decode('utf-8'))
-        open("public.pem","w").write(public_key_hex.to_pem().decode('utf-8'))
         priv_string=(private_key_hex.to_string()).hex()
         pub_string = (public_key_hex.to_string()).hex()
         print(priv_string)
@@ -77,8 +75,6 @@ class EcdsaHashing:
     def generate_key_pair_str():
         private_key_hex = SigningKey.generate(curve=SECP256k1, hashfunc=hashlib.sha256)
         public_key_hex = private_key_hex.get_verifying_key()
-        open("private.pem","w").write(private_key_hex.to_pem().decode('utf-8'))
-        open("public.pem","w").write(public_key_hex.to_pem().decode('utf-8'))
         priv_string=(private_key_hex.to_string()).hex()
         pub_string = (public_key_hex.to_string()).hex()
         return priv_string, pub_string
