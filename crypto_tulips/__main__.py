@@ -315,6 +315,8 @@ def wallet_callback(wallet_sock):
                 a_node.connection_manager.server.send_msg(data="Test", client_socket=wallet_sock)
         elif new_msg.action == 'exit':
             break
+        else:
+            a_node.connection_manager.server.send_msg(data="Bad Data", client_socket=wallet_sock)
     a_node.connection_manager.server.close_client(client_socket=wallet_sock)
 
 def send_a_transaction(new_transaction):
