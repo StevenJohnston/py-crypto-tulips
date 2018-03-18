@@ -224,6 +224,10 @@ def regular_node_callback(data, peer_id=None):
             block_lock.release()
         else:
             print('Same height')
+            ending_msg = message.Message(action='block_sync_end', data='')
+            json_dic = ending_msg.to_json(is_object=False)
+            json_str = json.dumps(json_dic, sort_keys=True, separators=(',', ':'))
+            a_node.connection_manager.send_msg(msg=json_str, target_peer_id=peer_id)
     elif new_msg.action == 'block':
         block_service = BlockService()
         new_block = Block.from_dict(new_msg.data)
