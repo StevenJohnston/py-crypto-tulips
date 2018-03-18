@@ -65,26 +65,22 @@ class EcdsaHashing:
     def generate_key_pair():
         private_key_hex = SigningKey.generate(curve=SECP256k1, hashfunc=hashlib.sha256)
         public_key_hex = private_key_hex.get_verifying_key()
-        priv_string=(private_key_hex.to_string()).hex()
-        pub_string = (public_key_hex.to_string()).hex()
-        print(priv_string)
-        print(pub_string)
         return public_key_hex, private_key_hex
 
     @staticmethod
     def generate_key_pair_str():
         private_key_hex = SigningKey.generate(curve=SECP256k1, hashfunc=hashlib.sha256)
         public_key_hex = private_key_hex.get_verifying_key()
-        priv_string=(private_key_hex.to_string()).hex()
-        pub_string = (public_key_hex.to_string()).hex()
-        return priv_string, pub_string
+        priv_string= private_key_hex.to_string().hex()
+        pub_string = public_key_hex.to_string().hex()
+        return pub_string, priv_string
 
     @staticmethod
     def sign_message(message, private_key):
         return hexlify(private_key.sign(message.encode('utf-8'), hashfunc=hashlib.sha256))
 
     @staticmethod
-    def sign_message_hex(privkey, message):
+    def sign_message_hex(message, privkey):
         sk = SigningKey.from_string(unhexlify(privkey), curve=ecdsa.SECP256k1, hashfunc = hashlib.sha256)
         return hexlify(sk.sign(message.encode('utf-8'), hashfunc=hashlib.sha256))
 
