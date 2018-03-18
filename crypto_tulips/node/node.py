@@ -29,6 +29,8 @@ class Node:
         self.default_bootstrap_port = 25252
         self.default_node_port = 36363
         self.port = self.default_node_port
+        self.doing_blockchain_sync = False
+        self.block_queue = []
         #print('Started a node')
 
     def start_bootstrap(self, port=25252):
@@ -208,6 +210,7 @@ class Node:
             connected = self.peer_connection(peer, read_callback=read_callback)
             if first_peer and connected:
                 first_peer = False
+                self.doing_blockchain_sync = True
                 self.send_sync_request(peer)
         if start_gossiping:
             self.start_gossiping(callback)
@@ -232,29 +235,33 @@ class Node:
                 port=int(peer.port), read_callback=callback)
 
     def send_sync_request(self, peer):
+        """
+        Send a sync request to a peer
+
+        Arguments:
+        peer -- peer to send send request to
+        """
         my_current_height = block_service.BlockService.get_max_height()
         message_obj = message.Message(action='init_sync', data=my_current_height)
         json_dic = message_obj.to_json(is_object=False)
         json_str = json.dumps(json_dic, sort_keys=True, separators=(',', ':'))
         id_to_send = ''
+        # because id in peer that is received from a bootstrap node
+        # is different from id that is was assigned when we connected to it
+        # we need to find that id
         for a_peer in self.connection_manager.peer_list:
             if a_peer.get_ip_address() == peer.get_ip_address():
                 id_to_send = a_peer.peer_id
                 break
         self.connection_manager.send_msg(json_str, id_to_send)
 
-    def block_chain_sync(self):
-        # ask each peer to send its max height
-        # keep the peer id and hight of the max height
-        # after done connecting and asking, request blocks from the max height peer
-        # only send blocks that are higher that my current block
-        #
-        # or only ask very first one to send its blocks
-        # need to add blocks new blocks from the network to a queue  if they are recv before sync is done
-        # after sync add queue blocks as well
-        #
-        #rs = redis_service.RedisService()
-        my_current_height = block_service.BlockService.get_max_height()
+    def add_blocks_from_queue(self):
+        """
+        After the sync is done we should add blocks that are in the queue
+        """
+        block_service_obj = block_service.BlockService()
+        for a_block in self.block_queue:
+            block_service_obj.add_block_to_chain(a_block)
 
     def connect_to_bootstrap(self, host, port):
         """

@@ -174,11 +174,13 @@ def check_if_object_exist(obj_hash, obj_type):
 
 def regular_node_callback(data, peer_id=None):
     do_block_resend= True
+    sync_block = False
     json_dic = json.loads(data)
     new_msg = message.Message.from_dict(json_dic)
     if new_msg.action == 'block_sync':
         new_msg.action = 'block'
         do_block_resend = False
+        sync_block = True
     if new_msg.action == 'transaction':
         new_msg.data = Transaction.from_dict(new_msg.data)
         new_transaction = new_msg.data
@@ -195,6 +197,10 @@ def regular_node_callback(data, peer_id=None):
         transaction_lock.release()
         if need_to_send:
             send_a_transaction(new_transaction)
+    elif new_msg.action == 'block_sync_end':
+        sync_block = False
+        a_node.doing_blockchain_sync = False
+        a_node.add_blocks_from_queue()
     elif new_msg.action == 'init_sync':
         print('\nGot init sync, height is {}'.format(new_msg.data))
         peer_height = new_msg.data
@@ -206,6 +212,10 @@ def regular_node_callback(data, peer_id=None):
             block_lock.acquire()
             for a_block in list_of_blocks:
                 send_a_block(a_block, action='block_sync', block_target_peer_id=peer_id)
+            ending_msg = message.Message(action='block_sync_end', data='')
+            json_dic = ending_msg.to_json(is_object=False)
+            json_str = json.dumps(json_dic, sort_keys=True, separators=(',', ':'))
+            a_node.connection_manager.send_msg(msg=json_str, target_peer_id=peer_id)
             block_lock.release()
         else:
             print('Same height')
@@ -215,12 +225,19 @@ def regular_node_callback(data, peer_id=None):
         need_to_send = False
         block_lock.acquire()
         print('\nBlock : {}'.format(new_block._hash))
-        result_list = block_service.add_block_to_chain(new_block)
+        if a_node.doing_blockchain_sync and not sync_block:
+            a_node.block_queue.append(new_block)
+            result_list = []
+        else:
+            result_list = block_service.add_block_to_chain(new_block)
         if result_list:
             need_to_send = True
             print('All good')
         else:
-            print('Duplicate block')
+            if a_node.doing_blockchain_sync and not sync_block:
+                print('Added block to a queue')
+            else:
+                print('Duplicate block')
         block_lock.release()
         if need_to_send and do_block_resend:
             send_a_block(new_block)
