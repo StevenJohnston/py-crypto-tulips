@@ -89,9 +89,8 @@ class EcdsaHashing:
 
     @staticmethod
     def sign_message_hex(privkey, message):
-            sk = SigningKey.from_string(unhexlify(privkey), curve=ecdsa.SECP256k1, hashfunc = hashlib.sha256)
-            #print(sk.to_pem().decode('utf-8'))
-            return hexlify(sk.sign(message.encode('utf-8'), hashfunc=hashlib.sha256))
+        sk = SigningKey.from_string(unhexlify(privkey), curve=ecdsa.SECP256k1, hashfunc = hashlib.sha256)
+        return hexlify(sk.sign(message.encode('utf-8'), hashfunc=hashlib.sha256))
 
     @staticmethod
     def recover_public_key(private_key):

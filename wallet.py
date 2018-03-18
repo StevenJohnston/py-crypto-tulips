@@ -119,6 +119,7 @@ if __name__ == '__main__':
     transaction_msg = message.Message('tx', new_transaction)
     transaction_json = transaction_msg.to_json()
     transaction_json = json.dumps(transaction_json, sort_keys=True)
+    print(transaction_json)
     p2p.send_msg(transaction_json)
     data = p2p.recv_msg()
 
