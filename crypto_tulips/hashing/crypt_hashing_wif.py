@@ -1,3 +1,4 @@
+import json
 import hashlib
 import ecdsa
 from ecdsa import VerifyingKey, SECP256k1, SigningKey, NIST384p

@@ -36,6 +36,9 @@ class BaseTransaction(Hashable, Sendable, Signable):
     def _to_index():
         return ['from_addr', 'is_mempool']
 
+    def get_public_key(self):
+        return self.from_addr
+        
     def get_signable(self):
         return {
             'to_addr': self.to_addr,

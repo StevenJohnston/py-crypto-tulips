@@ -54,6 +54,9 @@ class Block(Hashable, Sendable, Signable):
     def _to_index(self):
         return []
 
+    def get_public_key(self):
+        return self.owner
+
     def get_signable(self):
         return {
             'prev_block': self.prev_block,

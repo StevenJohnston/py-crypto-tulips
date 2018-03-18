@@ -1,4 +1,4 @@
-from crypto_tulips.hashing.crypt_hashing import Hashing
+from crypto_tulips.hashing.crypt_hashing_wif import EcdsaHashing
 import json
 
 class Hashable:
@@ -14,10 +14,13 @@ class Hashable:
     # updates the _hash of the object
     def get_hash(self):
         hashable = self.get_hashable()
-        return Hashing.hash_object(hashable)
+        return EcdsaHashing.hash_object(hashable)
 
     # Used to get the hashable version of an object.
     # Use this with a the map function
     @staticmethod
     def get_hashable_callback(hashableObject):
         return hashableObject.get_hashable()
+
+    def valid_hash(self):
+        return self.get_hash() == self._hash

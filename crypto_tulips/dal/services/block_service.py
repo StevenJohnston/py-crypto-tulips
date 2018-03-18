@@ -93,74 +93,77 @@ class BlockService:
         # get key to retrieve list of block's fields
         name = self.key_suffix + block_hash
 
-        # get all of the fields in the list
-        hashes = r.lrange(name, 0, -1)
+        if r.exists(name):
+            # get all of the fields in the list
+            hashes = r.lrange(name, 0, -1)
 
-        # timestamp will always be first
-        prev_block = hashes[0]
-        # remove for iteration
-        hashes.remove(prev_block)
+            # timestamp will always be first
+            prev_block = hashes[0]
+            # remove for iteration
+            hashes.remove(prev_block)
 
-        # timestamp will always be first
-        height = hashes[0]
-        # remove for iteration
-        hashes.remove(height)
+            # timestamp will always be first
+            height = hashes[0]
+            # remove for iteration
+            hashes.remove(height)
 
-        # timestamp will always be first
-        owner = hashes[0]
-        # remove for iteration
-        hashes.remove(owner)
+            # timestamp will always be first
+            owner = hashes[0]
+            # remove for iteration
+            hashes.remove(owner)
 
-        # timestamp will always be first
-        signature = hashes[0]
-        # remove for iteration
-        hashes.remove(signature)
+            # timestamp will always be first
+            signature = hashes[0]
+            # remove for iteration
+            hashes.remove(signature)
 
-        # timestamp will always be first
-        timestamp = hashes[0]
-        # remove for iteration
-        hashes.remove(timestamp)
+            # timestamp will always be first
+            timestamp = hashes[0]
+            # remove for iteration
+            hashes.remove(timestamp)
 
-        prefix = ''
-        # list to hold all of the objects
-        transactions = []
-        pos_transactions = []
-        contract_transactions = []
+            prefix = ''
+            # list to hold all of the objects
+            transactions = []
+            pos_transactions = []
+            contract_transactions = []
 
-        # temporary list to copy from
-        temp_list = []
-        obj = None
-        for h in hashes:
-            # if at a new type of object, change some variables
-            if h == 'transactions':
-                prefix = Transaction._to_index()[-1]
-                obj = Transaction
-                continue
-            elif h == 'pos_transactions':
-                prefix = ''
-                obj = Transaction
-                transactions = temp_list.copy()
-                temp_list.clear()
-                # TODO class hasn't been created yet
-                continue
-            elif h == 'contract_transactions':
-                prefix = ''
-                obj = Transaction
-                pos_transactions = temp_list.copy()
-                temp_list.clear()
-                # TODO class hasn't been created yet
-                continue
+            # temporary list to copy from
+            temp_list = []
+            obj = None
+            for h in hashes:
+                # if at a new type of object, change some variables
+                if h == 'transactions':
+                    prefix = Transaction._to_index()[-1]
+                    obj = Transaction
+                    continue
+                elif h == 'pos_transactions':
+                    prefix = ''
+                    obj = Transaction
+                    transactions = temp_list.copy()
+                    temp_list.clear()
+                    # TODO class hasn't been created yet
+                    continue
+                elif h == 'contract_transactions':
+                    prefix = ''
+                    obj = Transaction
+                    pos_transactions = temp_list.copy()
+                    temp_list.clear()
+                    # TODO class hasn't been created yet
+                    continue
 
-            # get the object from redis and add to the temporary list
-            t = rs.get_object_by_full_key(prefix + ":" + h, obj, r)
-            temp_list.append(t)
+                # get the object from redis and add to the temporary list
+                t = rs.get_object_by_full_key(prefix + ":" + h, obj, r)
+                temp_list.append(t)
 
-        contract_transactions = temp_list.copy()
-        temp_list.clear()
+            contract_transactions = temp_list.copy()
+            temp_list.clear()
 
-        # create block object and return it
-        block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, timestamp)
-        return block
+            # create block object and return it
+            block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, timestamp)
+            return block
+        else:
+            return None
 
     def get_max_block_height(self):
         r = self._connect()
@@ -223,3 +226,14 @@ class BlockService:
         # charset and decode_responses will need to be removed if we want this to be actually stored
         # as bytes (per: https://stackoverflow.com/questions/25745053/about-char-b-prefix-in-python3-4-1-client-connect-to-redis)
         return redis.StrictRedis(self.host, self.port, db=0, charset="utf-8", decode_responses="True")
+
+    def get_all_transaction_up_to_block(self, block_hash):
+        block = self.find_by_hash(block_hash)
+        if block:
+            transactions = block.transactions
+            while block.prev_block:
+                block = self.find_by_hash(block.prev_block)
+                transactions.extend(block.transactions)
+            return {transaction._hash: transaction for transaction in transactions}
+        else:
+            return {}
