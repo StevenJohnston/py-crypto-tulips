@@ -8,7 +8,6 @@ import time
 import json
 from crypto_tulips.p2p import p2p_client, connection_manager, p2p_server, p2p_peer, message
 from crypto_tulips.node.bootstrap import BootstrapNode
-#from crypto_tulips.dal.services import redis_service
 from crypto_tulips.services import block_service
 
 
@@ -31,6 +30,7 @@ class Node:
         self.port = self.default_node_port
         self.doing_blockchain_sync = False
         self.block_queue = []
+        self._do_block_sync = True
         #print('Started a node')
 
     def start_bootstrap(self, port=25252):
@@ -241,19 +241,20 @@ class Node:
         Arguments:
         peer -- peer to send send request to
         """
-        my_current_height = block_service.BlockService.get_max_height()
-        message_obj = message.Message(action='init_sync', data=my_current_height)
-        json_dic = message_obj.to_json(is_object=False)
-        json_str = json.dumps(json_dic, sort_keys=True, separators=(',', ':'))
-        id_to_send = ''
-        # because id in peer that is received from a bootstrap node
-        # is different from id that is was assigned when we connected to it
-        # we need to find that id
-        for a_peer in self.connection_manager.peer_list:
-            if a_peer.get_ip_address() == peer.get_ip_address():
-                id_to_send = a_peer.peer_id
-                break
-        self.connection_manager.send_msg(json_str, id_to_send)
+        if self._do_block_sync:
+            my_current_height = block_service.BlockService.get_max_height()
+            message_obj = message.Message(action='init_sync', data=my_current_height)
+            json_dic = message_obj.to_json(is_object=False)
+            json_str = json.dumps(json_dic, sort_keys=True, separators=(',', ':'))
+            id_to_send = ''
+            # because id in peer that is received from a bootstrap node
+            # is different from id that is was assigned when we connected to it
+            # we need to find that id
+            for a_peer in self.connection_manager.peer_list:
+                if a_peer.get_ip_address() == peer.get_ip_address():
+                    id_to_send = a_peer.peer_id
+                    break
+            self.connection_manager.send_msg(json_str, id_to_send)
 
     def add_blocks_from_queue(self):
         """
@@ -262,6 +263,7 @@ class Node:
         block_service_obj = block_service.BlockService()
         for a_block in self.block_queue:
             block_service_obj.add_block_to_chain(a_block)
+        self.block_queue = []
 
     def connect_to_bootstrap(self, host, port):
         """

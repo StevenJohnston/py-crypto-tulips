@@ -177,6 +177,8 @@ def regular_node_callback(data, peer_id=None):
     sync_block = False
     json_dic = json.loads(data)
     new_msg = message.Message.from_dict(json_dic)
+    # sync block is the same as block, but they don't
+    # need to be resend
     if new_msg.action == 'block_sync':
         new_msg.action = 'block'
         do_block_resend = False
@@ -198,13 +200,16 @@ def regular_node_callback(data, peer_id=None):
         if need_to_send:
             send_a_transaction(new_transaction)
     elif new_msg.action == 'block_sync_end':
-        sync_block = False
         a_node.doing_blockchain_sync = False
+        # after we have added all sync blocks
+        # we need to add normal blocks
+        # that were send while we where doing sync
         a_node.add_blocks_from_queue()
     elif new_msg.action == 'init_sync':
         print('\nGot init sync, height is {}'.format(new_msg.data))
         peer_height = new_msg.data
         my_height = BlockService.get_max_height()
+        # only do sync if we need to send blocks to a peer
         if peer_height < my_height:
             print('My height is higher, {}'.format(my_height))
             bs = dal_service_block_service.BlockService()
@@ -225,6 +230,9 @@ def regular_node_callback(data, peer_id=None):
         need_to_send = False
         block_lock.acquire()
         print('\nBlock : {}'.format(new_block._hash))
+        # if the node is doing blockchain sync
+        # and this block is not sync block
+        # we need to add it to the queue
         if a_node.doing_blockchain_sync and not sync_block:
             a_node.block_queue.append(new_block)
             result_list = []
