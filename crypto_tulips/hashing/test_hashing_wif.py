@@ -7,9 +7,9 @@ def test_signiture_obj():
     assert status == True
 
 def test_signiture_str():
-    public_key_hex, private_key_hex = crypt_hashing_wif.EcdsaHashing.generate_key_pair()
-    signature_hex = crypt_hashing_wif.EcdsaHashing.sign_message_hex(private_key_hex.to_string().hex(), "message")
-    status = crypt_hashing_wif.EcdsaHashing.verify_signature_hex(public_key_hex.to_string().hex(), signature_hex, "message")
+    public_key_hex, private_key_hex = crypt_hashing_wif.EcdsaHashing.generate_key_pair_str()
+    signature_hex = crypt_hashing_wif.EcdsaHashing.sign_message_hex("message", private_key_hex)
+    status = crypt_hashing_wif.EcdsaHashing.verify_signature_hex(public_key_hex, signature_hex, "message")
     assert status == True
 
 
