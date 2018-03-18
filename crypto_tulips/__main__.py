@@ -10,6 +10,7 @@ from .dal.services import redis_service
 from .node import node
 from .p2p import message
 from .hashing.crypt_hashing import Hashing
+from crypto_tulips.dal.services import block_service as dal_service_block_service
 from crypto_tulips.dal.objects.transaction import Transaction
 from crypto_tulips.dal.objects.block import Block
 from crypto_tulips.p2p.message import Message
@@ -172,8 +173,12 @@ def check_if_object_exist(obj_hash, obj_type):
     return True
 
 def regular_node_callback(data, peer_id=None):
+    do_block_resend= True
     json_dic = json.loads(data)
     new_msg = message.Message.from_dict(json_dic)
+    if new_msg.action == 'block_sync':
+        new_msg.action = 'block'
+        do_block_resend = False
     if new_msg.action == 'transaction':
         new_msg.data = Transaction.from_dict(new_msg.data)
         new_transaction = new_msg.data
@@ -195,7 +200,13 @@ def regular_node_callback(data, peer_id=None):
         peer_height = new_msg.data
         my_height = BlockService.get_max_height()
         if peer_height < my_height:
-            print('My height is higher')
+            print('My height is higher, {}'.format(my_height))
+            bs = dal_service_block_service.BlockService()
+            list_of_blocks = bs.get_blocks_after_height(peer_height)
+            block_lock.acquire()
+            for a_block in list_of_blocks:
+                send_a_block(a_block, action='block_sync', block_target_peer_id=peer_id)
+            block_lock.release()
         else:
             print('Same height')
     elif new_msg.action == 'block':
@@ -211,7 +222,7 @@ def regular_node_callback(data, peer_id=None):
         else:
             print('Duplicate block')
         block_lock.release()
-        if need_to_send:
+        if need_to_send and do_block_resend:
             send_a_block(new_block)
 
 def run_miner():
@@ -232,11 +243,11 @@ def run_miner():
     block_lock.release()
     send_a_block(block)
 
-def send_a_block(new_block):
-    block_msg = message.Message('block', new_block)
+def send_a_block(new_block, action='block', block_target_peer_id=None):
+    block_msg = message.Message(action, new_block)
     sendable_block = block_msg.to_json()
     block_json = json.dumps(sendable_block, sort_keys=True, separators=(',', ':'))
-    a_node.connection_manager.send_msg(msg=block_json)
+    a_node.connection_manager.send_msg(msg=block_json, target_peer_id=block_target_peer_id)
 
 a_node = None
 
@@ -296,6 +307,8 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         user_input = input('\t\t\tEnter a command: ')
         if user_input == 'quit' or user_input == 'q':
             break
+        elif user_input == 'height':
+            print(BlockService.get_max_height())
         elif user_input == 'test':
             max_height = BlockService.get_max_height()
             print('\n{}'.format(max_height))
