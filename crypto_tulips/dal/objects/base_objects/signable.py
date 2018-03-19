@@ -25,4 +25,4 @@ class Signable:
         return signableObject.get_signable()
 
     def valid_signature(self):
-        return EcdsaHashing.verify_signature(self.get_public_key(), self.signature, self.get_signable())
+        return EcdsaHashing.verify_signature_hex(self.get_public_key(), self.signature, self.get_signable())
