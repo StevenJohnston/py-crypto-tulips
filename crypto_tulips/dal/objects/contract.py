@@ -41,6 +41,9 @@ class Contract(Hashable, Sendable, Signable):
         new_contract = Contract(contract_hash, signature, to_addr, from_addr, is_mempool, duration, timestamp)
         return new_contract
 
+    def get_public_key(self):
+        return self.from_addr
+
     def get_signable(self):
         return {
             'to_addr': self.to_addr,
