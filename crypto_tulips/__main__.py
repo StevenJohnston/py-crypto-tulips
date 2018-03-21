@@ -27,7 +27,7 @@ william_private_key = """83c82312b925e50dde81f57f88f2fe1fb8310de1d81e97b696235c6
 
 matt_private_key = """f5dd743c84ddec77330b5dcf7e1f69a26ec55e0aa4fe504307b83f7850782510"""
 
-steven_private_key = """4a7351205a7bfaa9726a67cba6f331f1b03ee1e904250f95f81f82e775bb55c1-"""
+steven_private_key = """4a7351205a7bfaa9726a67cba6f331f1b03ee1e904250f95f81f82e775bb55c1"""
 
 naween_private_key = """418a3147a90f519cd72fb05eb2f201368ee7265f36efb8824e9daed59aabe9e0"""
 
@@ -185,6 +185,11 @@ def wallet_callback(wallet_sock):
                 a_node.connection_manager.server.send_msg(data="Test", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Test", client_socket=wallet_sock)
+        elif new_msg.action == "get_nodes_ip":
+            print("inside node list")
+            node_list = a_node.connection_manager.peer_list
+            print(node_list)
+            pass
         elif new_msg.action == 'exit':
             break
         else:

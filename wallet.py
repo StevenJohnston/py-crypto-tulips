@@ -1,6 +1,6 @@
 from crypto_tulips.p2p.p2p_client import P2pClient
 from crypto_tulips.p2p import message
-from crypto_tulips.hashing.crypt_hashing import Hashing
+from crypto_tulips.hashing.crypt_hashing_wif import EcdsaHashing
 import json
 from crypto_tulips.dal.objects.transaction import Transaction
 
@@ -16,13 +16,13 @@ if __name__ == '__main__':
     p2p.connect_to('vagrant', 36363)
     p2p.send_msg('wallet')
     #Start getting balance, trans history and pending trans
-    denys_public_key = Hashing.get_public_key(denys_private_key)
-    william_public_key = Hashing.get_public_key(william_private_key)
-    transaction_msg = message.Message('tx_by_public_key', william_public_key)
-    transaction_json = transaction_msg.to_json(is_object=False)
-    transaction_json = json.dumps(transaction_json, sort_keys=True)
-    p2p.send_msg(transaction_json)
-    data = p2p.recv_msg()
+    # denys_public_key = Hashing.get_public_key(denys_private_key)
+    # william_public_key = Hashing.get_public_key(william_private_key)
+    # transaction_msg = message.Message('tx_by_public_key', william_public_key)
+    # transaction_json = transaction_msg.to_json(is_object=False)
+    # transaction_json = json.dumps(transaction_json, sort_keys=True)
+    # p2p.send_msg(transaction_json)
+    # data = p2p.recv_msg()
     #ends
 
     #Testing user wallet key generation
@@ -33,17 +33,23 @@ if __name__ == '__main__':
     #ends user wallet testing
 
     #start a transaction
-    amount = 100
-    new_transaction = Transaction('', '', denys_public_key, william_public_key, amount, 1)
-    new_transaction.update_signature(william_private_key)
-    new_transaction.update_hash()
+    # amount = 100
+    # new_transaction = Transaction('', '', denys_public_key, william_public_key, amount, 1)
+    # new_transaction.update_signature(william_private_key)
+    # new_transaction.update_hash()
 
-    transaction_msg = message.Message('tx', new_transaction)
-    transaction_json = transaction_msg.to_json()
-    transaction_json = json.dumps(transaction_json, sort_keys=True)
-    print(transaction_json)
-    p2p.send_msg(transaction_json)
-    data = p2p.recv_msg()
+    # transaction_msg = message.Message('tx', new_transaction)
+    # transaction_json = transaction_msg.to_json()
+    # transaction_json = json.dumps(transaction_json, sort_keys=True)
+    # print(transaction_json)
+    # p2p.send_msg(transaction_json)
+    # data = p2p.recv_msg()
+
+    msg = message.Message('get_nodes_ip', '')
+    msg_json = msg.to_json(is_object=False)
+    msg_json = json.dumps(msg_json, sort_keys=True)
+    p2p.send_msg(msg_json)
+
 
     #quiting
     transaction_msg = message.Message('exit', 'quit')
