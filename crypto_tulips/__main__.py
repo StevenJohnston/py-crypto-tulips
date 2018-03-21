@@ -157,7 +157,7 @@ def wallet_callback(wallet_sock):
         json_dic = json.loads(data)
         new_msg = message.Message.from_dict(json_dic)
         print(new_msg.action)
-        if new_msg.action == 'tx_by_public_key':
+        if new_msg.action == 'get_user_info':
             pending = []
             transaction = []
             user_trans_history, user_balance = TransactionService.get_transactions_by_public_key(new_msg.data, True)
@@ -166,30 +166,33 @@ def wallet_callback(wallet_sock):
                     pending.append(trans.get_sendable())
                 else:
                     transaction.append(trans.get_sendable())
-            user_info = {
+            user_info_json = {
                 "pending" : pending,
                 "transaction": transaction,
                 "amount": user_balance
             }
-            string_json_user_info = json.dumps(user_info)
-            a_node.connection_manager.server.send_msg(data=string_json_user_info, client_socket=wallet_sock)
-        elif new_msg.action == 'tx':
+            string_user_info_json = json.dumps(user_info_json)
+            a_node.connection_manager.server.send_msg(data=string_user_info_json, client_socket=wallet_sock)
+        elif new_msg.action == 'send_tx':
             t = Transaction.from_dict(new_msg.data)
             trans_signable = t.get_signable()
             trans_signable_json = json.dumps(trans_signable, sort_keys=True, separators=(',', ':'))
-            # trans_signature_bytes = EcdsaHashing.reverse_str_signature_of_data(trans_signable_json)
             status = EcdsaHashing.verify_signature_hex(t.from_addr, t.signature, trans_signable_json)
             if status == True:
                 rs = redis_service.RedisService()
                 rs.store_object(t)
-                a_node.connection_manager.server.send_msg(data="Test", client_socket=wallet_sock)
+                a_node.connection_manager.server.send_msg(data="Transaction Successful", client_socket=wallet_sock)
             else:
-                a_node.connection_manager.server.send_msg(data="Test", client_socket=wallet_sock)
-        elif new_msg.action == "get_nodes_ip":
-            print("inside node list")
-            node_list = a_node.connection_manager.peer_list
-            print(node_list)
-            pass
+                a_node.connection_manager.server.send_msg(data="Transaction Failed", client_socket=wallet_sock)
+        elif new_msg.action == "get_all_ip":
+            node_obj_list = a_node.connection_manager.peer_list
+            ip_list = [node.get_ip_address() for node in node_obj_list]
+            ip_list_json = {
+                "ipaddress_list" : ip_list
+            }
+            string_ip_list_json = json.dumps(ip_list_json)
+            print(string_ip_list_json)
+            a_node.connection_manager.server.send_msg(data=string_ip_list_json, client_socket=wallet_sock)
         elif new_msg.action == 'exit':
             break
         else:
