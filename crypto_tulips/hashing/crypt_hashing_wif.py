@@ -33,10 +33,6 @@ class EcdsaHashing:
         return hashlib.sha256(json.dumps(object_to_hash, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
 
     @staticmethod
-    def recover_pubic_key(private_key):
-        return private_key.get_verifying_key()
-
-    @staticmethod
     def recover_public_key_str(private_key_str):
         sk = SigningKey.from_string(unhexlify(private_key_str), curve=ecdsa.SECP256k1, hashfunc = hashlib.sha256)
         public_key_hex = sk.get_verifying_key()
