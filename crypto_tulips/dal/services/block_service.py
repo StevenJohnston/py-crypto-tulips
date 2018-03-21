@@ -2,6 +2,8 @@ import json
 import redis
 from crypto_tulips.dal.objects.block import Block
 from crypto_tulips.dal.objects.transaction import Transaction
+from crypto_tulips.dal.objects.contract_transaction import ContractTransaction
+from crypto_tulips.dal.objects.pos_transaction import PosTransaction
 
 from crypto_tulips.logger.crypt_logger import Logger, LoggingLevel
 from crypto_tulips.dal.services.redis_service import RedisService
@@ -139,17 +141,15 @@ class BlockService:
                     continue
                 elif h == 'pos_transactions':
                     prefix = ''
-                    obj = Transaction
+                    obj = PosTransaction
                     transactions = temp_list.copy()
                     temp_list.clear()
-                    # TODO class hasn't been created yet
                     continue
                 elif h == 'contract_transactions':
                     prefix = ''
-                    obj = Transaction
+                    obj = ContractTransaction
                     pos_transactions = temp_list.copy()
                     temp_list.clear()
-                    # TODO class hasn't been created yet
                     continue
 
                 # get the object from redis and add to the temporary list
@@ -166,10 +166,16 @@ class BlockService:
             return None
 
     def get_max_block_height(self):
+        """
+        Gets the largest block height currently stored.
+
+        Returns:
+        int -- height of last block
+        """
         r = self._connect()
         if not r.exists(self.max_block_height):
             r.set(self.max_block_height, 0)
-        return r.get(self.max_block_height)
+        return int(r.get(self.max_block_height))
 
     def find_by_height(self, block_height):
         """
@@ -221,6 +227,17 @@ class BlockService:
         """
         current_block = self.find_by_hash(block_hash)
         return self.get_blocks_after_height(current_block.height)
+
+    def get_all_block_hashes(self):
+        """
+        Get all block hashes.
+
+        Returns:
+        list    -- list of strings containing all block hashes
+        """
+        r = self._connect()
+        block_hashes = r.zrange('blocks', 0, -1)
+        return block_hashes
 
     def _connect(self):
         # charset and decode_responses will need to be removed if we want this to be actually stored

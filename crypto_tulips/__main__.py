@@ -130,7 +130,8 @@ def run_miner():
     time_now = int(time.time())
     height = int(BlockService.get_max_height()) + 1
     ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
-    block = Block('', '', steven_pub, 'LAST_BLOCK_HASH', height, ten_transactions, [], [], time_now)
+    last_block_hash = BlockService.get_last_block_hash()
+    block = Block('', '', steven_pub, last_block_hash, height, ten_transactions, [], [], time_now)
     block.update_signature(steven_private_key)
     block.update_hash()
     block_lock.acquire()
