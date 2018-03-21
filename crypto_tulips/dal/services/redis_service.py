@@ -116,7 +116,6 @@ class RedisService:
         pipe = redis_conn.pipeline()
 
         keys = list()
-        print(keys)
         # iterate through attributes of object
         for key, value in attr_dict.items():
             # queue hget
@@ -173,6 +172,19 @@ class RedisService:
             return pipe.execute()
         else:
            return pipe.hget(obj_hash, field_name)
+
+
+    def delete_by_key(self, key):
+        """
+        WARNING: THIS IS IRREVERSIBLE AND THE VALUE OF THE KEY WILL BE LOST
+
+        Removes a key/value pair from the database.
+
+        Parameters:
+        key -- full key of the key/value pair to remove
+        """
+        r = self._connect()
+        return r.delete(key)
 
     def _connect(self):
         """

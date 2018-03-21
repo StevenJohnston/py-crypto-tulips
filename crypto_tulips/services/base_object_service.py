@@ -168,6 +168,12 @@ class BaseObjectService():
 
     @staticmethod
     def get_from_mem_pool(obj):
+        """
+        Get 10 objects from the mempool.
+
+        Arguments:
+        obj -- type of object to retrieve (ie. Transaction, PosTransaction, ContractTransaction)
+        """
         r = BaseObjectService._connect()
         rs = RedisService()
 
@@ -184,6 +190,12 @@ class BaseObjectService():
 
     @staticmethod
     def remove_from_mem_pool(obj):
+        """
+        Remove object from the mempool.
+
+        Arguments:
+        obj -- object to remove from the mempool.
+        """
         r = BaseObjectService._connect()
         pipe = r.pipeline()
 
@@ -197,6 +209,31 @@ class BaseObjectService():
 
         # add to list of not-mempool objects
         new_set_name = obj._to_index()[-1] + ":is_mempool:0"
+        pipe.sadd(new_set_name, name)
+
+        res = pipe.execute()
+
+    @staticmethod
+    def add_to_mem_pool(obj):
+        """
+        Add object to mempool.
+
+        Arguments:
+        obj -- object to add to the mempool
+        """
+        r = BaseObjectService._connect()
+        pipe = r.pipeline()
+
+        # change is_mempool to 1
+        name = obj._to_index()[-1] + ':' + obj._hash
+        pipe.hset(name, 'is_mempool', 1)
+
+        # remove from list of non-mempool objects
+        set_name = obj._to_index()[-1] + ":is_mempool:0"
+        pipe.srem(set_name, name)
+
+        # add to list of mempool objects
+        new_set_name = obj._to_index()[-1] + ":is_mempool:1"
         pipe.sadd(new_set_name, name)
 
         res = pipe.execute()
