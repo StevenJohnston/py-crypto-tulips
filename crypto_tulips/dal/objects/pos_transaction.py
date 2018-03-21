@@ -29,7 +29,7 @@ class PosTransaction(BaseTransaction):
     def get_signable(self):
         return {
             'from_addr': self.from_addr,
-            'amount': self.amount,
+            'amount': "{0:.8f}".format(self.amount),
             'timestamp': self.timestamp
         }
 
@@ -38,7 +38,7 @@ class PosTransaction(BaseTransaction):
         return {
             'signature': self.signature,
             'from_addr': self.from_addr,
-            'amount': self.amount,
+            'amount': "{0:.8f}".format(self.amount),
             'timestamp': self.timestamp
         }
 
@@ -47,7 +47,7 @@ class PosTransaction(BaseTransaction):
         return {
             'signature': self.signature,
             'from_addr': self.from_addr,
-            'amount': self.amount,
+            'amount': "{0:.8f}".format(self.amount),
             'timestamp': self.timestamp,
             '_hash': self._hash
         }

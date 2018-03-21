@@ -51,7 +51,7 @@ class BlockService():
                 duplicate_transaction = True
                 # TODO add logger
             # signature validation
-            if not block_transaction.valid_signature():
+            if new_block.prev_block and not block_transaction.valid_signature():
                 signatures_valid = False
             if not block_transaction.valid_hash():
                 hashes_valid = False
@@ -62,11 +62,13 @@ class BlockService():
                 balances[transaction.from_addr] -= transaction.amount
             if transaction.to_addr in balances:
                 balances[transaction.to_addr] += transaction.amount
-        # make sure each balance > 0
+        # not genesis block
         all_balance_positive = True
-        for key, balance in balances:
-            if balance < 0:
-                all_balance_positive = False
-                # TODO add logger
-                break
+        if new_block.prev_block:
+            # make sure each balance > 0
+            for key, balance in balances:
+                if balance < 0:
+                    all_balance_positive = False
+                    # TODO add logger
+                    break
         return duplicate_transaction and all_balance_positive

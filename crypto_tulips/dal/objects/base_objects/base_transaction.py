@@ -37,13 +37,15 @@ class BaseTransaction(Hashable, Sendable, Signable):
         return ['from_addr', 'is_mempool']
 
     def get_public_key(self):
+        print('fromsadd')
+        print(self.from_addr)
         return self.from_addr
         
     def get_signable(self):
         return {
             'to_addr': self.to_addr,
             'from_addr': self.from_addr,
-            'amount': self.amount,
+            'amount': "{0:.8f}".format(self.amount),
             'timestamp': self.timestamp
         }
     # Returns the object that will be hashed into blockchain
@@ -52,7 +54,7 @@ class BaseTransaction(Hashable, Sendable, Signable):
             'signature': self.signature,
             'to_addr': self.to_addr,
             'from_addr': self.from_addr,
-            'amount': self.amount,
+            'amount': "{0:.8f}".format(self.amount),
             'timestamp': self.timestamp
         }
 
@@ -61,7 +63,7 @@ class BaseTransaction(Hashable, Sendable, Signable):
             'signature': self.signature,
             'to_addr': self.to_addr,
             'from_addr': self.from_addr,
-            'amount': self.amount,
+            'amount': "{0:.8f}".format(self.amount),
             'timestamp': self.timestamp,
             '_hash': self._hash
         }

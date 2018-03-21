@@ -48,7 +48,7 @@ class Contract(Hashable, Sendable, Signable):
         return {
             'to_addr': self.to_addr,
             'from_addr': self.from_addr,
-            'amount': self.amount,
+            'amount': "{0:.8f}".format(self.amount),
             'duration': self.duration,
             'timestamp': self.timestamp
         }
@@ -58,7 +58,7 @@ class Contract(Hashable, Sendable, Signable):
             'signature': self.signature,
             'to_addr': self.to_addr,
             'from_addr': self.from_addr,
-            'amount': self.amount,
+            'amount': "{0:.8f}".format(self.amount),
             'duration': self.duration,
             'timestamp': self.timestamp
         }
@@ -68,7 +68,7 @@ class Contract(Hashable, Sendable, Signable):
             'signature': self.signature,
             'to_addr': self.to_addr,
             'from_addr': self.from_addr,
-            'amount': self.amount,
+            'amount': "{0:.8f}".format(self.amount),
             'duration': self.duration,
             'timestamp': self.timestamp
             '_hash': self._hash

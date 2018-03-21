@@ -13,7 +13,7 @@ def test_hashable():
         'signature': '',
         'to_addr': 'to_steven_test',
         'from_addr': 'from_matt_test',
-        'amount': 1,
+        'amount': '1.00000000',
         'timestamp': test_time
     }
     assert actual == expected
@@ -26,7 +26,7 @@ def test_hashable_fail():
         'signature': '',
         'to_addr': 'to_steven_test',
         'from_addr': 'from_matt_test',
-        'amount': 2,
+        'amount': '2.00000000',
         'timestamp': test_time
     }
     assert actual != not_expected
@@ -41,7 +41,7 @@ def test_sendable():
         'signature': '',
         'to_addr': 'to_steven_test',
         'from_addr': 'from_matt_test',
-        'amount': 1,
+        'amount': '1.00000000',
         'timestamp': test_time,
         '_hash': 'block_send_test'
     }
@@ -55,7 +55,7 @@ def test_sendable_fail():
         'signature': '',
         'to_addr': 'to_steven_test',
         'from_addr': 'from_matt_test',
-        'amount': 2,
+        'amount': '2.00000000',
         'timestamp': test_time,
         '_hash': 'block_send_test'
     }
@@ -67,7 +67,7 @@ def test_sendable_json():
     actual = json.dumps(transaction.get_sendable(), sort_keys=True, separators=(',', ':'))
     expected = json.dumps({
         'signature': '',
-        'amount': 1.0,
+        'amount': '1.00000000',
         'to_addr': 'to_steven_test',
         'from_addr': 'from_matt_test',
         '_hash': 'block_send_test',

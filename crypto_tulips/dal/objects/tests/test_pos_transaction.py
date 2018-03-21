@@ -12,7 +12,7 @@ def test_hashable():
     expected = {
         'signature': '',
         'from_addr': 'steven_addr_test',
-        'amount': 100,
+        'amount': '100.00000000',
         'timestamp': test_time
     }
     assert actual == expected
@@ -24,7 +24,7 @@ def test_hashable_fail():
     not_expected = {
         'signature': '',
         'from_addr': 'steven_addr_test_fail',
-        'amount': 100,
+        'amount': '100.00000000',
         'timestamp': test_time
     }
     assert actual != not_expected
@@ -38,7 +38,7 @@ def test_sendable():
     expected = {
         'signature': '',
         'from_addr': 'steven_addr_test',
-        'amount': 100,
+        'amount': '100.00000000',
         'timestamp': test_time,
         '_hash': 'pos_transaction_hash_test'
     }
@@ -51,7 +51,7 @@ def test_sendable_fail():
     not_expected = {
         'signature': '',
         'from_addr': 'steven_addr_test_fail',
-        'amount': 100,
+        'amount': '100.00000000',
         'timestamp': test_time,
         '_hash': 'pos_transaction_hash_test_fail'
     }

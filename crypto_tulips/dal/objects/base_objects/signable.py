@@ -1,4 +1,3 @@
-from crypto_tulips.hashing.crypt_hashing import Hashing
 from crypto_tulips.hashing.crypt_hashing_wif import EcdsaHashing
 import collections
 import json
@@ -16,7 +15,7 @@ class Signable:
     def get_signature(self, private_key):
         signable = self.get_signable()
         signable_string = json.dumps(signable, sort_keys=True, separators=(',', ':'))
-        return Hashing.str_signature_of_data(signable_string, private_key)
+        return EcdsaHashing.sign_message_hex(signable_string, private_key)
 
     # Used to get the hashable version of an object.
     # Use this with a the map function
