@@ -38,26 +38,11 @@ class BaseTransaction(Hashable, Sendable, Signable):
         return self.from_addr
 
     def get_signable(self):
-        return {
-            'from_addr': self.from_addr,
-            'amount': "{0:.8f}".format(self.amount),
-            'timestamp': self.timestamp
-        }
+        raise NotImplementedError
 
     # Returns the object that will be hashed into blockchain
     def get_hashable(self):
-        return {
-            'signature': self.signature,
-            'from_addr': self.from_addr,
-            'amount': "{0:.8f}".format(self.amount),
-            'timestamp': self.timestamp
-        }
+        raise NotImplementedError
 
     def get_sendable(self):
-        return {
-            'signature': self.signature,
-            'from_addr': self.from_addr,
-            'amount': "{0:.8f}".format(self.amount),
-            'timestamp': self.timestamp,
-            '_hash': self._hash
-        }
+        raise NotImplementedError
