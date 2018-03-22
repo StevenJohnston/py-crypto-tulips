@@ -7,6 +7,7 @@ from crypto_tulips.dal.objects.pos_transaction import PosTransaction
 
 from crypto_tulips.logger.crypt_logger import Logger, LoggingLevel
 from crypto_tulips.dal.services.redis_service import RedisService
+from crypto_tulips.dal.services.contract_service import ContractService
 
 class BlockService:
     _host = ''
@@ -55,17 +56,22 @@ class BlockService:
                 # store the transaction's hash under the block's list
                 pipe.rpush(name, transaction._hash)
                 # store the actual transaction object
-                rs.store_object(transaction, r, pipe)
+                pipe = rs.store_object(transaction, r, pipe)
 
             pipe.rpush(name, 'pos_transactions')
             for pos_transaction in block.pos_transactions:
                 pipe.rpush(name, pos_transaction._hash)
-                rs.store_object(pos_transaction, r, pipe)
+                pipe = rs.store_object(pos_transaction, r, pipe)
 
             pipe.rpush(name, 'contract_transactions')
             for contract_transaction in block.contract_transactions:
                 pipe.rpush(name, contract_transaction._hash)
-                rs.store_object(contract_transaction, r, pipe)
+                pipe = rs.store_object(contract_transaction, r, pipe)
+
+            pipe.rpush(name, 'contracts')
+            for contract in block.contracts:
+                pipe.rpush(name, contract._hash)
+                pipe = ContractService.store_contract(contract, pipe)
 
             pipe.zadd('blocks', block.height, block._hash)
 
@@ -129,10 +135,12 @@ class BlockService:
             transactions = []
             pos_transactions = []
             contract_transactions = []
+            contracts = []
 
             # temporary list to copy from
             temp_list = []
             obj = None
+            contract_section = False
             for h in hashes:
                 # if at a new type of object, change some variables
                 if h == 'transactions':
@@ -140,27 +148,35 @@ class BlockService:
                     obj = Transaction
                     continue
                 elif h == 'pos_transactions':
-                    prefix = ''
+                    prefix = PosTransaction._to_index()[-1]
                     obj = PosTransaction
                     transactions = temp_list.copy()
                     temp_list.clear()
                     continue
                 elif h == 'contract_transactions':
-                    prefix = ''
+                    prefix = ContractTransaction._to_index()[-1]
                     obj = ContractTransaction
                     pos_transactions = temp_list.copy()
                     temp_list.clear()
                     continue
+                elif h == 'contracts':
+                    contract_section = True
+
 
                 # get the object from redis and add to the temporary list
-                t = rs.get_object_by_full_key(prefix + ":" + h, obj, r)
-                temp_list.append(t)
+                if contract_section:
+                    contract = ContractService.get_contract_by_hash(h)
+                    if contract != None:
+                        contracts.append(contract)
+                else:
+                    t = rs.get_object_by_full_key(prefix + ":" + h, obj, r)
+                    temp_list.append(t)
 
             contract_transactions = temp_list.copy()
             temp_list.clear()
 
             # create block object and return it
-            block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, timestamp)
+            block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, contracts, timestamp)
             return block
         else:
             return None

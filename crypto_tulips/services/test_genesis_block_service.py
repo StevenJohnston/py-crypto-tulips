@@ -18,7 +18,8 @@ def test_validate_rsa_block():
     genesis_block = {
         "height": 0,
         "prev_block": "",
-        "_hash": "4a6d696de88b2404a3ce502ebc3fe675385844cabc957aa1502112b951007d72",
+        "_hash": "1a06bafd792615929ab6c65fd9f54ef2a1a2e408f9548f5d4c32e2cfd6b10a0e",
+        "contracts": [],
         "pos_transactions": [{
             "from_addr": "c8fdd9558e4e36d3549c449986c587aa16be67439ed70b8bf1f7e47e8586572f4c821059e4077a94d3e31f1cfa8bccc5c2acf86e955d30ef93633bcabcdc9f34",
             "timestamp": 1520135639,
@@ -58,7 +59,7 @@ def test_validate_rsa_block():
             "from_addr": "",
             "signature": "556474088e1f4c75f24cb72db8b0be78134d10d0323c40569207baef1172c43b96596573a446389d2330d781109b76da8725d2ef29876cdd4a198fafc9cbf50f"
         }],
-        "signature": "2ac0ed3f915d141c1339700547518c0eddec2ec546bfa24bdd0711ec1077baea7dca0024e9a978d75c9c0efdf029d64c5b46c2aee06b8c3c162ebaa107fad513"
+        "signature": "c1baa8f6d1789c2ddb803b1ad34ba742efd30aa4f77aea3ca5c86224a193596bd74299cccedbe9603af15edc7890fb403d79bd3acc72adefdd214244fad6000c"
     }
     block = Block.from_dict(genesis_block)
     block_signable = block.get_signable()

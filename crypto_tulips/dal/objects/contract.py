@@ -11,69 +11,84 @@ from crypto_tulips.dal.objects.base_objects.signable import Signable
 class Contract(Hashable, Sendable, Signable):
     _hash = ''
     signature = ''
-    to_addr = ''
-    from_addr = ''
+    addr = ''
+    owner = ''
     amount = ''
+    rate = ''
     is_mempool = ''
     duration = ''
     timestamp = ''
+    end_timestamp = ''
 
-    def __init__(self, contract_hash, signature, to_addr, from_addr, is_mempool, duration, timestamp = time.time()):
+    def __init__(self, contract_hash, signature, addr, owner, amount, rate, is_mempool, duration, timestamp = time.time(), end_timestamp = None):
         self._hash = contract_hash
         self.signature = signature
-        self.to_addr = to_addr
-        self.from_addr = from_addr
+        self.addr = addr
+        self.owner = owner
         self.amount = amount
+        self.rate = rate
         self.is_mempool = is_mempool
         self.duration = int(duration)
         self.timestamp = int(timestamp)
+        if end_timestamp == None:
+            self.end_timestamp = self.timestamp + self.duration
+        else:
+            self.end_timestamp = end_timestamp
 
     @staticmethod
     def from_dict(dict_values):
         contract_hash = dict_values.get('_hash')
         signature = dict_values.get('signature')
-        to_addr = dict_values.get('to_addr')
-        from_addr = dict_values.get('from_addr')
+        addr = dict_values.get('addr')
+        owner = dict_values.get('owner')
         amount = dict_values.get('amount')
+        rate = dict_values.get('rate')
         is_mempool = dict_values.get('is_mempool')
         duration = dict_values.get('duration')
         timestamp = dict_values.get('timestamp')
-        new_contract = Contract(contract_hash, signature, to_addr, from_addr, is_mempool, duration, timestamp)
+        end_timestamp = dict_values.get('end_timestamp')
+        new_contract = Contract(contract_hash, signature, addr, owner, is_mempool, duration, timestamp, end_timestamp)
         return new_contract
 
     def get_public_key(self):
-        return self.from_addr
+        return self._hash
 
     def get_signable(self):
         return {
-            'to_addr': self.to_addr,
-            'from_addr': self.from_addr,
+            'addr': self.addr,
+            'owner': self.owner,
             'amount': "{0:.8f}".format(self.amount),
+            'rate': "{0:.8f}".format(self.rate),
             'duration': self.duration,
-            'timestamp': self.timestamp
+            'timestamp': self.timestamp,
+            'end_timestamp': self.end_timestamp
         }
-    
+
     def get_hashable(self):
         return {
             'signature': self.signature,
-            'to_addr': self.to_addr,
-            'from_addr': self.from_addr,
+            'addr': self.addr,
+            'owner': self.owner,
             'amount': "{0:.8f}".format(self.amount),
+            'rate': "{0:.8f}".format(self.rate),
             'duration': self.duration,
-            'timestamp': self.timestamp
+            'timestamp': self.timestamp,
+            'end_timestamp': self.end_timestamp
         }
 
     def get_sendable(self):
         return {
             'signature': self.signature,
-            'to_addr': self.to_addr,
-            'from_addr': self.from_addr,
+            'owner': self.owner,
+            'addr': self.addr,
             'amount': "{0:.8f}".format(self.amount),
+            'rate': "{0:.8f}".format(self.rate),
             'duration': self.duration,
-            'timestamp': self.timestamp
+            'timestamp': self.timestamp,
+            'end_timestamp': self.end_timestamp,
             '_hash': self._hash
         }
 
     @staticmethod
     def _to_index():
-        return ['to_addr', 'from_addr', 'is_mempool', 'contract']
+        return ['addr', 'owner', 'is_mempool', 'contract']

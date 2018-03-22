@@ -50,9 +50,11 @@ class RedisService:
         pipe        -- pipeline if already established
 
         Returns:
-        list    -- list containing results of each query used to store an object (0s and 1s)
-                0s indicate that the field was updated (already present)
-                1s indicate that the field is new and was stored
+        list        -- list containing results of each query used to store an object (0s and 1s)
+                    0s indicate that the field was updated (already present)
+                    1s indicate that the field is new and was stored
+            OR
+        pipeline    -- pipeline object to continue inserting into redis with (if pipe was passed in)
         """
         attr_dict = self._get_attributes(obj)
 
@@ -60,8 +62,10 @@ class RedisService:
         if redis_conn == None :
             redis_conn = self._connect()
 
+        pipe_created = False
         if pipe == None:
             pipe = redis_conn.pipeline()
+            pipe_created = True
         # name will be the prefix specified in the object + _hash
         obj_field_keys = obj._to_index()
         prefix = obj_field_keys[-1]
@@ -75,7 +79,10 @@ class RedisService:
                 if (k != self._hash) and (obj._to_index().__contains__(k)):
                     # index the field as 'prefix:field_name:field_value', and the transaction key
                     pipe.sadd(prefix + ":" + k + ":" + str(v), name)
-        return pipe.execute()
+        if pipe_created:
+            return pipe.execute()
+        else:
+            return pipe
 
     def _get_attributes(self, obj):
         """
