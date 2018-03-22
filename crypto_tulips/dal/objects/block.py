@@ -54,9 +54,6 @@ class Block(Hashable, Sendable, Signable):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
-    def _to_index(self):
-        return []
-
     def get_public_key(self):
         return self.owner
 
@@ -66,10 +63,11 @@ class Block(Hashable, Sendable, Signable):
             'height': self.height,
             'transactions': list(map(Signable.get_signable_callback, self.transactions)),
             'pos_transactions': list(map(Signable.get_signable_callback, self.pos_transactions)),
-            'contract_transactions': [], #list(map(Signable.get_signable_callback, self.contract_transactions)),
+            'contract_transactions': list(map(Signable.get_signable_callback, self.contract_transactions)),
             'contracts': list(map(Signable.get_signable_callback, self.contracts)),
             'timestamp': self.timestamp
         }
+
     # Returns the object that will be hashed into blockchain
     def get_hashable(self):
         return {

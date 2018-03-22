@@ -18,22 +18,17 @@ class Contract(Hashable, Sendable, Signable):
     is_mempool = ''
     duration = ''
     timestamp = ''
-    end_timestamp = ''
 
-    def __init__(self, contract_hash, signature, addr, owner, amount, rate, is_mempool, duration, timestamp = time.time(), end_timestamp = None):
+    def __init__(self, contract_hash, signature, addr, owner, amount, rate, is_mempool, duration, timestamp = time.time()):
         self._hash = contract_hash
         self.signature = signature
         self.addr = addr
         self.owner = owner
-        self.amount = amount
-        self.rate = rate
+        self.amount = float(amount)
+        self.rate = float(rate)
         self.is_mempool = is_mempool
         self.duration = int(duration)
         self.timestamp = int(timestamp)
-        if end_timestamp == None:
-            self.end_timestamp = self.timestamp + self.duration
-        else:
-            self.end_timestamp = end_timestamp
 
     @staticmethod
     def from_dict(dict_values):
@@ -46,8 +41,7 @@ class Contract(Hashable, Sendable, Signable):
         is_mempool = dict_values.get('is_mempool')
         duration = dict_values.get('duration')
         timestamp = dict_values.get('timestamp')
-        end_timestamp = dict_values.get('end_timestamp')
-        new_contract = Contract(contract_hash, signature, addr, owner, is_mempool, duration, timestamp, end_timestamp)
+        new_contract = Contract(contract_hash, signature, addr, owner, amount, rate, is_mempool, duration, timestamp)
         return new_contract
 
     def get_public_key(self):
@@ -60,8 +54,7 @@ class Contract(Hashable, Sendable, Signable):
             'amount': "{0:.8f}".format(self.amount),
             'rate': "{0:.8f}".format(self.rate),
             'duration': self.duration,
-            'timestamp': self.timestamp,
-            'end_timestamp': self.end_timestamp
+            'timestamp': self.timestamp
         }
 
     def get_hashable(self):
@@ -72,8 +65,7 @@ class Contract(Hashable, Sendable, Signable):
             'amount': "{0:.8f}".format(self.amount),
             'rate': "{0:.8f}".format(self.rate),
             'duration': self.duration,
-            'timestamp': self.timestamp,
-            'end_timestamp': self.end_timestamp
+            'timestamp': self.timestamp
         }
 
     def get_sendable(self):
@@ -85,7 +77,6 @@ class Contract(Hashable, Sendable, Signable):
             'rate': "{0:.8f}".format(self.rate),
             'duration': self.duration,
             'timestamp': self.timestamp,
-            'end_timestamp': self.end_timestamp,
             '_hash': self._hash
         }
 
