@@ -285,3 +285,14 @@ class BlockService:
             return {transaction._hash: transaction for transaction in transactions}
         else:
             return {}
+
+    def get_all_pos_transaction(self, block_hash):
+        block = self.find_by_hash(block_hash)
+        if block:
+            pos_transactions = block.pos_transactions
+            while block.prev_block:
+                block = self.find_by_hash(block.prev_block)
+                pos_transactions.extend(block.pos_transactions)
+            return {pos_transaction._hash: pos_transaction for pos_transaction in pos_transactions}
+        else:
+            return {}

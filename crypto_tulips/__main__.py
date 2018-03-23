@@ -17,23 +17,25 @@ from crypto_tulips.p2p.message import Message
 
 from crypto_tulips.services.transaction_service import TransactionService
 from crypto_tulips.services.block_service import BlockService
-
+from crypto_tulips.services.pos_service import POSService
 
 from crypto_tulips.services.base_object_service import BaseObjectService
 
-denys_private_key = """55a1281dfe6cf404816be8f2bb33813e2cf8ef499fb22e21cb090f8f8563a72a"""
+denys_private_key = """4a7351205a7bfaa9726a67cba6f331f1b03ee1e904250f95f81f82e775bb55c1"""
 
 william_private_key = """83c82312b925e50dde81f57f88f2fe1fb8310de1d81e97b696235c6093cd6af8"""
 
 matt_private_key = """f5dd743c84ddec77330b5dcf7e1f69a26ec55e0aa4fe504307b83f7850782510"""
 
-steven_private_key = """4a7351205a7bfaa9726a67cba6f331f1b03ee1e904250f95f81f82e775bb55c1"""
+steven_private_key = """55a1281dfe6cf404816be8f2bb33813e2cf8ef499fb22e21cb090f8f8563a72a"""
 
 naween_private_key = """418a3147a90f519cd72fb05eb2f201368ee7265f36efb8824e9daed59aabe9e0"""
+
 
 transaction_lock = threading.Lock()
 block_lock = threading.Lock()
 
+new_block_callbacks = []
 def check_if_object_exist(obj_hash, obj_type):
     rs = redis_service.RedisService()
     obj = rs.get_object_by_hash(obj_hash=obj_hash, obj=obj_type)
@@ -112,6 +114,8 @@ def regular_node_callback(data, peer_id=None):
             result_list = []
         else:
             result_list = block_service.add_block_to_chain(new_block)
+            for new_block_callback in new_block_callbacks: 
+                new_block_callback(new_block)
         if result_list:
             need_to_send = True
             print('All good')
@@ -125,23 +129,31 @@ def regular_node_callback(data, peer_id=None):
             send_a_block(new_block)
 
 def run_miner():
-    block_service = BlockService()
+    new_block_callbacks.append(mine_block)
+    
+def mine_block(last_block):
+    # check if we are the miner. 
     steven_pub = EcdsaHashing.recover_public_key_str(steven_private_key)
-    time_now = int(time.time())
-    height = int(BlockService.get_max_height()) + 1
-    ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
-    last_block_hash = BlockService.get_last_block_hash()
-    block = Block('', '', steven_pub, last_block_hash, height, ten_transactions, [], [], [], [], time_now)
-    block.update_signature(steven_private_key)
-    block.update_hash()
-    block_lock.acquire()
-    block_service.add_block_to_chain(block)
-    # TODO Test if worked block was added. Might fail due to same hash
-    for trabs in ten_transactions:
-        BaseObjectService.remove_from_mem_pool(trabs)
-    print('\nCreated Block hash: ' + block._hash)
-    block_lock.release()
-    send_a_block(block)
+    next_author = POSService.get_next_block_author(last_block)
+    if next_author == steven_pub:
+        block_service = BlockService()
+        time_now = int(time.time())
+        #height = int(BlockService.get_max_height()) + 1
+        height = last_block.height + 1
+        ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
+        #last_block_hash = BlockService.get_last_block_hash()
+        last_block_hash = last_block._hash
+        block = Block('', '', steven_pub, last_block_hash, height, ten_transactions, [], [], [], [], time_now)
+        block.update_signature(steven_private_key)
+        block.update_hash()
+        block_lock.acquire()
+        block_service.add_block_to_chain(block)
+        # TODO Test if worked block was added. Might fail due to same hash
+        for trabs in ten_transactions:
+            BaseObjectService.remove_from_mem_pool(trabs)
+        print('\nCreated Block hash: ' + block._hash)
+        block_lock.release()
+        send_a_block(block)
 
 def send_a_block(new_block, action='block', block_target_peer_id=None):
     block_msg = message.Message(action, new_block)
