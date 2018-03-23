@@ -8,8 +8,11 @@ from crypto_tulips.dal.objects.base_objects.base_transaction import BaseTransact
 
 class Transaction(BaseTransaction):
 
+    to_addr = ''
+
     def __init__(self, transaction_hash, signature, to_addr, from_addr, amount, is_mempool, timestamp = time.time()):
-        BaseTransaction.__init__(self, transaction_hash, signature, to_addr, from_addr, amount, is_mempool, timestamp)
+        self.to_addr = to_addr
+        BaseTransaction.__init__(self, transaction_hash, signature, from_addr, amount, is_mempool, timestamp)
 
     @staticmethod
     def from_dict(dict_values):
@@ -29,3 +32,32 @@ class Transaction(BaseTransaction):
         index.append('to_addr')
         index.append('transaction')
         return index
+
+
+    def get_signable(self):
+        return {
+            'to_addr': self.to_addr,
+            'from_addr': self.from_addr,
+            'amount': "{0:.8f}".format(self.amount),
+            'timestamp': self.timestamp
+        }
+
+    # Returns the object that will be hashed into blockchain
+    def get_hashable(self):
+        return {
+            'signature': self.signature,
+            'to_addr': self.to_addr,
+            'from_addr': self.from_addr,
+            'amount': "{0:.8f}".format(self.amount),
+            'timestamp': self.timestamp
+        }
+
+    def get_sendable(self):
+        return {
+            'signature': self.signature,
+            'to_addr': self.to_addr,
+            'from_addr': self.from_addr,
+            'amount': "{0:.8f}".format(self.amount),
+            'timestamp': self.timestamp,
+            '_hash': self._hash
+        }

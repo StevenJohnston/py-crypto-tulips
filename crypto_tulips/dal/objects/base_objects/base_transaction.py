@@ -9,16 +9,14 @@ from crypto_tulips.dal.objects.base_objects.sendable import Sendable
 from crypto_tulips.dal.objects.base_objects.signable import Signable
 
 class BaseTransaction(Hashable, Sendable, Signable):
-    to_addr = ''
     from_addr = ''
     amount = ''
     timestamp = ''
     is_mempool = ''
 
-    def __init__(self, transaction_hash, signature, to_addr, from_addr, amount, is_mempool = 1, timestamp = time.time()):
+    def __init__(self, transaction_hash, signature, from_addr, amount, is_mempool = 1, timestamp = time.time()):
         self._hash = transaction_hash
         self.signature = signature
-        self.to_addr = to_addr
         self.from_addr = from_addr
         self.amount = float(amount)
         if is_mempool == None:
@@ -37,33 +35,14 @@ class BaseTransaction(Hashable, Sendable, Signable):
         return ['from_addr', 'is_mempool']
 
     def get_public_key(self):
-        print('fromsadd')
-        print(self.from_addr)
         return self.from_addr
-        
+
     def get_signable(self):
-        return {
-            'to_addr': self.to_addr,
-            'from_addr': self.from_addr,
-            'amount': "{0:.8f}".format(self.amount),
-            'timestamp': self.timestamp
-        }
+        raise NotImplementedError
+
     # Returns the object that will be hashed into blockchain
     def get_hashable(self):
-        return {
-            'signature': self.signature,
-            'to_addr': self.to_addr,
-            'from_addr': self.from_addr,
-            'amount': "{0:.8f}".format(self.amount),
-            'timestamp': self.timestamp
-        }
+        raise NotImplementedError
 
     def get_sendable(self):
-        return {
-            'signature': self.signature,
-            'to_addr': self.to_addr,
-            'from_addr': self.from_addr,
-            'amount': "{0:.8f}".format(self.amount),
-            'timestamp': self.timestamp,
-            '_hash': self._hash
-        }
+        raise NotImplementedError

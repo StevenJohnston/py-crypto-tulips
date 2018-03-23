@@ -9,14 +9,14 @@ class GenesisBlockService():
     def generate_from_priv(private_key):
         time_now = 1520135639.4713802
         public = EcdsaHashing.recover_public_key_str(private_key)
-        transcations = [
+        transactions = [
             Transaction('', '', public, '', 1, 1, time_now),
             Transaction('', '', public, '', 10, 1, time_now),
             Transaction('', '', public, '', 100, 1, time_now),
             Transaction('', '', public, '', 1000, 1, time_now),
         ]
 
-        for tranaction in transcations:
+        for tranaction in transactions:
             tranaction.update_signature(private_key)
             tranaction.update_hash()
 
@@ -29,7 +29,7 @@ class GenesisBlockService():
             pos_transaction.update_hash()
 
 
-        block = Block('', '', public, '', 0, transcations, pos_transactions, [], time_now)
+        block = Block('', '', public, '', 0, transactions, pos_transactions, [], [], [], time_now)
         block.update_signature(private_key)
         block.update_hash()
         return block
