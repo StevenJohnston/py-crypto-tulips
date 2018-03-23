@@ -21,6 +21,11 @@ from crypto_tulips.services.pos_service import POSService
 
 from crypto_tulips.services.base_object_service import BaseObjectService
 
+from crypto_tulips.dal.services.contract_service import ContractService, ContractFilter
+from crypto_tulips.dal.objects.contract import Contract
+from crypto_tulips.dal.services.signed_contract_service import SignedContractService, SignedContractFilter
+from crypto_tulips.dal.objects.signed_contract import SignedContract
+
 denys_private_key = """4a7351205a7bfaa9726a67cba6f331f1b03ee1e904250f95f81f82e775bb55c1"""
 
 william_private_key = """83c82312b925e50dde81f57f88f2fe1fb8310de1d81e97b696235c6093cd6af8"""
@@ -114,7 +119,7 @@ def regular_node_callback(data, peer_id=None):
             result_list = []
         else:
             result_list = block_service.add_block_to_chain(new_block)
-            for new_block_callback in new_block_callbacks: 
+            for new_block_callback in new_block_callbacks:
                 new_block_callback(new_block)
         if result_list:
             need_to_send = True
@@ -130,9 +135,9 @@ def regular_node_callback(data, peer_id=None):
 
 def run_miner():
     new_block_callbacks.append(mine_block)
-    
+
 def mine_block(last_block):
-    # check if we are the miner. 
+    # check if we are the miner.
     steven_pub = EcdsaHashing.recover_public_key_str(steven_private_key)
     next_author = POSService.get_next_block_author(last_block)
     if next_author == steven_pub:
@@ -205,11 +210,51 @@ def wallet_callback(wallet_sock):
             string_ip_list_json = json.dumps(ip_list_json)
             print(string_ip_list_json)
             a_node.connection_manager.server.send_msg(data=string_ip_list_json, client_socket=wallet_sock)
+        elif new_msg.action == "get_contracts":
+            contracts_filter = get_contracts_list(new_msg.data)
+            #contracts = ContractService.get_contracts_by_filter(contracts_filter, False)
+            contracts = ContractService.get_contracts_by_filter(contracts_filter, True)
+            new_contracts = [contract.get_sendable() for contract in contracts]
+            contracts_json = {
+                "available_contracts" : new_contracts
+            }
+            string_contract_json = json.dumps(contracts_json)
+            a_node.connection_manager.server.send_msg(data=string_contract_json, client_socket=wallet_sock)
+        elif new_msg.action == "publish_contract":
+            pass
+        elif new_msg.action == "get_signed_contract":
+            signed_contracts_filter = get_contracts_list(new_msg.data, contract_type=2)
+            #signed_contracts = SignedContractService.get_signed_contracts_by_filter(signed_contracts_filter, False)
+            #Use this for testing
+            signed_contracts = SignedContractService.get_signed_contracts_by_filter(signed_contracts_filter, True)
+            new_signed_contracts = [contract.get_sendable() for contract in signed_contracts]
+            contracts_json = {
+                "signed_contracts" : new_signed_contracts
+            }
+            string_signed_contract_json = json.dumps(contracts_json)
+            a_node.connection_manager.server.send_msg(data=string_signed_contract_json, client_socket=wallet_sock)
         elif new_msg.action == 'exit':
             break
         else:
             a_node.connection_manager.server.send_msg(data="Bad Data", client_socket=wallet_sock)
     a_node.connection_manager.server.close_client(client_socket=wallet_sock)
+
+def parse_contract_filter(contract):
+    return contract["type"], contract["startRange"], contract["endRange"]
+
+def get_contracts_list(dict_data, contract_type=1):
+    contracts_filter = []
+    contracts_json_str = json.dumps(dict_data, sort_keys=True, separators=(',', ':'))
+    json_contract_list = json.loads(contracts_json_str)
+    for json_contract in json_contract_list["contractFilters"]:
+        type_filter, start_range, end_range = parse_contract_filter(json_contract)
+        if contract_type == 1:
+            cf = ContractFilter(type_filter, start_range, end_range)
+        else:
+            cf = SignedContractFilter(type_filter, start_range, end_range)
+        contracts_filter.append(cf)
+    return contracts_filter
+
 
 def send_a_transaction(new_transaction):
     transaction_msg = message.Message('transaction', new_transaction)
