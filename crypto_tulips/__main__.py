@@ -183,12 +183,7 @@ def wallet_callback(wallet_sock):
                     pending.append(trans.get_sendable())
                 else:
                     transaction.append(trans.get_sendable())
-            user_info_json = {
-                "pending" : pending,
-                "transaction": transaction,
-                "amount": user_balance
-            }
-            string_user_info_json = json.dumps(user_info_json)
+            string_user_info_json = build_return_json([("pending", pending), ("transaction", transaction), ("amount", user_balance)])
             a_node.connection_manager.server.send_msg(data=string_user_info_json, client_socket=wallet_sock)
         elif new_msg.action == 'send_tx':
             t = Transaction.from_dict(new_msg.data)
@@ -204,22 +199,17 @@ def wallet_callback(wallet_sock):
         elif new_msg.action == "get_all_ip":
             node_obj_list = a_node.connection_manager.peer_list
             ip_list = [node.get_ip_address() for node in node_obj_list]
-            ip_list_json = {
-                "ipaddress_list" : ip_list
-            }
-            string_ip_list_json = json.dumps(ip_list_json)
-            print(string_ip_list_json)
-            a_node.connection_manager.server.send_msg(data=string_ip_list_json, client_socket=wallet_sock)
+            json_ip_list_str_return = build_return_json([("ipaddress_list", ip_list)])
+            print(json_ip_list_str_return)
+            a_node.connection_manager.server.send_msg(data=json_ip_list_str_return, client_socket=wallet_sock)
         elif new_msg.action == "get_contracts":
             contracts_filter = get_contracts_list(new_msg.data)
             #contracts = ContractService.get_contracts_by_filter(contracts_filter, False)
+            #Use this for testing
             contracts = ContractService.get_contracts_by_filter(contracts_filter, True)
             new_contracts = [contract.get_sendable() for contract in contracts]
-            contracts_json = {
-                "available_contracts" : new_contracts
-            }
-            string_contract_json = json.dumps(contracts_json)
-            a_node.connection_manager.server.send_msg(data=string_contract_json, client_socket=wallet_sock)
+            json_str_return = build_return_json([("available_contracts", new_contracts)])
+            a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == "publish_contract":
             pass
         elif new_msg.action == "get_signed_contract":
@@ -228,11 +218,8 @@ def wallet_callback(wallet_sock):
             #Use this for testing
             signed_contracts = SignedContractService.get_signed_contracts_by_filter(signed_contracts_filter, True)
             new_signed_contracts = [contract.get_sendable() for contract in signed_contracts]
-            contracts_json = {
-                "signed_contracts" : new_signed_contracts
-            }
-            string_signed_contract_json = json.dumps(contracts_json)
-            a_node.connection_manager.server.send_msg(data=string_signed_contract_json, client_socket=wallet_sock)
+            json_str_return = build_return_json([("signed_contracts", new_signed_contracts)])
+            a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == 'exit':
             break
         else:
@@ -241,6 +228,12 @@ def wallet_callback(wallet_sock):
 
 def parse_contract_filter(contract):
     return contract["type"], contract["startRange"], contract["endRange"]
+
+def build_return_json(list_of_pair):
+    data = {}
+    for key, value in list_of_pair:
+        data[key] = value
+    return json.dumps(data)
 
 def get_contracts_list(dict_data, contract_type=1):
     contracts_filter = []
