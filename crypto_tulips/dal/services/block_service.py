@@ -8,6 +8,7 @@ from crypto_tulips.dal.objects.pos_transaction import PosTransaction
 from crypto_tulips.logger.crypt_logger import Logger, LoggingLevel
 from crypto_tulips.dal.services.redis_service import RedisService
 from crypto_tulips.dal.services.contract_service import ContractService
+from crypto_tulips.dal.services.signed_contract_service import SignedContractService
 
 class BlockService:
     _host = ''
@@ -73,6 +74,11 @@ class BlockService:
                 pipe.rpush(name, contract._hash)
                 pipe = ContractService.store_contract(contract, pipe)
 
+            pipe.rpush(name, 'signed_contracts')
+            for signed_contract in block.signed_contracts:
+                pipe.rpush(name, signed_contract._hash)
+                pipe = SignedContractService.store_signed_contract(signed_contract, pipe)
+
             pipe.zadd('blocks', block.height, block._hash)
 
             # TODO max block height will not always be this, will change
@@ -136,11 +142,13 @@ class BlockService:
             pos_transactions = []
             contract_transactions = []
             contracts = []
+            signed_contracts = []
 
             # temporary list to copy from
             temp_list = []
             obj = None
             contract_section = False
+            signed_contract_section = False
             for h in hashes:
                 # if at a new type of object, change some variables
                 if h == 'transactions':
@@ -161,6 +169,9 @@ class BlockService:
                     continue
                 elif h == 'contracts':
                     contract_section = True
+                elif h == 'signed_contracts':
+                    contract_section = False
+                    signed_contract_section = True
 
 
                 # get the object from redis and add to the temporary list
@@ -168,6 +179,10 @@ class BlockService:
                     contract = ContractService.get_contract_by_hash(h)
                     if contract != None:
                         contracts.append(contract)
+                elif signed_contract_section:
+                    signed_contract = SignedContractService.get_signed_contract_by_hash(h)
+                    if signed_contract != None:
+                        signed_contracts.append(signed_contract)
                 else:
                     t = rs.get_object_by_full_key(prefix + ":" + h, obj, r)
                     temp_list.append(t)
@@ -176,7 +191,7 @@ class BlockService:
             temp_list.clear()
 
             # create block object and return it
-            block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, contracts, timestamp)
+            block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, contracts, signed_contracts, timestamp)
             return block
         else:
             return None
