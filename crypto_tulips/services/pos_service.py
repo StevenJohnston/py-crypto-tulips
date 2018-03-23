@@ -19,7 +19,7 @@ class POSService():
 
       balances = {}
       # balances of all pos'ers
-      for pos_transaction in pos_transactions_before_block:
+      for key, pos_transaction in pos_transactions_before_block.items():
           # update address current balance
           balances[pos_transaction.from_addr] = pos_transaction.amount + balances.get(pos_transaction.from_addr, 0)
           if balances[pos_transaction.from_addr] == 0:
@@ -31,5 +31,6 @@ class POSService():
     def get_next_block_author(current_block):
       pos_pool = POSService.get_pos_pool(current_block)
       number_of_pos_accounts = len(pos_pool)
-      pos_index = abs(hash(current_block._hash)) % number_of_pos_accounts
-      return pos_pool.keys()[pos_index]
+      pos_index = int(current_block._hash, 16) % number_of_pos_accounts
+      ordered = sorted(list(pos_pool.keys()))
+      return ordered[pos_index]
