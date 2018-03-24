@@ -322,7 +322,8 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         if user_input == 'quit' or user_input == 'q':
             break
         elif user_input == 'height':
-            print(BlockService.get_max_height())
+            print('Blocks {}'.format(BlockService.get_max_height()))
+            print('Mem Transactions {}'.format(len(TransactionService.get_all_mempool_transactions())))
         elif user_input == 'test':
             mem_transactions = TransactionService.get_all_mempool_transactions()
             print('I have {} mem transactions'.format(len(mem_transactions)))
