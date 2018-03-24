@@ -125,8 +125,9 @@ def regular_node_callback(data, peer_id=None):
             result_list = []
         else:
             result_list = block_service.add_block_to_chain(new_block)
-            for new_block_callback in new_block_callbacks:
-                new_block_callback(new_block)
+            if result_list:
+                for new_block_callback in new_block_callbacks:
+                    new_block_callback(new_block)
         if result_list:
             need_to_send = True
             print('All good')
