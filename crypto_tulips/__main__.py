@@ -77,10 +77,14 @@ def regular_node_callback(data, peer_id=None):
         transaction_lock.acquire()
         print('\nTransaction : {}'.format(new_transaction._hash))
         if not check_if_object_exist(new_transaction._hash, Transaction):
-            rs = redis_service.RedisService()
-            rs.store_object(new_transaction)
-            need_to_send = True
-            print('All good')
+            if a_node.doing_transaction_sync and not sync_transaction:
+                a_node.transaction_queue.append(new_transaction)
+                print('Added transaction to the queue')
+            else:
+                rs = redis_service.RedisService()
+                rs.store_object(new_transaction)
+                need_to_send = True
+                print('All good')
         else:
             print('Duplicate transaction')
         transaction_lock.release()
@@ -88,6 +92,8 @@ def regular_node_callback(data, peer_id=None):
             send_a_transaction(new_transaction)
     elif new_msg.action == 'transaction_sync_end':
         print('\n\nFinished transaction sync')
+        a_node.doing_transaction_sync = False
+        a_node.add_transactions_from_queue()
     elif new_msg.action == 'block_sync_end':
         a_node.doing_blockchain_sync = False
         # after we have added all sync blocks
