@@ -90,5 +90,9 @@ class TransactionService(BaseObjectService):
         return super(TransactionService, TransactionService).get_objects_by_public_key(public_key, include_mempool, Transaction)
 
     @staticmethod
+    def get_all_mempool_transactions():
+        return super(TransactionService, TransactionService).get_all_mempool_objects(Transaction)
+
+    @staticmethod
     def get_10_transactions_from_mem_pool():
         return super(TransactionService, TransactionService).get_from_mem_pool(Transaction)

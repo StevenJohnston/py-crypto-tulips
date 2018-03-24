@@ -22,7 +22,8 @@ def test_validate_rsa_block():
     genesis_block = {
         "height": 0,
         "prev_block": "",
-        "_hash": "7eb5833dbd5bc17c3cc8edf69f6214f01cef2afd0c1d20b2cab08886510f49ce",
+        "_hash": "036850bec30839508bf16badc1efc5c0a31eb82f8b23c524c7ea8cd3d0c8b81f",
+        "terminated_contracts": [],
         "signed_contracts": [],
         "contracts": [],
         "pos_transactions": [{
@@ -64,7 +65,7 @@ def test_validate_rsa_block():
             "from_addr": "",
             "signature": "556474088e1f4c75f24cb72db8b0be78134d10d0323c40569207baef1172c43b96596573a446389d2330d781109b76da8725d2ef29876cdd4a198fafc9cbf50f"
         }],
-        "signature": "6c2235b13985e1b173ef98ae0a4fe0b24abdb51a30df12bae74a9fe5c70250390c869b5eeecdcbd6d340c6364142a7038c3087b034349b4dcc511413a9c60e29"
+        "signature": "3a3a88935574c820fa70a2408f594585d03988df1980f6c0129b84ee129c322c683de1a7f8be6087d468abbbeb32f2a49eb0ac0c64a9b8de57d43a480ebf4dfc"
     }
     block = Block.from_dict(genesis_block)
     block_signable = block.get_signable()

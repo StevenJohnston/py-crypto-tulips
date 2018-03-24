@@ -16,12 +16,13 @@ class Block(Hashable, Sendable, Signable):
     contract_transactions = []
     contracts = []
     signed_contracts = []
+    terminated_contracts = []
     timestamp = ''
     owner = ''
     height = 0
     prev_block = ''
 
-    def __init__(self, block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, contracts, signed_contracts, timestamp = time.time()):
+    def __init__(self, block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, contracts, signed_contracts, terminated_contracts, timestamp = time.time()):
         self._hash = block_hash
         self.signature = signature
         self.owner = owner
@@ -31,6 +32,7 @@ class Block(Hashable, Sendable, Signable):
         self.contract_transactions = contract_transactions
         self.contracts = contracts
         self.signed_contracts = signed_contracts
+        self.terminated_contracts = terminated_contracts
         self.timestamp = int(timestamp)
         self.prev_block = prev_block
 
@@ -45,9 +47,10 @@ class Block(Hashable, Sendable, Signable):
         contract_transactions = dict_values.get('contract_transactions')
         contracts = dict_values.get('contracts')
         signed_contracts = dict_values.get('signed_contracts')
+        terminated_contracts = dict_values.get('terminated_contracts')
         timestamp = dict_values.get('timestamp')
         prev_block = dict_values.get('prev_block')
-        new_block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, contracts, signed_contracts, timestamp)
+        new_block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, contracts, signed_contracts, terminated_contracts, timestamp)
         return new_block
 
     def to_string(self):
@@ -69,6 +72,7 @@ class Block(Hashable, Sendable, Signable):
             'contract_transactions': list(map(Signable.get_signable_callback, self.contract_transactions)),
             'contracts': list(map(Signable.get_signable_callback, self.contracts)),
             'signed_contracts': list(map(Signable.get_signable_callback, self.signed_contracts)),
+            'terminated_contracts': list(map(Sendable.get_sendable_callback, self.terminated_contracts)),
             'timestamp': self.timestamp
         }
 
@@ -84,6 +88,7 @@ class Block(Hashable, Sendable, Signable):
             'contract_transactions': list(map(Sendable.get_sendable_callback, self.contract_transactions)),
             'contracts': list(map(Sendable.get_sendable_callback, self.contracts)),
             'signed_contracts': list(map(Sendable.get_sendable_callback, self.signed_contracts)),
+            'terminated_contracts': list(map(Sendable.get_sendable_callback, self.terminated_contracts)),
             'timestamp': self.timestamp
         }
 
@@ -99,6 +104,7 @@ class Block(Hashable, Sendable, Signable):
             'contract_transactions': list(map(Sendable.get_sendable_callback, self.contract_transactions)),
             'contracts': list(map(Sendable.get_sendable_callback, self.contracts)),
             'signed_contracts': list(map(Sendable.get_sendable_callback, self.signed_contracts)),
+            'terminated_contracts': list(map(Sendable.get_sendable_callback, self.terminated_contracts)),
             'timestamp': self.timestamp,
             '_hash': self._hash
         }

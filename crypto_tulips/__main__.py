@@ -155,7 +155,7 @@ def mine_block(last_block):
         last_block = GenesisBlockService.generate_from_priv(miner_private)
         block_service_dal = dal_service_block_service.BlockService()
         block_service_dal.store_block(last_block)
-        
+
 
     # check if we are the miner.
     miner_pub = EcdsaHashing.recover_public_key_str(miner_private)
@@ -170,7 +170,7 @@ def mine_block(last_block):
         print(all_pos_transactions)
         #last_block_hash = BlockService.get_last_block_hash()
         last_block_hash = last_block._hash
-        block = Block('', '', miner_pub, last_block_hash, height, ten_transactions, all_pos_transactions, [], [], [], time_now)
+        block = Block('', '', miner_pub, last_block_hash, height, ten_transactions, all_pos_transactions, [], [], [], [], time_now)
         block.update_signature(steven_private_key)
         block.update_hash()
         # block_lock.acquire()
@@ -326,7 +326,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             pos_transaction.update_signature(private_key)
             pos_transaction.update_hash()
             # send pos_transaction
-            
+
             transaction_lock.acquire()
             rs = redis_service.RedisService()
             rs.store_object(pos_transaction)

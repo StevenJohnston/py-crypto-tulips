@@ -189,6 +189,22 @@ class BaseObjectService():
         return objects
 
     @staticmethod
+    def get_all_mempool_objects(obj):
+        rs = RedisService()
+        r = rs._connect()
+
+        name = obj._to_index()[-1] + 'is_mempool:1'
+        object_list = r.smembers(name)
+
+        objects = list()
+        for object_hash in object_list:
+            t = rs.get_object_by_full_key(object_hash, obj)
+            objects.append(t)
+
+        return objects
+
+
+    @staticmethod
     def remove_from_mem_pool(obj):
         """
         Remove object from the mempool.
