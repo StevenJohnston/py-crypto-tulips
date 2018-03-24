@@ -163,3 +163,147 @@ class BlockService():
                     # TODO add logger
                     break
         return duplicate_transaction and all_balance_positive
+
+
+    @staticmethod
+    def get_transaction_balances():
+        block_service_dal = BlockServiceDal()
+        last_block_hash = BlockService.get_last_block_hash()
+        transactions_before_block = block_service_dal.get_all_transaction_up_to_block(last_block_hash)
+
+        balances = {}
+        # update balances using all transaction from the past
+        for key, transaction in transactions_before_block:
+            balances[transaction.from_addr] = balances.get(transaction.from_addr, 0) - transaction.amount
+            balances[transaction.to_addr] = balances.get(transaction.to_addr, 0) + transaction.amount
+        return balances
+
+    @staticmethod
+    def get_all_balances(objects = None):
+        if objects == None:
+            block_dal = BlockServiceDal()
+            last_block_hash = BlockService.get_last_block_hash()
+            objects = block_dal.get_all_objects_up_to_block(last_block_hash)
+
+        balances = {}
+        # Transactions
+        transaction_dict = objects.get('transactions', {})
+        for transaction_hash in transaction_dict:
+            transaction = transaction_dict.get(transaction_hash)
+            balances[transaction.from_addr] = balances.get(transaction.from_addr, 0) - transaction.amount
+            balances[transaction.to_addr] = balances.get(transaction.to_addr, 0) + transaction.amount
+
+        # Proof of Stake Transactions
+        pos_transaction_dict = objects.get('pos_transactions', {})
+        for pos_transaction_hash in pos_transaction_dict:
+            pos_transaction = pos_transaction_dict.get(pos_transaction_hash)
+            balances[pos_transaction.from_addr] = balances.get(pos_transaction.from_addr, 0) - pos_transaction.amount
+
+        # Signed Contracts
+        signed_contract_dict = objects.get('signed_contracts', {})
+        for signed_contract_hash in signed_contract_dict:
+            signed_contract = signed_contract_dict[signed_contract_hash]
+            balances[signed_contract.from_addr] = balances.get(signed_contract.from_addr, 0) - signed_contract.amount
+            print('sc|| from:\t' + signed_contract.from_addr + ": balance:" + str(balances[signed_contract.from_addr]))
+            balances[signed_contract._hash] = balances.get(signed_contract._hash, 0) + signed_contract.amount
+            print('sc|| parent:\t' + signed_contract._hash + ": balance:" + str(balances[signed_contract._hash]))
+
+
+        # Contract Transactions
+        contract_transaction_dict = objects.get('contract_transactions', {})
+
+        temp_contracts = {}
+
+        for key, contract_transaction in contract_transaction_dict.items():
+            temp_contracts[contract_transaction.signed_contract_addr] = temp_contracts.get(contract_transaction.signed_contract_addr, list())
+            temp_contracts[contract_transaction.signed_contract_addr].append(contract_transaction)
+
+        unspent_cts = {}
+        for signed_contract_addr in temp_contracts.keys():
+            # sort by signed_contract_addr first, then to_symbol, then from_symbol, then price
+            contract_transactions = sorted(temp_contracts[signed_contract_addr], key=lambda ct: (ct.signed_contract_addr, ct.timestamp))
+            print('owner:' + signed_contract_addr + "  len=" + str(len(contract_transactions)))
+            for contract_transaction in contract_transactions:
+                if contract_transaction.from_symbol == 'TPS':
+                    # remove from balance
+                    print('\tFROM TPS| amount: ' + str(contract_transaction.amount) + ' @ ' + str(contract_transaction.price) + ' ct hash:' + contract_transaction._hash)
+
+                    balances[contract_transaction.signed_contract_addr] = balances.get(contract_transaction.signed_contract_addr, 0) - contract_transaction.amount
+
+                    print('\t\t' + contract_transaction.signed_contract_addr + ": balance:" + str(balances[contract_transaction.signed_contract_addr]))
+
+                    unspent_cts[signed_contract_addr] = unspent_cts.get(signed_contract_addr, list())
+                    unspent_cts[signed_contract_addr].append(contract_transaction)
+                elif contract_transaction.to_symbol == 'TPS':
+                    print('\tTO TPS| amount: ' + str(contract_transaction.amount) + ' @ ' + str(contract_transaction.price) + ' ct hash:' + contract_transaction._hash)
+
+                    # sort by price first
+                    unspent_cts[signed_contract_addr].sort(key=lambda ct: ct.price)
+                    amount_remaining = contract_transaction.amount
+                    # iterate through copy of unspent_cts, removing as they are used up
+                    for unspent_ct in unspent_cts[signed_contract_addr]:
+                        # if took place before current contract transaction
+                        if amount_remaining == 0:
+                            break
+                        if unspent_ct.timestamp <= contract_transaction.timestamp and unspent_ct.amount != 0:
+                            if amount_remaining - unspent_ct.amount == 0:
+                                print('\t\t->B:S')
+                                # sell contract is used up, buy contract is used up
+                                amount_remaining -= unspent_ct.amount
+                                profit = contract_transaction.price / unspent_ct.price * unspent_ct.amount
+                                print('\t\t' + str(contract_transaction.price) + "/" + str(unspent_ct.price) + "*" + str(unspent_ct.amount) + "=" + str(profit))
+                                balances[contract_transaction.signed_contract_addr] += profit
+                                print('\t\t' + contract_transaction.signed_contract_addr + ' amount: ' + str(balances.get(contract_transaction.signed_contract_addr)) + ' (added: ' + str(profit) + ")")
+                                unspent_ct.amount = 0
+                                break
+                            elif amount_remaining - unspent_ct.amount > 0:
+                                print('\t\t->B')
+                                # sell contract is not used up, buy contract is used up
+                                profit = contract_transaction.price / unspent_ct.price * unspent_ct.amount
+                                print('\t\t' + str(contract_transaction.price) + "/" + str(unspent_ct.price) + "*" + str(unspent_ct.amount) + "=" + str(profit))
+                                balances[contract_transaction.signed_contract_addr] += profit
+                                print('\t\t' + contract_transaction.signed_contract_addr + ' amount: ' + str(balances.get(contract_transaction.signed_contract_addr)) + ' (added: ' + str(profit) + ")")
+                                amount_remaining -= unspent_ct.amount
+                                unspent_ct.amount = 0
+                                continue
+                            elif amount_remaining - unspent_ct.amount < 0:
+                                print('\t\t->S')
+                                # sell contract is used up, buy contract is not
+                                profit = contract_transaction.price / unspent_ct.price * amount_remaining
+                                print('\t\t' + str(contract_transaction.price) + "/" + str(unspent_ct.price) + "*" + str(amount_remaining) + "=" + str(profit))
+                                balances[contract_transaction.signed_contract_addr] += profit
+                                print('\t\t' + contract_transaction.signed_contract_addr + ' amount: ' + str(balances.get(contract_transaction.signed_contract_addr)) + ' (added: ' + str(profit) + ")")
+                                unspent_ct.amount -= amount_remaining
+                                amount_remaining = 0
+                                break
+
+        # Terminated Contracts
+
+        term_contract_dict = objects.get('terminated_contracts', {})
+
+        for signed_contract_addr in term_contract_dict.keys():
+            print(signed_contract_addr + "||unspent cts len: " + str(len(unspent_cts.get(signed_contract_addr, []))))
+            terminated_contract = term_contract_dict.get(signed_contract_addr)
+
+            for unspent_ct in unspent_cts.get(signed_contract_addr, []):
+                print('\thash:' + unspent_ct._hash + ' -> amount:' + str(unspent_ct.amount))
+                if unspent_ct.timestamp <= terminated_contract.timestamp and unspent_ct.amount != 0:
+                    profit = terminated_contract.price / unspent_ct.price * unspent_ct.amount
+                    print('\t\t' + str(terminated_contract.price) + "/" + str(unspent_ct.price) + "*" + str(unspent_ct.amount) + "=" + str(profit))
+                    unspent_ct.amount = 0
+                    balances[signed_contract_addr] = balances.get(signed_contract_addr, 0) + profit
+                    print('\t\t' + signed_contract_addr + ' amount: ' + str(balances.get(signed_contract_addr)) + ' (added: ' + str(profit) + ")")
+
+
+
+        # Contracts
+        contract_dict = objects.get('contracts', {})
+
+        # Owners
+        owners = objects.get('owners', [])
+        for owner in owners:
+            balances[owner] = balances.get(owner, 0) + 10
+            print('owner: ' + owner + ' amount: ' + str(balances[owner]) + ' (added: 10)')
+
+
+        return balances

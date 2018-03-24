@@ -4,19 +4,20 @@ from crypto_tulips.dal.objects.block import Block
 from crypto_tulips.dal.objects.transaction import Transaction
 from crypto_tulips.dal.objects.contract_transaction import ContractTransaction
 from crypto_tulips.dal.objects.pos_transaction import PosTransaction
+from crypto_tulips.dal.objects.terminated_contract import TerminatedContract
 
 from crypto_tulips.logger.crypt_logger import Logger, LoggingLevel
 from crypto_tulips.dal.services.redis_service import RedisService
 from crypto_tulips.dal.services.contract_service import ContractService
 from crypto_tulips.dal.services.signed_contract_service import SignedContractService
 
-class BlockService:
+class BlockService():
     _host = ''
     _port = ''
 
     key_suffix = 'block:'
     max_block_height = 'max_block_height'
-    
+
     rs = None
     def __init__(self):
         #settings = json.load(open('crypto_tulips/config/db_settings.json'))
@@ -26,6 +27,7 @@ class BlockService:
         self.port = settings["port"]
         #Logger.log("BlockService Initialized with redis running on " + self.host + ":" + self.port, 0, LoggingLevel.INFO)
         self.rs = RedisService()
+
     def store_block(self, block):
         """
         Store an entire block in redis. Will store fields and lists of objects. Will not store anything if the block's hash already exists in the database.
@@ -58,31 +60,75 @@ class BlockService:
             pipe.rpush(name, 'transactions')
             for transaction in block.transactions:
                 transaction.is_mempool = 0
+                # check if transaction is in the mempool
+                set_name = transaction._to_index()[-1] + ":is_mempool:1"
+                t_key = transaction._to_index()[-1] + ":" + transaction._hash
+                if r.sismember(set_name, t_key):
+                    # remove from list of mempool objects
+                    pipe.srem(set_name, t_key)
+
                 # store the transaction's hash under the block's list
                 pipe.rpush(name, transaction._hash)
                 # store the actual transaction object
+
                 pipe = self.rs.store_object(transaction, r, pipe)
 
             pipe.rpush(name, 'pos_transactions')
             for pos_transaction in block.pos_transactions:
                 pos_transaction.is_mempool = 0
+                # check if pos transaction is in the mempool
+                set_name = pos_transaction._to_index()[-1] + ":is_mempool:1"
+                pt_key = pos_transaction._to_index()[-1] + ":" + pos_transaction._hash
+                if r.sismember(set_name, pt_key):
+                    # remove from list of mempool objects
+                    pipe.srem(set_name, pt_key)
+
                 pipe.rpush(name, pos_transaction._hash)
                 pipe = self.rs.store_object(pos_transaction, r, pipe)
 
             pipe.rpush(name, 'contract_transactions')
             for contract_transaction in block.contract_transactions:
+                contract_transaction.is_mempool = 0
+                # check if contract transaction is in the mempool
+                set_name = contract_transaction._to_index()[-1] + ":is_mempool:1"
+                ct_key = contract_transaction._to_index()[-1] + ":" + contract_transaction._hash
+                if r.sismember(set_name, ct_key):
+                    # remove from list of mempool objects
+                    pipe.srem(set_name, ct_key)
+
                 pipe.rpush(name, contract_transaction._hash)
                 pipe = self.rs.store_object(contract_transaction, r, pipe)
 
             pipe.rpush(name, 'contracts')
             for contract in block.contracts:
+                contract.is_mempool = 0
+                # check if contract is in the mempool
+                set_name = contract._to_index()[-1] + ":is_mempool:1"
+                c_key = contract._to_index()[-1] + ":" + contract._hash
+                if r.sismember(set_name, c_key):
+                    # remove from list of mempool objects
+                    pipe.srem(set_name, c_key)
+
                 pipe.rpush(name, contract._hash)
                 pipe = ContractService.store_contract(contract, pipe)
 
             pipe.rpush(name, 'signed_contracts')
             for signed_contract in block.signed_contracts:
+                signed_contract.is_mempool = 0
+                # check if signed contract is in the mempool
+                set_name = signed_contract._to_index()[-1] + ":is_mempool:1"
+                sc_key = signed_contract._to_index()[-1] + ":" + signed_contract._hash
+                if r.sismember(set_name, sc_key):
+                    # remove from list of mempool objects
+                    pipe.srem(set_name, sc_key)
+
                 pipe.rpush(name, signed_contract._hash)
                 pipe = SignedContractService.store_signed_contract(signed_contract, pipe)
+
+            pipe.rpush(name, 'terminated_contracts')
+            for terminated_contract in block.terminated_contracts:
+                pipe.rpush(name, terminated_contract._hash)
+                pipe = self.rs.store_object(terminated_contract, r, pipe)
 
             pipe.zadd('blocks', block.height, block._hash)
 
@@ -148,12 +194,14 @@ class BlockService:
             contract_transactions = []
             contracts = []
             signed_contracts = []
+            terminated_contracts = []
 
             # temporary list to copy from
             temp_list = []
             obj = None
             contract_section = False
             signed_contract_section = False
+            terminated_contract_section = False
             for h in hashes:
                 # if at a new type of object, change some variables
                 if h == 'transactions':
@@ -177,6 +225,9 @@ class BlockService:
                 elif h == 'signed_contracts':
                     contract_section = False
                     signed_contract_section = True
+                elif h == 'terminated_contracts':
+                    signed_contract_section = False
+                    terminated_contract_section = True
 
 
                 # get the object from redis and add to the temporary list
@@ -188,6 +239,10 @@ class BlockService:
                     signed_contract = SignedContractService.get_signed_contract_by_hash(h)
                     if signed_contract != None:
                         signed_contracts.append(signed_contract)
+                elif terminated_contract_section:
+                    terminated_contract = self.rs.get_object_by_full_key('terminated_contract:' + h, TerminatedContract, r)
+                    if terminated_contract != None:
+                        terminated_contracts.append(terminated_contract)
                 else:
                     t = self.rs.get_object_by_full_key(prefix + ":" + h, obj, r)
                     temp_list.append(t)
@@ -196,7 +251,7 @@ class BlockService:
             temp_list.clear()
 
             # create block object and return it
-            block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, contracts, signed_contracts, timestamp)
+            block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, contracts, signed_contracts, terminated_contracts, timestamp)
             return block
         else:
             return None
@@ -299,5 +354,35 @@ class BlockService:
                 block = self.find_by_hash(block.prev_block)
                 pos_transactions.extend(block.pos_transactions)
             return {pos_transaction._hash: pos_transaction for pos_transaction in pos_transactions}
+
+
+    def get_all_objects_up_to_block(self, block_hash):
+        block = self.find_by_hash(block_hash)
+        if block:
+            transactions = block.transactions
+            pos_transactions = block.pos_transactions
+            contract_transactions = block.contract_transactions
+            contracts = block.contracts
+            signed_contracts = block.signed_contracts
+            terminated_contracts = block.terminated_contracts
+            owners = [block.owner]
+
+            while block.prev_block:
+                block = self.find_by_hash(block.prev_block)
+                transactions.extend(block.transactions)
+                pos_transactions.extend(block.pos_transactions)
+                contract_transactions.extend(block.contract_transactions)
+                contracts.extend(block.contracts)
+                signed_contracts.extend(block.signed_contracts)
+                terminated_contracts.extend(block.terminated_contracts)
+                owners.append(block.owner)
+            # convert to dictionaries
+            transaction_dict = {transaction._hash: transaction for transaction in transactions}
+            pos_transaction_dict = {pos_transaction._hash: pos_transaction for pos_transaction in pos_transactions}
+            contract_transaction_dict = {contract_transaction._hash: contract_transaction for contract_transaction in contract_transactions}
+            contract_dict = {contract._hash: contract for contract in contracts}
+            signed_contract_dict = {signed_contract._hash: signed_contract for signed_contract in signed_contracts}
+            terminated_contract_dict = {terminated_contract._hash: terminated_contract for terminated_contract in terminated_contracts}
+            return {'transactions': transaction_dict, 'pos_transactions': pos_transaction_dict, 'contract_transactions': contract_transaction_dict, 'contracts': contract_dict, 'signed_contracts': signed_contract_dict, 'terminated_contracts': terminated_contract_dict, 'owners': owners}
         else:
             return {}
