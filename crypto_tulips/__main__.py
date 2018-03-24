@@ -12,6 +12,7 @@ from .p2p import message
 from .hashing.crypt_hashing_wif import EcdsaHashing
 from crypto_tulips.dal.services import block_service as dal_service_block_service
 from crypto_tulips.dal.objects.transaction import Transaction
+from crypto_tulips.dal.objects.pos_transaction import PosTransaction
 from crypto_tulips.dal.objects.block import Block
 from crypto_tulips.p2p.message import Message
 
@@ -124,9 +125,8 @@ def regular_node_callback(data, peer_id=None):
             result_list = []
         else:
             result_list = block_service.add_block_to_chain(new_block)
-            if not bs.find_by_hash(new_block._hash):
-                for new_block_callback in new_block_callbacks:
-                    new_block_callback(new_block)
+            for new_block_callback in new_block_callbacks:
+                new_block_callback(new_block)
         if result_list:
             need_to_send = True
             print('All good')
@@ -166,20 +166,24 @@ def mine_block(last_block):
         #height = int(BlockService.get_max_height()) + 1
         height = last_block.height + 1
         ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
+        all_pos_transactions = POSService.get_all_mem_pos_transaction()
+        print(all_pos_transactions)
         #last_block_hash = BlockService.get_last_block_hash()
         last_block_hash = last_block._hash
-        block = Block('', '', miner_pub, last_block_hash, height, ten_transactions, [], [], [], [], time_now)
+        block = Block('', '', miner_pub, last_block_hash, height, ten_transactions, all_pos_transactions, [], [], [], time_now)
         block.update_signature(steven_private_key)
         block.update_hash()
-        block_lock.acquire()
+        # block_lock.acquire()
         block_service.add_block_to_chain(block)
         # TODO Test if worked block was added. Might fail due to same hash
         for trabs in ten_transactions:
             BaseObjectService.remove_from_mem_pool(trabs)
+        for trabs in all_pos_transactions:
+            BaseObjectService.remove_from_mem_pool(trabs)
         print('\nCreated Block hash: ' + block._hash)
-        block_lock.release()
+        # block_lock.release()
         send_a_block(block)
-        start_next_block = threading.Timer(0.1, mine_block, [block])
+        start_next_block = threading.Timer(5, mine_block, [block])
         start_next_block.start()
 
 def send_a_block(new_block, action='block', block_target_peer_id=None):
@@ -299,8 +303,36 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         elif user_input == 'miner' or user_input == 'm':
             run_miner()
         elif user_input == 'priv' or user_input == 'p':
+            global miner_private
             miner_private = input('\t\t\tEnter miner private key: ')
+
+        elif user_input == 'pos' or user_input == 'pos_transaction':
+            secret = input('\t\t\tFrom : ')
+            if secret == 'denys' or secret == 'd':
+                private_key = denys_private_key
+            elif secret == 'william' or secret == 'will' or secret == 'w':
+                private_key = william_private_key
+            elif secret == 'matt' or secret == 'm':
+                private_key = matt_private_key
+            elif secret == 'steven' or secret == 's':
+                private_key = steven_private_key
+            elif secret == 'naween' or secret == 'n':
+                private_key = naween_private_key
+            else:
+                continue
+            public_key = EcdsaHashing.recover_public_key_str(private_key)
+            amount = input('\t\t\tAmount: ')
+            pos_transaction = PosTransaction('','', public_key, amount, 1)
+            pos_transaction.update_signature(private_key)
+            pos_transaction.update_hash()
+            # send pos_transaction
             
+            transaction_lock.acquire()
+            rs = redis_service.RedisService()
+            rs.store_object(pos_transaction)
+            transaction_lock.release()
+
+
         elif user_input == 'trans' or user_input == 'transaction' or user_input == 't':
             secret = input('\t\t\tFrom : ')
             if secret == 'denys' or secret == 'd':

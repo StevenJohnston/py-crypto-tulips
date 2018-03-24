@@ -7,10 +7,12 @@ from crypto_tulips.services.transaction_service import TransactionService
 from crypto_tulips.services.contract_transaction_service import ContractTransactionService
 from crypto_tulips.services.pos_transaction_service import PosTransactionService
 from crypto_tulips.dal.objects.block import Block
+from crypto_tulips.services.base_object_service import BaseObjectService
+from crypto_tulips.dal.objects.pos_transaction import PosTransaction
 
 import redis
 
-class POSService():
+class POSService(BaseObjectService):
     
     @staticmethod
     def get_pos_pool(current_block):
@@ -35,3 +37,7 @@ class POSService():
       ordered = sorted(list(pos_pool.keys()))
 
       return ordered[pos_index]
+
+    @staticmethod
+    def get_all_mem_pos_transaction():
+        return super(POSService, POSService).get_from_mem_pool(PosTransaction, 9999)

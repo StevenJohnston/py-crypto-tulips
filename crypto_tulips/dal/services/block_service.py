@@ -57,6 +57,7 @@ class BlockService:
             # store string 'transactions' to help with retrieval parsing
             pipe.rpush(name, 'transactions')
             for transaction in block.transactions:
+                transaction.is_mempool = 0
                 # store the transaction's hash under the block's list
                 pipe.rpush(name, transaction._hash)
                 # store the actual transaction object
@@ -64,6 +65,7 @@ class BlockService:
 
             pipe.rpush(name, 'pos_transactions')
             for pos_transaction in block.pos_transactions:
+                pos_transaction.is_mempool = 0
                 pipe.rpush(name, pos_transaction._hash)
                 pipe = self.rs.store_object(pos_transaction, r, pipe)
 
@@ -244,7 +246,7 @@ class BlockService:
         # want blocks between current and the max height
         if int(max_height) > int(block_height):
             # get blocks by height for heights between the supplied and max
-            for height in range(int(block_height) + 1, int(max_height) + 1):
+            for height in range(int(block_height), int(max_height) + 1):
                 new_blocks = self.find_by_height(height)
                 blocks.extend(new_blocks)
         return blocks

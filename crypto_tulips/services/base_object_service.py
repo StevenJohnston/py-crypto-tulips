@@ -167,7 +167,7 @@ class BaseObjectService():
         return objects, balance
 
     @staticmethod
-    def get_from_mem_pool(obj):
+    def get_from_mem_pool(obj, count = 10):
         """
         Get 10 objects from the mempool.
 
@@ -179,7 +179,7 @@ class BaseObjectService():
 
         # key to retrieve all object hashes in the mempool (ie object:is_mempool:1)
         name = obj._to_index()[-1] + ':is_mempool:1'
-        object_list = r.srandmember(name, 10)
+        object_list = r.srandmember(name, count)
 
         objects = list()
         for object_hash in object_list:
