@@ -246,7 +246,10 @@ class BaseObjectService():
         Notes:
         - charset and decode_responses will need to be removed if we want this to be actually stored as bytes (per: https://stackoverflow.com/questions/25745053/about-char-b-prefix-in-python3-4-1-client-connect-to-redis)
         """
-        settings = json.load(open('crypto_tulips/config/db_settings.json'))
+        #settings = json.load(open('crypto_tulips/config/db_settings.json'))
+        
+        with open(file="crypto_tulips/config/db_settings.json", mode="r") as data_file:
+            settings = json.load(data_file)
         host = settings["host"]
         port = settings["port"]
         return redis.StrictRedis(host, port, db=0, charset="utf-8", decode_responses="True")

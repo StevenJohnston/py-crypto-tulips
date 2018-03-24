@@ -25,6 +25,7 @@ from crypto_tulips.dal.services.contract_service import ContractService, Contrac
 from crypto_tulips.dal.objects.contract import Contract
 from crypto_tulips.dal.services.signed_contract_service import SignedContractService, SignedContractFilter
 from crypto_tulips.dal.objects.signed_contract import SignedContract
+from crypto_tulips.services.genesis_block_service import GenesisBlockService
 
 denys_private_key = """4a7351205a7bfaa9726a67cba6f331f1b03ee1e904250f95f81f82e775bb55c1"""
 
@@ -39,6 +40,8 @@ naween_private_key = """418a3147a90f519cd72fb05eb2f201368ee7265f36efb8824e9daed5
 
 transaction_lock = threading.Lock()
 block_lock = threading.Lock()
+
+miner_private = steven_private_key
 
 new_block_callbacks = []
 def check_if_object_exist(obj_hash, obj_type):
@@ -108,6 +111,8 @@ def regular_node_callback(data, peer_id=None):
     elif new_msg.action == 'block':
         block_service = BlockService()
         new_block = Block.from_dict(new_msg.data)
+        bs = dal_service_block_service.BlockService()
+
         need_to_send = False
         block_lock.acquire()
         print('\nBlock : {}'.format(new_block._hash))
@@ -119,8 +124,9 @@ def regular_node_callback(data, peer_id=None):
             result_list = []
         else:
             result_list = block_service.add_block_to_chain(new_block)
-            for new_block_callback in new_block_callbacks:
-                new_block_callback(new_block)
+            if not bs.find_by_hash(new_block._hash):
+                for new_block_callback in new_block_callbacks:
+                    new_block_callback(new_block)
         if result_list:
             need_to_send = True
             print('All good')
@@ -134,13 +140,27 @@ def regular_node_callback(data, peer_id=None):
             send_a_block(new_block)
 
 def run_miner():
+    print('starting miner')
     new_block_callbacks.append(mine_block)
+    last_block_hash = BlockService.get_last_block_hash()
+    block_service_dal = dal_service_block_service.BlockService()
+    last_block = block_service_dal.find_by_hash(last_block_hash)
+    mine_block(last_block)
 
 def mine_block(last_block):
+    if last_block:
+        print('mining off last block ' + last_block._hash)
+    else:
+        print('Creating genisis')
+        last_block = GenesisBlockService.generate_from_priv(miner_private)
+        block_service_dal = dal_service_block_service.BlockService()
+        block_service_dal.store_block(last_block)
+        
+
     # check if we are the miner.
-    steven_pub = EcdsaHashing.recover_public_key_str(steven_private_key)
+    miner_pub = EcdsaHashing.recover_public_key_str(miner_private)
     next_author = POSService.get_next_block_author(last_block)
-    if next_author == steven_pub:
+    if next_author == miner_pub:
         block_service = BlockService()
         time_now = int(time.time())
         #height = int(BlockService.get_max_height()) + 1
@@ -148,7 +168,7 @@ def mine_block(last_block):
         ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
         #last_block_hash = BlockService.get_last_block_hash()
         last_block_hash = last_block._hash
-        block = Block('', '', steven_pub, last_block_hash, height, ten_transactions, [], [], [], [], time_now)
+        block = Block('', '', miner_pub, last_block_hash, height, ten_transactions, [], [], [], [], time_now)
         block.update_signature(steven_private_key)
         block.update_hash()
         block_lock.acquire()
@@ -159,6 +179,8 @@ def mine_block(last_block):
         print('\nCreated Block hash: ' + block._hash)
         block_lock.release()
         send_a_block(block)
+        start_next_block = threading.Timer(0.1, mine_block, [block])
+        start_next_block.start()
 
 def send_a_block(new_block, action='block', block_target_peer_id=None):
     block_msg = message.Message(action, new_block)
@@ -276,6 +298,9 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             print('\n{}'.format(max_height))
         elif user_input == 'miner' or user_input == 'm':
             run_miner()
+        elif user_input == 'priv' or user_input == 'p':
+            miner_private = input('\t\t\tEnter miner private key: ')
+            
         elif user_input == 'trans' or user_input == 'transaction' or user_input == 't':
             secret = input('\t\t\tFrom : ')
             if secret == 'denys' or secret == 'd':

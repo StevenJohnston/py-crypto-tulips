@@ -34,10 +34,13 @@ class RedisService:
 
         Gets the host and port from config/db_settings.json for redis
         """
-        settings = json.load(open('crypto_tulips/config/db_settings.json'))
+        #settings = json.load(open('crypto_tulips/config/db_settings.json'))
+        
+        with open(file="crypto_tulips/config/db_settings.json", mode="r") as data_file:
+            settings = json.load(data_file)
         self.host = settings["host"]
         self.port = settings["port"]
-        Logger.log("HashService Initialized with redis running on " + self.host + ":" + self.port, 0, LoggingLevel.INFO)
+        #Logger.log("HashService Initialized with redis running on " + self.host + ":" + self.port, 0, LoggingLevel.INFO)
 
     def store_object(self, obj, redis_conn = None, pipe = None):
         """

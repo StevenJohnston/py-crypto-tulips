@@ -33,4 +33,5 @@ class POSService():
       number_of_pos_accounts = len(pos_pool)
       pos_index = int(current_block._hash, 16) % number_of_pos_accounts
       ordered = sorted(list(pos_pool.keys()))
+
       return ordered[pos_index]

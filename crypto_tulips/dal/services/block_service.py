@@ -16,13 +16,16 @@ class BlockService:
 
     key_suffix = 'block:'
     max_block_height = 'max_block_height'
-
+    
+    rs = None
     def __init__(self):
-        settings = json.load(open('crypto_tulips/config/db_settings.json'))
+        #settings = json.load(open('crypto_tulips/config/db_settings.json'))
+        with open(file="crypto_tulips/config/db_settings.json", mode="r") as data_file:
+            settings = json.load(data_file)
         self.host = settings["host"]
         self.port = settings["port"]
-        Logger.log("BlockService Initialized with redis running on " + self.host + ":" + self.port, 0, LoggingLevel.INFO)
-
+        #Logger.log("BlockService Initialized with redis running on " + self.host + ":" + self.port, 0, LoggingLevel.INFO)
+        self.rs = RedisService()
     def store_block(self, block):
         """
         Store an entire block in redis. Will store fields and lists of objects. Will not store anything if the block's hash already exists in the database.
@@ -37,7 +40,7 @@ class BlockService:
         """
         r = self._connect()
 
-        rs = RedisService()
+        #rs = RedisService()
 
         # key to store list of objects under
         name = self.key_suffix + block._hash
@@ -57,17 +60,17 @@ class BlockService:
                 # store the transaction's hash under the block's list
                 pipe.rpush(name, transaction._hash)
                 # store the actual transaction object
-                pipe = rs.store_object(transaction, r, pipe)
+                pipe = self.rs.store_object(transaction, r, pipe)
 
             pipe.rpush(name, 'pos_transactions')
             for pos_transaction in block.pos_transactions:
                 pipe.rpush(name, pos_transaction._hash)
-                pipe = rs.store_object(pos_transaction, r, pipe)
+                pipe = self.rs.store_object(pos_transaction, r, pipe)
 
             pipe.rpush(name, 'contract_transactions')
             for contract_transaction in block.contract_transactions:
                 pipe.rpush(name, contract_transaction._hash)
-                pipe = rs.store_object(contract_transaction, r, pipe)
+                pipe = self.rs.store_object(contract_transaction, r, pipe)
 
             pipe.rpush(name, 'contracts')
             for contract in block.contracts:
@@ -102,7 +105,7 @@ class BlockService:
         """
         r = self._connect()
 
-        rs = RedisService()
+        #rs = RedisService()
 
         # get key to retrieve list of block's fields
         name = self.key_suffix + block_hash
@@ -184,7 +187,7 @@ class BlockService:
                     if signed_contract != None:
                         signed_contracts.append(signed_contract)
                 else:
-                    t = rs.get_object_by_full_key(prefix + ":" + h, obj, r)
+                    t = self.rs.get_object_by_full_key(prefix + ":" + h, obj, r)
                     temp_list.append(t)
 
             contract_transactions = temp_list.copy()
