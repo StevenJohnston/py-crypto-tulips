@@ -41,6 +41,7 @@ naween_private_key = """418a3147a90f519cd72fb05eb2f201368ee7265f36efb8824e9daed5
 
 transaction_lock = threading.Lock()
 block_lock = threading.Lock()
+contract_lock = threading.Lock()
 
 miner_private = steven_private_key
 
@@ -48,7 +49,6 @@ new_block_callbacks = []
 def check_if_object_exist(obj_hash, obj_type):
     rs = redis_service.RedisService()
     obj = rs.get_object_by_hash(obj_hash=obj_hash, obj=obj_type)
-    #obj = rs.get_object_by_full_key(obj_key=obj_hash, obj=obj_type)
     if obj is None:
         return False
     return True
@@ -90,6 +90,21 @@ def regular_node_callback(data, peer_id=None):
         transaction_lock.release()
         if need_to_send and do_transaction_resend:
             send_a_transaction(new_transaction)
+    elif new_msg.action == 'contract':
+        new_msg.data = Contract.from_dict(new_msg.data)
+        new_contract = new_msg.data
+        need_to_send = False
+        contract_lock.acquire()
+        print('\nContract : {}'.format(new_contract._hash))
+        if not check_if_object_exist(new_contract._hash, Contract):
+            ContractService.store_contract(new_contract)
+            need_to_send = True
+            print('All good')
+        else:
+            print('Duplicate contract')
+        contract_lock.release()
+        if need_to_send:
+            send_a_contract(new_contract)
     elif new_msg.action == 'transaction_sync_end':
         print('\n\nFinished transaction sync')
         a_node.doing_transaction_sync = False
@@ -313,6 +328,12 @@ def send_a_transaction(new_transaction, action='transaction', transaction_target
     transaction_json = json.dumps(transaction_json, sort_keys=True, separators=(',', ':'))
     a_node.connection_manager.send_msg(msg=transaction_json, target_peer_id=transaction_target_peer_id)
 
+def send_a_contract(new_contract, action='contract', contract_target_peer_id=None):
+    contract_msg = message.Message(action, new_contract)
+    contract_json = contract_msg.to_json()
+    contract_json = json.dumps(contract_json, sort_keys=True, separators=(',', ':'))
+    a_node.connection_manager.send_msg(msg=contract_json, target_peer_id=contract_target_peer_id)
+
 def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         socket_timeout=1):
     print('\t\tStarting as a regular node')
@@ -337,6 +358,31 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         elif user_input == 'priv' or user_input == 'p':
             global miner_private
             miner_private = input('\t\t\tEnter miner private key: ')
+        
+        elif user_input == 'contract' or user_input == 'c':
+            secret = input('\t\t\tOwner : ')
+            a_contract = Contract('', '', owner='', amount=10, \
+                    rate=0.2, is_mempool=1, duration=60, \
+                    created_timestamp=time.time(), sign_end_timestamp=time.time() + 1000)
+            if secret == 'denys' or secret == 'd':
+                private_key = denys_private_key
+            elif secret == 'william' or secret == 'will' or secret == 'w':
+                private_key = william_private_key
+            elif secret == 'matt' or secret == 'm':
+                private_key = matt_private_key
+            elif secret == 'steven' or secret == 's':
+                private_key = steven_private_key
+            elif secret == 'naween' or secret == 'n':
+                private_key = naween_private_key
+            else:
+                continue
+            a_contract.owner = EcdsaHashing.recover_public_key_str(private_key)
+            a_contract.update_signature(private_key)
+            a_contract.update_hash()
+            send_a_contract(a_contract)
+            contract_lock.acquire()
+            ContractService.store_contract(a_contract)
+            contract_lock.release()
 
         elif user_input == 'pos' or user_input == 'pos_transaction':
             secret = input('\t\t\tFrom : ')
