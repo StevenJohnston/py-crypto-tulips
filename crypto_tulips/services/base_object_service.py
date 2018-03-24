@@ -193,7 +193,7 @@ class BaseObjectService():
         rs = RedisService()
         r = rs._connect()
 
-        name = obj._to_index()[-1] + 'is_mempool:1'
+        name = obj._to_index()[-1] + ':is_mempool:1'
         object_list = r.smembers(name)
 
         objects = list()
