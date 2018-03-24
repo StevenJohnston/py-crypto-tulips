@@ -21,9 +21,7 @@ class Bitfinex(Exchange):
         return PriceStamp("", "bitfinex", time, price)
     @classmethod
     def on_message(self, ws, message):
-        print(message)
         msg = json.loads(message)
-        print(msg)
         if isinstance(msg, list) and msg[1] == "tu":
             # add this to the db
             price_stamp = self.trade_pricestamp_adaptor(msg)

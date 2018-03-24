@@ -10,9 +10,6 @@ class ExchangeManager:
         ]
         for exchange in self.exchanges:
             exchange.start()
-
-    def __del__(self):
-        print('Peer list is empty')
         
 if __name__ == "__main__":
     ExchangeManager()

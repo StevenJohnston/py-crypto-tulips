@@ -15,6 +15,7 @@ from crypto_tulips.dal.objects.transaction import Transaction
 from crypto_tulips.dal.objects.pos_transaction import PosTransaction
 from crypto_tulips.dal.objects.block import Block
 from crypto_tulips.p2p.message import Message
+from crypto_tulips.market.exchange_manager import ExchangeManager
 
 from crypto_tulips.services.transaction_service import TransactionService
 from crypto_tulips.services.block_service import BlockService
@@ -296,6 +297,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             socket_timeout=socket_timeout, read_callback=regular_node_callback, wallet_callback=wallet_callback, \
             start_bootstrap=True, start_gossiping=True)
     a_node.make_silent(True)
+    ExchangeManager()
     while True:
         user_input = input('\t\t\tEnter a command: ')
         if user_input == 'quit' or user_input == 'q':

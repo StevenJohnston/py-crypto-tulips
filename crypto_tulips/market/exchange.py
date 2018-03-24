@@ -15,7 +15,7 @@ class Exchange(threading.Thread):
         self.rest_url = self.REST_URL
         self.subscribe_trades = self.SUBSCRIBE_TRADES
         
-        websocket.enableTrace(True)
+        websocket.enableTrace(False)
         
     def run(self):
         ws = websocket.WebSocketApp(self.WEBSOCKET_URL,
