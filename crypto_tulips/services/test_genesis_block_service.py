@@ -95,7 +95,8 @@ def test_pos_author():
     genesis_block = {
         "height": 0,
         "prev_block": "",
-        "_hash": "7eb5833dbd5bc17c3cc8edf69f6214f01cef2afd0c1d20b2cab08886510f49ce",
+        "_hash": "036850bec30839508bf16badc1efc5c0a31eb82f8b23c524c7ea8cd3d0c8b81f",
+        "terminated_contracts": [],
         "signed_contracts": [],
         "contracts": [],
         "pos_transactions": [{
@@ -137,7 +138,7 @@ def test_pos_author():
             "from_addr": "",
             "signature": "556474088e1f4c75f24cb72db8b0be78134d10d0323c40569207baef1172c43b96596573a446389d2330d781109b76da8725d2ef29876cdd4a198fafc9cbf50f"
         }],
-        "signature": "6c2235b13985e1b173ef98ae0a4fe0b24abdb51a30df12bae74a9fe5c70250390c869b5eeecdcbd6d340c6364142a7038c3087b034349b4dcc511413a9c60e29"
+        "signature": "3a3a88935574c820fa70a2408f594585d03988df1980f6c0129b84ee129c322c683de1a7f8be6087d468abbbeb32f2a49eb0ac0c64a9b8de57d43a480ebf4dfc"
     }
     block = Block.from_dict(genesis_block)
     dal_block_service = DalBlockService()
@@ -153,7 +154,8 @@ def test_pos_author_two_blocks():
     genesis_block = {
         "height": 0,
         "prev_block": "",
-        "_hash": "7eb5833dbd5bc17c3cc8edf69f6214f01cef2afd0c1d20b2cab08886510f49ce",
+        "_hash": "036850bec30839508bf16badc1efc5c0a31eb82f8b23c524c7ea8cd3d0c8b81f",
+        "terminated_contracts": [],
         "signed_contracts": [],
         "contracts": [],
         "pos_transactions": [{
@@ -195,7 +197,7 @@ def test_pos_author_two_blocks():
             "from_addr": "",
             "signature": "556474088e1f4c75f24cb72db8b0be78134d10d0323c40569207baef1172c43b96596573a446389d2330d781109b76da8725d2ef29876cdd4a198fafc9cbf50f"
         }],
-        "signature": "6c2235b13985e1b173ef98ae0a4fe0b24abdb51a30df12bae74a9fe5c70250390c869b5eeecdcbd6d340c6364142a7038c3087b034349b4dcc511413a9c60e29"
+        "signature": "3a3a88935574c820fa70a2408f594585d03988df1980f6c0129b84ee129c322c683de1a7f8be6087d468abbbeb32f2a49eb0ac0c64a9b8de57d43a480ebf4dfc"
     }
 
     second_block = {
@@ -232,9 +234,10 @@ def test_pos_author_two_blocks():
             'signature': '5b8dfb857bbee98edc869948bcd90b361d2a9ac48704981cd4a4697ae090b22bf3389b2a0d17ed198f7c9aaa98baa68db5d869279a5065c6ebb44dcb628d06f7'
         }],
         'timestamp': 1520135642,
+        'terminated_contracts': [],
         'signed_contracts': [],
         'contracts': [],
-        'prev_block': '7eb5833dbd5bc17c3cc8edf69f6214f01cef2afd0c1d20b2cab08886510f49ce',
+        'prev_block': '036850bec30839508bf16badc1efc5c0a31eb82f8b23c524c7ea8cd3d0c8b81f',
         'signature': '829ac7859ca675ea410a781cf30b39fd7864daeda054c50893001da164d04cfacab103dc57cb9d39e545b8533dbd8d54954c3399c01bc356c06801e48242d531',
         'owner': '23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0',
         'pos_transactions': [{
@@ -252,7 +255,7 @@ def test_pos_author_two_blocks():
 
     block = Block.from_dict(second_block)
     dal_block_service.store_block(block)
-    
+
     actual = POSService.get_next_block_author(block)
     assert actual == expected
 
