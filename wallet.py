@@ -3,6 +3,10 @@ from crypto_tulips.p2p import message
 from crypto_tulips.hashing.crypt_hashing_wif import EcdsaHashing
 import json
 from crypto_tulips.dal.objects.transaction import Transaction
+import time
+
+from crypto_tulips.dal.objects.contract import Contract
+from crypto_tulips.dal.services.contract_service import ContractService, ContractFilter
 
 william_private_key = """55a1281dfe6cf404816be8f2bb33813e2cf8ef499fb22e21cb090f8f8563a72a"""
 
@@ -19,12 +23,12 @@ if __name__ == '__main__':
     denys_public_key = EcdsaHashing.recover_public_key_str(denys_private_key)
     william_public_key = EcdsaHashing.recover_public_key_str(temp_key)
     #william_public_key = '4dc0891733e18601025d2509ea2008661a916078af92237cf4e624ed9aed4419'
-    transaction_msg = message.Message('get_user_info', william_public_key)
-    transaction_json = transaction_msg.to_json(is_object=False)
-    transaction_json = json.dumps(transaction_json, sort_keys=True)
-    p2p.send_msg(transaction_json)
-    data = p2p.recv_msg()
-    print(data)
+    # transaction_msg = message.Message('get_user_info', william_public_key)
+    # transaction_json = transaction_msg.to_json(is_object=False)
+    # transaction_json = json.dumps(transaction_json, sort_keys=True)
+    # p2p.send_msg(transaction_json)
+    # data = p2p.recv_msg()
+    # print(data)
     #ends
 
     #Testing user wallet key generation
@@ -68,8 +72,20 @@ if __name__ == '__main__':
             ]
         }
     }
+    now = int(time.time())
 
-
+    contractCreation = {"action": "publish_contract", "data": {
+            "_hash": "tcs_hash1",
+            "signature": "d48017528fb665a8b47436257b96af3fe098a7751199447875891e0804208a670d36b39f060b6313b8552618098e57b437d06af4a0029bceb1e9ea4ef2730461",
+            "owner": william_public_key,
+            "amount": "100",
+            "rate": ".5",
+            "is_mempool": 1,
+            "duration": "1",
+            "created_timestamp": 1521920465,
+            "sign_end_timestamp": 1521920465
+        }
+    }
     scontract_test = {"action": "get_signed_contract", "data": {
             "contractFilters": [
                 {
@@ -85,10 +101,20 @@ if __name__ == '__main__':
             ]
         }
     }
-    # contract_json = json.dumps(scontract_test, sort_keys=True)
+
+    c = {'created_timestamp': 1521920465, 'amount': '100.00000000', 'sign_end_timestamp': 1521920465, 'rate': '0.50000000', 'owner': '2c1b95aa7ab8d18a6dda267a413117027cd05a26e5226fa01552d794d9ec87f13e0dbec0959e09ea5ab5665a9d81d25ee0f7d5c7145008d3e52cd60e6d204271', 'duration': 1}
+
+    contract_signable_json_str = json.dumps(c, sort_keys=True, separators=(',', ':'))
+    print(contract_signable_json_str)
+    sig = EcdsaHashing.sign_message_hex(contract_signable_json_str, temp_key)
+    print(sig)
+    transaction_json = json.dumps(contractCreation, sort_keys=True)
+    p2p.send_msg(transaction_json)
+
+    # contract_json = json.dumps(contractCreation, sort_keys=True)
     # p2p.send_msg(contract_json)
     # data = p2p.recv_msg()
-    # print(data)
+    #print(data)
     #quiting
     transaction_msg = message.Message('exit', 'quit')
     transaction_json = transaction_msg.to_json(is_object=False)

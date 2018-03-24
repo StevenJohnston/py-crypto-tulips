@@ -233,18 +233,22 @@ def wallet_callback(wallet_sock):
         elif new_msg.action == "get_contracts":
             contracts_filter = get_contracts_list(new_msg.data)
             contracts = ContractService.get_contracts_by_filter(contracts_filter, False)
-            #Use this for testing
-            #contracts = ContractService.get_contracts_by_filter(contracts_filter, True)
             new_contracts = [contract.get_sendable() for contract in contracts]
             json_str_return = build_return_json([("available_contracts", new_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == "publish_contract":
-            pass
+            c = Contract.from_dict(new_msg.data)
+            contract_signable_json = c.get_signable()
+            contract_signable_json_str = json.dumps(contract_signable_json, sort_keys=True, separators=(',', ':'))
+            status = EcdsaHashing.verify_signature_hex(c.owner, c.signature, contract_signable_json_str)
+            if status == True:
+                ContractService.store_contract(c)
+                a_node.connection_manager.server.send_msg(data="Contract Successfully Created", client_socket=wallet_sock)
+            else:
+                a_node.connection_manager.server.send_msg(data="Contract Cannot be created", client_socket=wallet_sock)
         elif new_msg.action == "get_signed_contract":
             signed_contracts_filter = get_contracts_list(new_msg.data, contract_type=2)
             signed_contracts = SignedContractService.get_signed_contracts_by_filter(signed_contracts_filter, False)
-            #Use this for testing
-            #signed_contracts = SignedContractService.get_signed_contracts_by_filter(signed_contracts_filter, True)
             new_signed_contracts = [contract.get_sendable() for contract in signed_contracts]
             json_str_return = build_return_json([("signed_contracts", new_signed_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
