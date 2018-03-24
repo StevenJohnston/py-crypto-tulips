@@ -167,7 +167,7 @@ class BaseObjectService():
         return objects, balance
 
     @staticmethod
-    def get_from_mem_pool(obj):
+    def get_from_mem_pool(obj, count = 10):
         """
         Get 10 objects from the mempool.
 
@@ -179,7 +179,7 @@ class BaseObjectService():
 
         # key to retrieve all object hashes in the mempool (ie object:is_mempool:1)
         name = obj._to_index()[-1] + ':is_mempool:1'
-        object_list = r.srandmember(name, 10)
+        object_list = r.srandmember(name, count)
 
         objects = list()
         for object_hash in object_list:
@@ -246,7 +246,10 @@ class BaseObjectService():
         Notes:
         - charset and decode_responses will need to be removed if we want this to be actually stored as bytes (per: https://stackoverflow.com/questions/25745053/about-char-b-prefix-in-python3-4-1-client-connect-to-redis)
         """
-        settings = json.load(open('crypto_tulips/config/db_settings.json'))
+        #settings = json.load(open('crypto_tulips/config/db_settings.json'))
+        
+        with open(file="crypto_tulips/config/db_settings.json", mode="r") as data_file:
+            settings = json.load(data_file)
         host = settings["host"]
         port = settings["port"]
         return redis.StrictRedis(host, port, db=0, charset="utf-8", decode_responses="True")

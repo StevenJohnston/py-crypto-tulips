@@ -24,7 +24,9 @@ class PosTransaction(BaseTransaction):
 
     @staticmethod
     def _to_index():
-        return ['pos_transaction']
+        index = super(PosTransaction, PosTransaction)._to_index()
+        index.append('pos_transaction')
+        return index
 
     def get_signable(self):
         return {

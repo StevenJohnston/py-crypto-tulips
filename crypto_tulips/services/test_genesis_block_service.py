@@ -198,51 +198,51 @@ def test_pos_author_two_blocks():
     }
 
     second_block = {
-        "owner": "23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0",
-        "signed_contracts": [],
-        "pos_transactions": [{
-            "_hash": "1d1d4247b7611a28e66b114a14445e894dfb7086accb8d02f6f1ac06ff15e049",
-            "signature": "b7e348c8ebe6e483279a22d1426d31122f14a4ea46b27b9fa85d2cd91b533abc463cafd85ddf524f3677daabf888a146f91721cac26a17568a768a3c18956a15",
-            "amount": "100.00000000",
-            "timestamp": 1520135639,
-            "from_addr": "23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0"
+        '_hash': '1048eb4638a45b140a51e7a6d92e972010878d9f05be6fe5c0d20d17b4c26e7a',
+        'height': 1,
+        'contract_transactions': [],
+        'transactions': [{
+            'amount': '1.00000000',
+            'to_addr': '23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0',
+            'timestamp': 1520135639,
+            '_hash': '188b1e41db5661c87777d7ea3d96cbe0b8858df2cd9c020abb4a424f91c22087',
+            'from_addr': '',
+            'signature': 'c3d5bdf941cf4a4a95483174e085da38cc4f7decb59cf07ce3ac80623de7e842f46b1d7f6880c358fe4b0ead324ba5af4176743bfd390daf34f79a6ed5e51de8'
+        }, {
+            'amount': '10.00000000',
+            'to_addr': '23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0',
+            'timestamp': 1520135639,
+            '_hash': '004186e14438ea30c3d6ee69dfdc4b66d589e6d5d85c751bfae1220ecdbe8954',
+            'from_addr': '',
+            'signature': '8d02e40b4923aa1e9869ab48c8de423a510f966e6edb3def1013cf243fe9b7c6ab9c77fa485a02ff03fc769f9e1c36f9085210058d729ed4d71194d7e6c98335'
+        }, {
+            'amount': '100.00000000',
+            'to_addr': '23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0',
+            'timestamp': 1520135639,
+            '_hash': '9463a74fa3e79a5a7f0dee4c8b0d06cdf5624dc529b2d1915cdffabfcdece8ff',
+            'from_addr': '',
+            'signature': '26962120d2621f61ce4281169d97a06fc508d0246e9779dc3d50a04382f469389166b040d54fab4f00b45fa4ef9ff69296709b1165afb1e695ff893124325e47'
+        }, {
+            'amount': '1000.00000000',
+            'to_addr': '23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0',
+            'timestamp': 1520135639,
+            '_hash': '79ba95186cf2068aa7868057661e315856e44d43a7b3e1fdebfdd9cf7e9679d1',
+            'from_addr': '',
+            'signature': '5b8dfb857bbee98edc869948bcd90b361d2a9ac48704981cd4a4697ae090b22bf3389b2a0d17ed198f7c9aaa98baa68db5d869279a5065c6ebb44dcb628d06f7'
         }],
-        "transactions": [{
-            "amount": "1.00000000",
-            "_hash": "188b1e41db5661c87777d7ea3d96cbe0b8858df2cd9c020abb4a424f91c22087",
-            "from_addr": "",
-            "signature": "c3d5bdf941cf4a4a95483174e085da38cc4f7decb59cf07ce3ac80623de7e842f46b1d7f6880c358fe4b0ead324ba5af4176743bfd390daf34f79a6ed5e51de8",
-            "to_addr": "23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0",
-            "timestamp": 1520135639
-        }, {
-            "amount": "10.00000000",
-            "_hash": "004186e14438ea30c3d6ee69dfdc4b66d589e6d5d85c751bfae1220ecdbe8954",
-            "from_addr": "",
-            "signature": "8d02e40b4923aa1e9869ab48c8de423a510f966e6edb3def1013cf243fe9b7c6ab9c77fa485a02ff03fc769f9e1c36f9085210058d729ed4d71194d7e6c98335",
-            "to_addr": "23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0",
-            "timestamp": 1520135639
-        }, {
-            "amount": "100.00000000",
-            "_hash": "9463a74fa3e79a5a7f0dee4c8b0d06cdf5624dc529b2d1915cdffabfcdece8ff",
-            "from_addr": "",
-            "signature": "26962120d2621f61ce4281169d97a06fc508d0246e9779dc3d50a04382f469389166b040d54fab4f00b45fa4ef9ff69296709b1165afb1e695ff893124325e47",
-            "to_addr": "23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0",
-            "timestamp": 1520135639
-        }, {
-            "amount": "1000.00000000",
-            "_hash": "79ba95186cf2068aa7868057661e315856e44d43a7b3e1fdebfdd9cf7e9679d1",
-            "from_addr": "",
-            "signature": "5b8dfb857bbee98edc869948bcd90b361d2a9ac48704981cd4a4697ae090b22bf3389b2a0d17ed198f7c9aaa98baa68db5d869279a5065c6ebb44dcb628d06f7",
-            "to_addr": "23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0",
-            "timestamp": 1520135639
-        }],
-        "prev_block": "7eb5833dbd5bc17c3cc8edf69f6214f01cef2afd0c1d20b2cab08886510f49ce",
-        "_hash": "d24d7772376169f39e649a96e999566b919678d6749188a6b2ef7e50547c3d65",
-        "signature": "84d62650e291ac40ed2a5871129027defe266986072878b842540dec724fd4c0648ac716dc23a389c786347c48f6f8e75dbeff239cd0d714cc2e12bd04ddbf59",
-        "contract_transactions": [],
-        "contracts": [],
-        "timestamp": 1520135642,
-        "height": 1
+        'timestamp': 1520135642,
+        'signed_contracts': [],
+        'contracts': [],
+        'prev_block': '7eb5833dbd5bc17c3cc8edf69f6214f01cef2afd0c1d20b2cab08886510f49ce',
+        'signature': '829ac7859ca675ea410a781cf30b39fd7864daeda054c50893001da164d04cfacab103dc57cb9d39e545b8533dbd8d54954c3399c01bc356c06801e48242d531',
+        'owner': '23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0',
+        'pos_transactions': [{
+            '_hash': '1d1d4247b7611a28e66b114a14445e894dfb7086accb8d02f6f1ac06ff15e049',
+            'amount': '100.00000000',
+            'from_addr': '23f48768a8e871db2ed721a1e0d250ce41a1fe49765e01e798db0816b781169115e01d3a702934276fa4536bb59527ba0cd7c2fd9eb9e3c13785750c4a9c31d0',
+            'signature': 'b7e348c8ebe6e483279a22d1426d31122f14a4ea46b27b9fa85d2cd91b533abc463cafd85ddf524f3677daabf888a146f91721cac26a17568a768a3c18956a15',
+            'timestamp': 1520135639
+        }]
     }
     dal_block_service = DalBlockService()
 
@@ -250,13 +250,9 @@ def test_pos_author_two_blocks():
     dal_block_service.store_block(block)
 
     block = Block.from_dict(second_block)
-    block.update_signature(_priv_den)
-    block.update_hash()
-
     dal_block_service.store_block(block)
     
     actual = POSService.get_next_block_author(block)
-    print(actual)
     assert actual == expected
 
 @pytest.mark.last
