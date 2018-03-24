@@ -16,13 +16,15 @@ if __name__ == '__main__':
     p2p.connect_to('vagrant', 36363)
     p2p.send_msg('wallet')
     #Start getting balance, trans history and pending trans
-    # denys_public_key = Hashing.get_public_key(denys_private_key)
-    # william_public_key = Hashing.get_public_key(william_private_key)
-    # transaction_msg = message.Message('tx_by_public_key', william_public_key)
-    # transaction_json = transaction_msg.to_json(is_object=False)
-    # transaction_json = json.dumps(transaction_json, sort_keys=True)
-    # p2p.send_msg(transaction_json)
-    # data = p2p.recv_msg()
+    denys_public_key = EcdsaHashing.recover_public_key_str(denys_private_key)
+    william_public_key = EcdsaHashing.recover_public_key_str(temp_key)
+    #william_public_key = '4dc0891733e18601025d2509ea2008661a916078af92237cf4e624ed9aed4419'
+    transaction_msg = message.Message('get_user_info', william_public_key)
+    transaction_json = transaction_msg.to_json(is_object=False)
+    transaction_json = json.dumps(transaction_json, sort_keys=True)
+    p2p.send_msg(transaction_json)
+    data = p2p.recv_msg()
+    print(data)
     #ends
 
     #Testing user wallet key generation
@@ -45,7 +47,7 @@ if __name__ == '__main__':
     # p2p.send_msg(transaction_json)
     # data = p2p.recv_msg()
 
-    # msg = message.Message('get_nodes_ip', '')
+    # msg = message.Message('get_all_ip', '')
     # msg_json = msg.to_json(is_object=False)
     # msg_json = json.dumps(msg_json, sort_keys=True)
     # p2p.send_msg(msg_json)
@@ -83,10 +85,10 @@ if __name__ == '__main__':
             ]
         }
     }
-    contract_json = json.dumps(contract_test, sort_keys=True)
-    p2p.send_msg(contract_json)
-    data = p2p.recv_msg()
-    print(data)
+    # contract_json = json.dumps(scontract_test, sort_keys=True)
+    # p2p.send_msg(contract_json)
+    # data = p2p.recv_msg()
+    # print(data)
     #quiting
     transaction_msg = message.Message('exit', 'quit')
     transaction_json = transaction_msg.to_json(is_object=False)
