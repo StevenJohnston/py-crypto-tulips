@@ -25,7 +25,7 @@ def test_get_store_block():
     new_send = new_b.get_sendable()
     assert b_send == new_send
 
-def atest_store_same_hash():
+def test_store_same_hash():
     b = Block('block_service_test_1', '', '', 'LAST_BLOCK', 0, [], [], [], [], [], [])
 
     bs = BlockService()

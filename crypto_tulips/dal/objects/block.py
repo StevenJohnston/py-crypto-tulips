@@ -5,6 +5,11 @@ import time
 
 from crypto_tulips.dal.objects.transaction import Transaction
 from crypto_tulips.dal.objects.pos_transaction import PosTransaction
+from crypto_tulips.dal.objects.contract_transaction import ContractTransaction
+from crypto_tulips.dal.objects.contract import Contract
+from crypto_tulips.dal.objects.signed_contract import SignedContract
+from crypto_tulips.dal.objects.terminated_contract import TerminatedContract
+
 from crypto_tulips.dal.objects.base_objects.hashable import Hashable
 from crypto_tulips.dal.objects.base_objects.sendable import Sendable
 from crypto_tulips.dal.objects.base_objects.signable import Signable
@@ -44,10 +49,10 @@ class Block(Hashable, Sendable, Signable):
         height = dict_values.get('height')
         transactions = list(map(Transaction.from_dict, dict_values.get('transactions')))
         pos_transactions = list(map(PosTransaction.from_dict, dict_values.get('pos_transactions')))
-        contract_transactions = dict_values.get('contract_transactions')
-        contracts = dict_values.get('contracts')
-        signed_contracts = dict_values.get('signed_contracts')
-        terminated_contracts = dict_values.get('terminated_contracts')
+        contract_transactions = list(map(ContractTransaction.from_dict, dict_values.get('contract_transactions')))
+        contracts = list(map(Contract.from_dict, dict_values.get('contracts')))
+        signed_contracts = list(map(SignedContract.from_dict, dict_values.get('signed_contracts')))
+        terminated_contracts = list(map(TerminatedContract.from_dict, dict_values.get('terminated_contracts')))
         timestamp = dict_values.get('timestamp')
         prev_block = dict_values.get('prev_block')
         new_block = Block(block_hash, signature, owner, prev_block, height, transactions, pos_transactions, contract_transactions, contracts, signed_contracts, terminated_contracts, timestamp)

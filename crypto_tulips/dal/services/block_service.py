@@ -60,29 +60,68 @@ class BlockService():
             pipe.rpush(name, 'transactions')
             for transaction in block.transactions:
                 transaction.is_mempool = 0
+                # check if transaction is in the mempool
+                set_name = transaction._to_index()[-1] + ":is_mempool:1"
+                t_key = transaction._to_index()[-1] + ":" + transaction._hash
+                if r.sismember(set_name, t_key):
+                    # remove from list of mempool objects
+                    pipe.srem(set_name, t_key)
+
                 # store the transaction's hash under the block's list
                 pipe.rpush(name, transaction._hash)
                 # store the actual transaction object
+
                 pipe = self.rs.store_object(transaction, r, pipe)
 
             pipe.rpush(name, 'pos_transactions')
             for pos_transaction in block.pos_transactions:
                 pos_transaction.is_mempool = 0
+                # check if pos transaction is in the mempool
+                set_name = pos_transaction._to_index()[-1] + ":is_mempool:1"
+                pt_key = pos_transaction._to_index()[-1] + ":" + pos_transaction._hash
+                if r.sismember(set_name, pt_key):
+                    # remove from list of mempool objects
+                    pipe.srem(set_name, pt_key)
+
                 pipe.rpush(name, pos_transaction._hash)
                 pipe = self.rs.store_object(pos_transaction, r, pipe)
 
             pipe.rpush(name, 'contract_transactions')
             for contract_transaction in block.contract_transactions:
+                contract_transaction.is_mempool = 0
+                # check if contract transaction is in the mempool
+                set_name = contract_transaction._to_index()[-1] + ":is_mempool:1"
+                ct_key = contract_transaction._to_index()[-1] + ":" + contract_transaction._hash
+                if r.sismember(set_name, ct_key):
+                    # remove from list of mempool objects
+                    pipe.srem(set_name, ct_key)
+
                 pipe.rpush(name, contract_transaction._hash)
                 pipe = self.rs.store_object(contract_transaction, r, pipe)
 
             pipe.rpush(name, 'contracts')
             for contract in block.contracts:
+                contract.is_mempool = 0
+                # check if contract is in the mempool
+                set_name = contract._to_index()[-1] + ":is_mempool:1"
+                c_key = contract._to_index()[-1] + ":" + contract._hash
+                if r.sismember(set_name, c_key):
+                    # remove from list of mempool objects
+                    pipe.srem(set_name, c_key)
+
                 pipe.rpush(name, contract._hash)
                 pipe = ContractService.store_contract(contract, pipe)
 
             pipe.rpush(name, 'signed_contracts')
             for signed_contract in block.signed_contracts:
+                signed_contract.is_mempool = 0
+                # check if signed contract is in the mempool
+                set_name = signed_contract._to_index()[-1] + ":is_mempool:1"
+                sc_key = signed_contract._to_index()[-1] + ":" + signed_contract._hash
+                if r.sismember(set_name, sc_key):
+                    # remove from list of mempool objects
+                    pipe.srem(set_name, sc_key)
+
                 pipe.rpush(name, signed_contract._hash)
                 pipe = SignedContractService.store_signed_contract(signed_contract, pipe)
 
