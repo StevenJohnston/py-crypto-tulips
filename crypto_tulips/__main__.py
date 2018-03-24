@@ -54,7 +54,9 @@ def check_if_object_exist(obj_hash, obj_type):
     return True
 
 def regular_node_callback(data, peer_id=None):
-    do_block_resend= True
+    do_block_resend = True
+    do_transaction_resend = True
+    sync_transaction = False
     sync_block = False
     json_dic = json.loads(data)
     new_msg = message.Message.from_dict(json_dic)
@@ -64,6 +66,10 @@ def regular_node_callback(data, peer_id=None):
         new_msg.action = 'block'
         do_block_resend = False
         sync_block = True
+    elif new_msg.action == 'transaction_sync':
+        new_msg.action = 'transaction'
+        do_transaction_resend = False
+        sync_transaction = True
     if new_msg.action == 'transaction':
         new_msg.data = Transaction.from_dict(new_msg.data)
         new_transaction = new_msg.data
@@ -78,14 +84,28 @@ def regular_node_callback(data, peer_id=None):
         else:
             print('Duplicate transaction')
         transaction_lock.release()
-        if need_to_send:
+        if need_to_send and do_transaction_resend:
             send_a_transaction(new_transaction)
+    elif new_msg.action == 'transaction_sync_end':
+        print('\n\nFinished transaction sync')
     elif new_msg.action == 'block_sync_end':
         a_node.doing_blockchain_sync = False
         # after we have added all sync blocks
         # we need to add normal blocks
         # that were send while we where doing sync
         a_node.add_blocks_from_queue()
+    elif new_msg.action == 'init_sync_trans':
+        print('Transaction sync request')
+        mem_transactions = TransactionService.get_all_mempool_transactions()
+        print('I have {} mem transactions'.format(len(mem_transactions)))
+        transaction_lock.acquire()
+        for a_transaction in mem_transactions:
+            send_a_transaction(a_transaction, action='transaction_sync', transaction_target_peer_id=peer_id)
+        ending_msg = message.Message(action='transaction_sync_end', data='')
+        json_dic = ending_msg.to_json(is_object=False)
+        json_str = json.dumps(json_dic, sort_keys=True, separators=(',', ':'))
+        a_node.connection_manager.send_msg(msg=json_str, target_peer_id=peer_id)
+        transaction_lock.release()
     elif new_msg.action == 'init_sync':
         print('\nGot init sync, height is {}'.format(new_msg.data))
         peer_height = new_msg.data
@@ -276,11 +296,11 @@ def get_contracts_list(dict_data, contract_type=1):
     return contracts_filter
 
 
-def send_a_transaction(new_transaction):
-    transaction_msg = message.Message('transaction', new_transaction)
+def send_a_transaction(new_transaction, action='transaction', transaction_target_peer_id=None):
+    transaction_msg = message.Message(action, new_transaction)
     transaction_json = transaction_msg.to_json()
     transaction_json = json.dumps(transaction_json, sort_keys=True, separators=(',', ':'))
-    a_node.connection_manager.send_msg(msg=transaction_json)
+    a_node.connection_manager.send_msg(msg=transaction_json, target_peer_id=transaction_target_peer_id)
 
 def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         socket_timeout=1):
@@ -298,8 +318,8 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         elif user_input == 'height':
             print(BlockService.get_max_height())
         elif user_input == 'test':
-            max_height = BlockService.get_max_height()
-            print('\n{}'.format(max_height))
+            mem_transactions = TransactionService.get_all_mempool_transactions()
+            print('I have {} mem transactions'.format(len(mem_transactions)))
         elif user_input == 'miner' or user_input == 'm':
             run_miner()
         elif user_input == 'priv' or user_input == 'p':

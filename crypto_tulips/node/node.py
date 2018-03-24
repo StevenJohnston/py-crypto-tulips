@@ -212,6 +212,7 @@ class Node:
                 first_peer = False
                 self.doing_blockchain_sync = True
                 self.send_sync_request(peer)
+                self.send_sync_request_transactions(peer)
         if start_gossiping:
             self.start_gossiping(callback)
 
@@ -250,6 +251,24 @@ class Node:
             # because id in peer that is received from a bootstrap node
             # is different from id that is was assigned when we connected to it
             # we need to find that id
+            for a_peer in self.connection_manager.peer_list:
+                if a_peer.get_ip_address() == peer.get_ip_address():
+                    id_to_send = a_peer.peer_id
+                    break
+            self.connection_manager.send_msg(json_str, id_to_send)
+
+    def send_sync_request_transactions(self, peer):
+        """
+        Send a sync request to a peer to sync transactions
+
+        Arguments:
+        peer -- peer to send request to
+        """
+        if self._do_block_sync:
+            message_obj = message.Message(action='init_sync_trans', data='')
+            json_dic = message_obj.to_json(is_object=False)
+            json_str = json.dumps(json_dic, sort_keys=True, separators=(',', ':'))
+            id_to_send = ''
             for a_peer in self.connection_manager.peer_list:
                 if a_peer.get_ip_address() == peer.get_ip_address():
                     id_to_send = a_peer.peer_id
