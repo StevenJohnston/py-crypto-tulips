@@ -73,7 +73,6 @@ class SignedContract(Hashable, Sendable, Signable):
             'parent_owner': self.parent_owner,
             'amount': self.amount,
             'rate': self.rate,
-            'is_mempool': self.is_mempool,
             'duration': self.duration,
             'created_timestamp': self.created_timestamp,
             'sign_end_timestamp': self.sign_end_timestamp
@@ -89,7 +88,6 @@ class SignedContract(Hashable, Sendable, Signable):
             'parent_owner': self.parent_owner,
             'amount': self.amount,
             'rate': self.rate,
-            'is_mempool': self.is_mempool,
             'duration': self.duration,
             'created_timestamp': self.created_timestamp,
             'sign_end_timestamp': self.sign_end_timestamp
@@ -105,7 +103,6 @@ class SignedContract(Hashable, Sendable, Signable):
             'parent_owner': self.parent_owner,
             'amount': self.amount,
             'rate': self.rate,
-            'is_mempool': self.is_mempool,
             'duration': self.duration,
             'created_timestamp': self.created_timestamp,
             'sign_end_timestamp': self.sign_end_timestamp,
