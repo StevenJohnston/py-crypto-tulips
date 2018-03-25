@@ -31,10 +31,13 @@ class Node:
         self.port = self.default_node_port
         self.doing_blockchain_sync = False
         self.doing_transaction_sync = False
+        self.doing_contract_sync = False
         self.transaction_queue = []
         self.block_queue = []
+        self.contract_queue = []
         self._do_block_sync = True
         self._do_transaction_sync = True
+        self._do_contract_sync = True
         #print('Started a node')
 
     def start_bootstrap(self, port=25252):
@@ -216,6 +219,7 @@ class Node:
                 first_peer = False
                 self.send_sync_request(peer)
                 self.send_sync_request_transactions(peer)
+                self.send_sync_request_contracts(peer)
         if start_gossiping:
             self.start_gossiping(callback)
 
@@ -284,6 +288,27 @@ class Node:
         else:
             self.doing_transaction_sync = False
 
+    def send_sync_request_contracts(self, peer):
+        """
+        Send a sync request to a peer to sync contracts
+
+        Arguments:
+        peer -- peer to send request to
+        """
+        if self._do_contract_sync:
+            self.doing_contract_sync = True
+            message_obj = message.Message(action='init_sync_contract', data='')
+            json_dic = message_obj.to_json(is_object=False)
+            json_str = json.dumps(json_dic, sort_keys=True, separators=(',', ':'))
+            id_to_send = ''
+            for a_peer in self.connection_manager.peer_list:
+                if a_peer.get_ip_address() == peer.get_ip_address():
+                    id_to_send = a_peer.peer_id
+                    break
+            self.connection_manager.send_msg(json_str, id_to_send)
+        else:
+            self.doing_contract_sync = False
+
     def add_blocks_from_queue(self):
         """
         After the sync is done we should add blocks that are in the queue
@@ -301,6 +326,14 @@ class Node:
         for a_transaction in self.transaction_queue:
             rs.store_object(a_transaction)
         self.transaction_queue = []
+
+    def add_contracts_from_queue(self):
+        """
+        After the sync is done we should add contracts that are in the queue
+        """
+        for a_contract, callback in self.contract_queue:
+            callback(a_contract)
+        self.contract_queue = []
 
     def connect_to_bootstrap(self, host, port):
         """

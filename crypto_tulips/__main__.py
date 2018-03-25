@@ -58,8 +58,10 @@ def check_if_object_exist(obj_hash, obj_type):
 def regular_node_callback(data, peer_id=None):
     do_block_resend = True
     do_transaction_resend = True
+    do_contract_resend = True
     sync_transaction = False
     sync_block = False
+    sync_contract = False
     signed_contract_flag = False
     contract_transaction_flag = False
     pos_transaction_flag = False
@@ -71,11 +73,24 @@ def regular_node_callback(data, peer_id=None):
         new_msg.action = 'block'
         do_block_resend = False
         sync_block = True
-    elif new_msg.action == 'transaction_sync':
-        new_msg.action = 'transaction'
+    elif new_msg.action == 'transaction_sync' or new_msg.action == 'transaction_pos_sync' or new_msg.action == 'transaction_contract_sync':
+        if new_msg.action == 'transaction_sync':
+            new_msg.action = 'transaction'
+        elif new_msg.action == 'transaction_pos_sync':
+            new_msg.action = 'transaction_pos'
+        elif new_msg.action == 'transaction_contract_sync':
+            new_msg.action = 'transaction_contract'
         do_transaction_resend = False
         sync_transaction = True
-    elif new_msg.action == 'contract_signed':
+    elif new_msg.action == 'contract_sync' or new_msg.action == 'contract_signed_sync':
+        if new_msg.action == 'contract_sync':
+            new_msg.action = 'contract'
+        elif new_msg.action == 'contract_signed_sync':
+            new_msg.action = 'contract_signed'
+        do_contract_resend = False
+        sync_contract = True
+    # case to set flags for special types of transactions and contracts
+    if new_msg.action == 'contract_signed':
         new_msg.action = 'contract'
         signed_contract_flag = True
     elif new_msg.action == 'transaction_contract':
@@ -136,31 +151,64 @@ def regular_node_callback(data, peer_id=None):
         contract_lock.acquire()
         print('Contract : {}'.format(new_contract._hash))
         if not check_if_object_exist(new_contract._hash, object_to_check):
-            method_to_call(new_contract)
-            need_to_send = True
-            print('All good')
+            if a_node.doing_contract_sync and not sync_contract:
+                a_node.contract_queue.append([new_contract, method_to_call])
+                print('Added contract to the queue')
+            else:
+                method_to_call(new_contract)
+                need_to_send = True
+                print('All good')
         else:
             print('Duplicate contract')
         contract_lock.release()
-        if need_to_send:
+        if need_to_send and do_contract_resend:
             send_a_contract(new_contract, action=contract_action)
     elif new_msg.action == 'transaction_sync_end':
         print('\n\nFinished transaction sync')
         a_node.doing_transaction_sync = False
         a_node.add_transactions_from_queue()
     elif new_msg.action == 'block_sync_end':
+        print('\n\nFinished block sync')
         a_node.doing_blockchain_sync = False
         # after we have added all sync blocks
         # we need to add normal blocks
         # that were send while we where doing sync
         a_node.add_blocks_from_queue()
+    elif new_msg.action == 'contract_sync_end':
+        print('\n\nFinished contract sync')
+        a_node.doing_contract_sync = False
+        a_node.add_contracts_from_queue()
+    elif new_msg.action == 'init_sync_contract':
+        print('Contract sync request')
+        mem_contracts = BaseObjectService.get_all_mempool_objects(Contract)
+        print('I have {} contracts'.format(len(mem_contracts)))
+        mem_signed_contracts = BaseObjectService.get_all_mempool_objects(SignedContract)
+        print('I have {} signed contracts'.format(len(mem_signed_contracts)))
+        contract_lock.acquire()
+        for a_contract in mem_contracts:
+            send_a_contract(a_contract, action='contract_sync', contract_target_peer_id=peer_id)
+        for a_signed_contract in mem_signed_contracts:
+            send_a_contract(a_signed_contract, action='contract_signed_sync', contract_target_peer_id=peer_id)
+        ending_msg = message.Message(action='contract_sync_end', data='')
+        json_dic = ending_msg.to_json(is_object=False)
+        json_str = json.dumps(json_dic, sort_keys=True, separators=(',', ':'))
+        a_node.connection_manager.send_msg(msg=json_str, target_peer_id=peer_id)
+        contract_lock.release()
     elif new_msg.action == 'init_sync_trans':
         print('Transaction sync request')
         mem_transactions = TransactionService.get_all_mempool_transactions()
         print('I have {} mem transactions'.format(len(mem_transactions)))
+        mem_pos_transactions = BaseObjectService.get_all_mempool_objects(PosTransaction)
+        print('I have {} mem pos transactions'.format(len(mem_pos_transactions)))
+        mem_contract_transactions = BaseObjectService.get_all_mempool_objects(ContractTransaction)
+        print('I have {} mem contract transactions'.format(len(mem_contract_transactions)))
         transaction_lock.acquire()
         for a_transaction in mem_transactions:
             send_a_transaction(a_transaction, action='transaction_sync', transaction_target_peer_id=peer_id)
+        for a_pos_transaction in mem_pos_transactions:
+            send_a_transaction(a_pos_transaction, action='transaction_pos_sync', transaction_target_peer_id=peer_id)
+        for a_contract_transaction in mem_contract_transactions:
+            send_a_transaction(a_contract_transaction, action='transaction_contract_sync', transaction_target_peer_id=peer_id)
         ending_msg = message.Message(action='transaction_sync_end', data='')
         json_dic = ending_msg.to_json(is_object=False)
         json_str = json.dumps(json_dic, sort_keys=True, separators=(',', ':'))
@@ -393,7 +441,9 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             socket_timeout=socket_timeout, read_callback=regular_node_callback, wallet_callback=wallet_callback, \
             start_bootstrap=True, start_gossiping=True)
     a_node.make_silent(True)
-    ExchangeManager()
+    # need to have a way to shut it down
+    # right now when trying to exit this just hangs
+    #ExchangeManager()
     while True:
         user_input = input('\t\t\tEnter a command: ')
         if user_input == 'quit' or user_input == 'q':
@@ -401,6 +451,10 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         elif user_input == 'height':
             print('Blocks {}'.format(BlockService.get_max_height()))
             print('Mem Transactions {}'.format(len(TransactionService.get_all_mempool_transactions())))
+            print('Mem POS Transactions {}'.format(len(BaseObjectService.get_all_mempool_objects(PosTransaction))))
+            print('Mem Contract Transactions {}'.format(len(BaseObjectService.get_all_mempool_objects(ContractTransaction))))
+            print('Mem Contracts {}'.format(len(BaseObjectService.get_all_mempool_objects(Contract))))
+            print('Mem Signed Contracts {}'.format(len(BaseObjectService.get_all_mempool_objects(SignedContract))))
         elif user_input == 'test':
             mem_transactions = TransactionService.get_all_mempool_transactions()
             print('I have {} mem transactions'.format(len(mem_transactions)))
@@ -446,6 +500,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             contract_lock.acquire()
             SignedContractService.store_signed_contract(a_signed_contract)
             contract_lock.release()
+            print('\nSigned Contract hash : {}'.format(a_signed_contract._hash))
 
         elif user_input == 'contract' or user_input == 'c':
             secret = input('\t\t\tOwner : ')
@@ -471,6 +526,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             contract_lock.acquire()
             ContractService.store_contract(a_contract)
             contract_lock.release()
+            print('\nContract hash : {}'.format(a_contract._hash))
 
         elif user_input == 'contract transaction' or user_input == 'ct':
             secret = input('\t\t\tCT from : ')
@@ -497,6 +553,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             rs = redis_service.RedisService()
             rs.store_object(a_contract_transaction)
             transaction_lock.release()
+            print('\nContract Transaction hash : {}'.format(a_contract_transaction._hash))
 
         elif user_input == 'pos' or user_input == 'pos_transaction' or user_input == 'pt':
             secret = input('\t\t\tFrom : ')
@@ -519,6 +576,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             pos_transaction.update_hash()
             # send pos_transaction
             send_a_transaction(pos_transaction, action='transaction_pos')
+            print('\nPOS Transaction hash : {}'.format(pos_transaction._hash))
 
             transaction_lock.acquire()
             rs = redis_service.RedisService()
