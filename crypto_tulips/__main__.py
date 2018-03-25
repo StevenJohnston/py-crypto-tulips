@@ -353,6 +353,18 @@ def wallet_callback(wallet_sock):
                 a_node.connection_manager.server.send_msg(data="Transaction Successful", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Transaction Failed", client_socket=wallet_sock)
+        elif new_msg.action == 'send_ctx':
+            ctx = ContractTransaction.from_dict(new_msg.data)
+            trans_signable = ctx.get_signable()
+            trans_signable_json = json.dumps(trans_signable, sort_keys=True, separators=(',', ':'))
+            status = EcdsaHashing.verify_signature_hex(ctx.from_addr, ctx.signature, trans_signable_json)
+            if status == True:
+                rs = redis_service.RedisService()
+                rs.store_object(ctx)
+                send_a_transaction(ctx)
+                a_node.connection_manager.server.send_msg(data="Transaction Successful", client_socket=wallet_sock)
+            else:
+                a_node.connection_manager.server.send_msg(data="Transaction Failed", client_socket=wallet_sock)
         elif new_msg.action == "get_all_ip":
             node_obj_list = a_node.connection_manager.peer_list
             ip_list = [node.get_ip_address() for node in node_obj_list]
