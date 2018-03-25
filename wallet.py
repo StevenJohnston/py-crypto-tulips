@@ -89,11 +89,6 @@ if __name__ == '__main__':
     scontract_test = {"action": "get_signed_contract", "data": {
             "contractFilters": [
                 {
-                    "type": "signed_contracts:rate",
-                    "startRange": .4,
-                    "endRange": .5
-                },
-                {
                     "type": "signed_contracts:amount",
                     "startRange": 50,
                     "endRange": 1000
@@ -108,7 +103,7 @@ if __name__ == '__main__':
     print(contract_signable_json_str)
     sig = EcdsaHashing.sign_message_hex(contract_signable_json_str, temp_key)
     print(sig)
-    transaction_json = json.dumps(contractCreation, sort_keys=True)
+    transaction_json = json.dumps(contract_test, sort_keys=True)
     p2p.send_msg(transaction_json)
 
     # contract_json = json.dumps(contractCreation, sort_keys=True)
