@@ -61,6 +61,7 @@ def regular_node_callback(data, peer_id=None):
     sync_block = False
     signed_contract_flag = False
     contract_transaction_flag = False
+    pos_transaction_flag = False
     json_dic = json.loads(data)
     new_msg = message.Message.from_dict(json_dic)
     # sync block is the same as block, but they don't
@@ -79,14 +80,22 @@ def regular_node_callback(data, peer_id=None):
     elif new_msg.action == 'transaction_contract':
         new_msg.action = 'transaction'
         contract_transaction_flag = True
+    elif new_msg.action == 'transaction_pos':
+        new_msg.action = 'transaction'
+        pos_transaction_flag = True
     if new_msg.action == 'transaction':
         if contract_transaction_flag:
             print('\nContract Transaction')
             new_msg.data = ContractTransaction.from_dict(new_msg.data)
             object_to_check = ContractTransaction
             transaction_action = 'transaction_contract'
+        elif pos_transaction_flag:
+            print('\nPOS Transaction')
+            new_msg.data = PosTransaction.from_dict(new_msg.data)
+            object_to_check = PosTransaction
+            transaction_action = 'transaction_pos'
         else:
-            print('Normal Transaction')
+            print('\nNormal Transaction')
             new_msg.data = Transaction.from_dict(new_msg.data)
             object_to_check = Transaction
             transaction_action = 'transaction'
@@ -476,7 +485,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             rs.store_object(a_contract_transaction)
             transaction_lock.release()
 
-        elif user_input == 'pos' or user_input == 'pos_transaction':
+        elif user_input == 'pos' or user_input == 'pos_transaction' or user_input == 'pt':
             secret = input('\t\t\tFrom : ')
             if secret == 'denys' or secret == 'd':
                 private_key = denys_private_key
@@ -492,10 +501,11 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
                 continue
             public_key = EcdsaHashing.recover_public_key_str(private_key)
             amount = input('\t\t\tAmount: ')
-            pos_transaction = PosTransaction('','', public_key, amount, 1)
+            pos_transaction = PosTransaction('', '', public_key, amount, 1)
             pos_transaction.update_signature(private_key)
             pos_transaction.update_hash()
             # send pos_transaction
+            send_a_transaction(pos_transaction, action='transaction_pos')
 
             transaction_lock.acquire()
             rs = redis_service.RedisService()
