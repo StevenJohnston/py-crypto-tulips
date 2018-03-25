@@ -348,7 +348,9 @@ def wallet_callback(wallet_sock):
             status = EcdsaHashing.verify_signature_hex(t.from_addr, t.signature, trans_signable_json)
             if status == True:
                 rs = redis_service.RedisService()
+                transaction_lock.acquire()
                 rs.store_object(t)
+                transaction_lock.release()
                 send_a_transaction(t)
                 a_node.connection_manager.server.send_msg(data="Transaction Successful", client_socket=wallet_sock)
             else:
@@ -360,7 +362,9 @@ def wallet_callback(wallet_sock):
             status = EcdsaHashing.verify_signature_hex(ctx.from_addr, ctx.signature, trans_signable_json)
             if status == True:
                 rs = redis_service.RedisService()
+                transaction_lock.acquire()
                 rs.store_object(ctx)
+                transaction_lock.release()
                 send_a_transaction(ctx)
                 a_node.connection_manager.server.send_msg(data="Transaction Successful", client_socket=wallet_sock)
             else:
@@ -377,13 +381,22 @@ def wallet_callback(wallet_sock):
             new_contracts = [contract.get_sendable() for contract in contracts]
             json_str_return = build_return_json([("available_contracts", new_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+        elif new_msg.action == "get_signed_contracts":
+            signed_contracts_filter = get_contracts_list(new_msg.data, contract_type=2)
+            signed_contracts = SignedContractService.get_signed_contracts_by_filter(signed_contracts_filter, False)
+            new_signed_contracts = [contract.get_sendable() for contract in signed_contracts]
+            json_str_return = build_return_json([("signed_contracts", new_signed_contracts)])
+            a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == "publish_contract":
             c = Contract.from_dict(new_msg.data)
             contract_signable_json = c.get_signable()
             contract_signable_json_str = json.dumps(contract_signable_json, sort_keys=True, separators=(',', ':'))
             status = EcdsaHashing.verify_signature_hex(c.owner, c.signature, contract_signable_json_str)
             if status == True:
+                contract_lock.acquire()
                 ContractService.store_contract(c)
+                contract_lock.release()
+                send_a_contract(c)
                 a_node.connection_manager.server.send_msg(data="Contract Successfully Created", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Contract Cannot be created", client_socket=wallet_sock)
@@ -397,12 +410,6 @@ def wallet_callback(wallet_sock):
                 a_node.connection_manager.server.send_msg(data="Successfully Subscribed", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Cannot Subscribed", client_socket=wallet_sock)
-        elif new_msg.action == "get_signed_contract":
-            signed_contracts_filter = get_contracts_list(new_msg.data, contract_type=2)
-            signed_contracts = SignedContractService.get_signed_contracts_by_filter(signed_contracts_filter, False)
-            new_signed_contracts = [contract.get_sendable() for contract in signed_contracts]
-            json_str_return = build_return_json([("signed_contracts", new_signed_contracts)])
-            a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == 'exit':
             break
         else:
