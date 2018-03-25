@@ -31,8 +31,9 @@ class ContractTransaction(BaseTransaction):
         is_mempool = dict_values.get('is_mempool')
         timestamp = dict_values.get('timestamp')
         signature = dict_values.get('signature')
-        new_ct = ContractTransaction(contract_transaction_hash, signature, to_addr, from_addr, amount, is_mempool, timestamp)
-        new_ct.price = price
+        new_ct = ContractTransaction(contract_transaction_hash, signature, from_addr, \
+                signed_contract_addr, to_symbol, from_symbol, amount, is_mempool, timestamp)
+        new_ct.price = float(price)
         return new_ct
 
     @staticmethod

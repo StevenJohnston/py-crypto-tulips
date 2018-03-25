@@ -13,6 +13,7 @@ from .hashing.crypt_hashing_wif import EcdsaHashing
 from crypto_tulips.dal.services import block_service as dal_service_block_service
 from crypto_tulips.dal.objects.transaction import Transaction
 from crypto_tulips.dal.objects.pos_transaction import PosTransaction
+from crypto_tulips.dal.objects.contract_transaction import ContractTransaction
 from crypto_tulips.dal.objects.block import Block
 from crypto_tulips.p2p.message import Message
 
@@ -59,6 +60,7 @@ def regular_node_callback(data, peer_id=None):
     sync_transaction = False
     sync_block = False
     signed_contract_flag = False
+    contract_transaction_flag = False
     json_dic = json.loads(data)
     new_msg = message.Message.from_dict(json_dic)
     # sync block is the same as block, but they don't
@@ -74,13 +76,25 @@ def regular_node_callback(data, peer_id=None):
     elif new_msg.action == 'contract_signed':
         new_msg.action = 'contract'
         signed_contract_flag = True
+    elif new_msg.action == 'transaction_contract':
+        new_msg.action = 'transaction'
+        contract_transaction_flag = True
     if new_msg.action == 'transaction':
-        new_msg.data = Transaction.from_dict(new_msg.data)
+        if contract_transaction_flag:
+            print('\nContract Transaction')
+            new_msg.data = ContractTransaction.from_dict(new_msg.data)
+            object_to_check = ContractTransaction
+            transaction_action = 'transaction_contract'
+        else:
+            print('Normal Transaction')
+            new_msg.data = Transaction.from_dict(new_msg.data)
+            object_to_check = Transaction
+            transaction_action = 'transaction'
         new_transaction = new_msg.data
         need_to_send = False
         transaction_lock.acquire()
         print('\nTransaction : {}'.format(new_transaction._hash))
-        if not check_if_object_exist(new_transaction._hash, Transaction):
+        if not check_if_object_exist(new_transaction._hash, object_to_check):
             if a_node.doing_transaction_sync and not sync_transaction:
                 a_node.transaction_queue.append(new_transaction)
                 print('Added transaction to the queue')
@@ -93,7 +107,7 @@ def regular_node_callback(data, peer_id=None):
             print('Duplicate transaction')
         transaction_lock.release()
         if need_to_send and do_transaction_resend:
-            send_a_transaction(new_transaction)
+            send_a_transaction(new_transaction, action=transaction_action)
     elif new_msg.action == 'contract':
         if signed_contract_flag:
             print('\nSigned Contract')
@@ -436,6 +450,32 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             ContractService.store_contract(a_contract)
             contract_lock.release()
 
+        elif user_input == 'contract transaction' or user_input == 'ct':
+            secret = input('\t\t\tCT from : ')
+            if secret == 'denys' or secret == 'd':
+                private_key = denys_private_key
+            elif secret == 'william' or secret == 'will' or secret == 'w':
+                private_key = william_private_key
+            elif secret == 'matt' or secret == 'm':
+                private_key = matt_private_key
+            elif secret == 'steven' or secret == 's':
+                private_key = steven_private_key
+            elif secret == 'naween' or secret == 'n':
+                private_key = naween_private_key
+            else:
+                continue
+            public_key = EcdsaHashing.recover_public_key_str(private_key)
+            a_contract_transaction = ContractTransaction('', '', public_key, \
+                    'sc_contract_addr', 'BTC', 'TPS', 100, 1, time.time())
+            a_contract_transaction.price = 6000
+            a_contract_transaction.update_signature(private_key)
+            a_contract_transaction.update_hash()
+            send_a_transaction(a_contract_transaction, action='transaction_contract')
+            transaction_lock.acquire()
+            rs = redis_service.RedisService()
+            rs.store_object(a_contract_transaction)
+            transaction_lock.release()
+
         elif user_input == 'pos' or user_input == 'pos_transaction':
             secret = input('\t\t\tFrom : ')
             if secret == 'denys' or secret == 'd':
@@ -496,7 +536,6 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             new_transaction = Transaction('', '', to_addr, from_addr, amount, 1)
             new_transaction.update_signature(private_key)
             new_transaction.update_hash()
-            #transaction_lock.acquire()
             send_a_transaction(new_transaction)
             transaction_lock.acquire()
             print('\nTransaction hash : {}'.format(new_transaction._hash))
