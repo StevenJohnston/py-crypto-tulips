@@ -284,6 +284,7 @@ def mine_block(last_block):
         last_block = GenesisBlockService.generate_from_priv(miner_private)
         block_service_dal = dal_service_block_service.BlockService()
         block_service_dal.store_block(last_block)
+        send_a_block(last_block)
 
 
     # check if we are the miner.
