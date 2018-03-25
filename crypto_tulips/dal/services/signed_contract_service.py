@@ -148,3 +148,15 @@ class SignedContractService:
                 open_signed_contracts.append(signed_contract)
         return sorted(open_signed_contracts, key=lambda sc: (sc.signed_timestamp + sc.duration))
 
+
+    @staticmethod
+    def get_all_signed_contracts_by_owner(owner):
+        rs = RedisService()
+        r = rs._connect()
+
+        keys = r.smembers('signed_contract:parent_owner:' + owner)
+        signed_contracts = []
+        for key in keys:
+            signed_contract = SignedContractService.get_signed_contract_by_full_key(key)
+            signed_contracts.append(signed_contract)
+        return signed_contracts

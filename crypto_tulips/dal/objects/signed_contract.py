@@ -114,4 +114,4 @@ class SignedContract(Hashable, Sendable, Signable):
 
     @staticmethod
     def _to_index():
-        return ['from_addr', 'parent_hash', 'is_mempool', 'signed_contract']
+        return ['from_addr', 'parent_hash', 'parent_owner', 'is_mempool', 'signed_contract']
