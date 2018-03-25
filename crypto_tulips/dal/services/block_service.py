@@ -356,8 +356,7 @@ class BlockService():
             return {pos_transaction._hash: pos_transaction for pos_transaction in pos_transactions}
 
 
-    def get_all_objects_up_to_block(self, block_hash):
-        block = self.find_by_hash(block_hash)
+    def get_all_objects_up_to_block(self, block):
         if block:
             transactions = block.transactions
             pos_transactions = block.pos_transactions
