@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     contractCreation = {"action": "publish_contract", "data": {
             "_hash": "tcs_hash1",
-            "signature": "d48017528fb665a8b47436257b96af3fe098a7751199447875891e0804208a670d36b39f060b6313b8552618098e57b437d06af4a0029bceb1e9ea4ef2730461",
+            "signature": "",
             "owner": william_public_key,
             "amount": "100",
             "rate": ".5",
