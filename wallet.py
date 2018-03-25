@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     contractCreation = {"action": "publish_contract", "data": {
             "_hash": "tcs_hash1",
-            "signature": "d48017528fb665a8b47436257b96af3fe098a7751199447875891e0804208a670d36b39f060b6313b8552618098e57b437d06af4a0029bceb1e9ea4ef2730461",
+            "signature": "",
             "owner": william_public_key,
             "amount": "100",
             "rate": ".5",
@@ -88,11 +88,6 @@ if __name__ == '__main__':
     }
     scontract_test = {"action": "get_signed_contract", "data": {
             "contractFilters": [
-                {
-                    "type": "signed_contracts:rate",
-                    "startRange": .4,
-                    "endRange": .5
-                },
                 {
                     "type": "signed_contracts:amount",
                     "startRange": 50,
@@ -108,7 +103,7 @@ if __name__ == '__main__':
     print(contract_signable_json_str)
     sig = EcdsaHashing.sign_message_hex(contract_signable_json_str, temp_key)
     print(sig)
-    transaction_json = json.dumps(contractCreation, sort_keys=True)
+    transaction_json = json.dumps(contract_test, sort_keys=True)
     p2p.send_msg(transaction_json)
 
     # contract_json = json.dumps(contractCreation, sort_keys=True)

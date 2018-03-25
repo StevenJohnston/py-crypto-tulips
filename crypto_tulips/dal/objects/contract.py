@@ -26,7 +26,7 @@ class Contract(Hashable, Sendable, Signable):
         self.owner = owner
         self.amount = float(amount)
         self.rate = float(rate)
-        self.is_mempool = int(is_mempool)
+        self.is_mempool = 1 if is_mempool is None else int(is_mempool)
         self.duration = int(duration)
         self.created_timestamp = int(created_timestamp)
         self.sign_end_timestamp = int(sign_end_timestamp)

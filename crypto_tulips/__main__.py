@@ -248,6 +248,7 @@ def wallet_callback(wallet_sock):
             if status == True:
                 rs = redis_service.RedisService()
                 rs.store_object(t)
+                send_a_transaction(t)
                 a_node.connection_manager.server.send_msg(data="Transaction Successful", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Transaction Failed", client_socket=wallet_sock)
@@ -273,6 +274,16 @@ def wallet_callback(wallet_sock):
                 a_node.connection_manager.server.send_msg(data="Contract Successfully Created", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Contract Cannot be created", client_socket=wallet_sock)
+        elif new_msg.action == "subscribe_to_contract":
+            sc = SignedContract.from_dict(new_msg.data)
+            signed_contract_signable_json = sc.get_signable()
+            signed_contract_signable_json_str = json.dumps(signed_contract_signable_json, sort_keys=True, separators=(',', ':'))
+            status = EcdsaHashing.verify_signature_hex(sc.from_addr, sc.signature, signed_contract_signable_json_str)
+            if status == True:
+                #ContractService.store_contract(c)
+                a_node.connection_manager.server.send_msg(data="Successfully Subscribed", client_socket=wallet_sock)
+            else:
+                a_node.connection_manager.server.send_msg(data="Cannot Subscribed", client_socket=wallet_sock)
         elif new_msg.action == "get_signed_contract":
             signed_contracts_filter = get_contracts_list(new_msg.data, contract_type=2)
             signed_contracts = SignedContractService.get_signed_contracts_by_filter(signed_contracts_filter, False)
