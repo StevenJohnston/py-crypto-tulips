@@ -436,6 +436,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         socket_timeout=1):
     print('\t\tStarting as a regular node')
     global a_node
+    global miner_private
     a_node = node.Node()
     a_node.join_network(bootstrap_host, peer_timeout=peer_timeout, recv_data_size=recv_data_size, \
             socket_timeout=socket_timeout, read_callback=regular_node_callback, wallet_callback=wallet_callback, \
@@ -456,13 +457,26 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             print('Mem Contracts {}'.format(len(BaseObjectService.get_all_mempool_objects(Contract))))
             print('Mem Signed Contracts {}'.format(len(BaseObjectService.get_all_mempool_objects(SignedContract))))
         elif user_input == 'test':
-            mem_transactions = TransactionService.get_all_mempool_transactions()
-            print('I have {} mem transactions'.format(len(mem_transactions)))
+            pass
+        elif user_input == 'who':
+            print('Current miner is {}'.format(miner_private))
         elif user_input == 'miner' or user_input == 'm':
             run_miner()
         elif user_input == 'priv' or user_input == 'p':
-            global miner_private
-            miner_private = input('\t\t\tEnter miner private key: ')
+            secret = input('\t\t\tNew miner : ')
+            if secret == 'denys' or secret == 'd':
+                private_key = denys_private_key
+            elif secret == 'william' or secret == 'will' or secret == 'w':
+                private_key = william_private_key
+            elif secret == 'matt' or secret == 'm':
+                private_key = matt_private_key
+            elif secret == 'steven' or secret == 's':
+                private_key = steven_private_key
+            elif secret == 'naween' or secret == 'n':
+                private_key = naween_private_key
+            else:
+                private_key = secret
+            miner_private = private_key
 
         elif user_input == 'signed contract' or user_input == 'sc':
             secret = input('\t\t\tOwner : ')
