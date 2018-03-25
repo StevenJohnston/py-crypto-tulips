@@ -263,7 +263,7 @@ class BaseObjectService():
         - charset and decode_responses will need to be removed if we want this to be actually stored as bytes (per: https://stackoverflow.com/questions/25745053/about-char-b-prefix-in-python3-4-1-client-connect-to-redis)
         """
         #settings = json.load(open('crypto_tulips/config/db_settings.json'))
-        
+
         with open(file="crypto_tulips/config/db_settings.json", mode="r") as data_file:
             settings = json.load(data_file)
         host = settings["host"]
