@@ -183,7 +183,8 @@ class BlockService():
         if objects == None:
             block_dal = BlockServiceDal()
             last_block_hash = BlockService.get_last_block_hash()
-            objects = block_dal.get_all_objects_up_to_block(last_block_hash)
+            block = self.find_by_hash(last_block_hash)
+            objects = block_dal.get_all_objects_up_to_block(block)
 
         balances = {}
         # Transactions

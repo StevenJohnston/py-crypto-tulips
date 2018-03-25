@@ -31,8 +31,8 @@ ct6.price = 7000
 ct7 = ContractTransaction('hash7', 'sig7', 'matt', 'sc_norb_to_denys', 'BTC', 'TPS', 40, 0, now)
 ct7.price = 7000
 
-tc1 = TerminatedContract('sc_matt_to_naween', 'asdf', 10000, now + 2)
-tc2 = TerminatedContract('sc_norb_to_denys', 'test', 4000, now + 1)
+tc1 = TerminatedContract('sc_matt_to_naween', 10000, now + 2)
+tc2 = TerminatedContract('sc_norb_to_denys', 4000, now + 1)
 
 c1 = Contract('con_steven', 'con_steven_sig', 'steven', 200, 0.4, 0, 1000, now - 100, now + 100)
 c2 = Contract('con_naween', 'con_naween_sig', 'naween', 3000, 0.3, 0, 2000, now - 120, now + 1340)
@@ -58,4 +58,4 @@ def test_get_all_balances():
     objects = {'contract_transactions': contract_transaction_dict, 'terminated_contracts': tcontract_dict, 'signed_contracts': signed_dict, 'contracts': contract_dict, 'owners': owners}
     balances = BlockService.get_all_balances(objects)
     print(balances)
-    #assert False
+    assert False

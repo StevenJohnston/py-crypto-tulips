@@ -1,6 +1,7 @@
 from crypto_tulips.services.block_service import BlockService
 from crypto_tulips.services.base_object_service import BaseObjectService
 
+from crypto_tulips.dal.services.block_service import BlockService as BlockServiceDal
 from crypto_tulips.dal.services.signed_contract_service import SignedContractService
 from crypto_tulips.dal.services.contract_service import ContractService
 
@@ -11,6 +12,7 @@ from crypto_tulips.dal.objects.pos_transaction import PosTransaction
 from crypto_tulips.dal.objects.contract_transaction import ContractTransaction
 from crypto_tulips.dal.objects.contract import Contract
 from crypto_tulips.dal.objects.signed_contract import SignedContract
+from crypto_tulips.dal.objects.terminated_contract import TerminatedContract
 
 
 def create_block():
@@ -61,10 +63,17 @@ def create_block():
         if valid:
             signed_contracts_to_add.append(signed_contract)
 
+    terminated_contracts_to_add = []
+    signed_contracts_to_check = SignedContractService.get_all_open_signed_contracts()
+    for sc_to_check in signed_contracts:
+        end_time = sc_to_check.signed_timestamp + sc_to_check.duration
+        if end_time <= now:
+            price = 1000 # TODO GET PRICE HERE @ end_time
+            tc = TerminatedContract(sc_to_check._hash, price, end_time)
+            terminated_contracts_to_add.append(tc)
+
     block = Block('', '', 'OWNER', 'prev_block', height, transactions_to_add, pos_transactions_to_add, contract_transactions_to_add, contracts_to_add, signed_contracts_to_add, terminated_contracts, time.time())
-
-
-
+    return block
 
 def validate_transaction(balances, transaction, adding):
     # enough funds
@@ -128,3 +137,16 @@ def validate_signed_contract(balances, signed_contract, adding):
                     return True, balances
     print('Invalid Signed Contract: ' + signed_contract._hash)
     return False
+
+def validate_incoming_block(block):
+    block_dal = BlockServiceDal()
+    objects = block_dal.get_all_objects_up_to_block(block)
+    balances = BlockService.get_all_balances(objects)
+    for balance in balances:
+        if type(balance) is tuple:
+            if balance[0] <= 0 or balance[1] <= 0:
+                return False
+        else:
+            if balance <= 0:
+                return False
+    return True

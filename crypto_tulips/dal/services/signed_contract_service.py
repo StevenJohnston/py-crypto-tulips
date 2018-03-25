@@ -133,3 +133,18 @@ class SignedContractService:
             signed_contract = rs.get_object_by_full_key(key)
             signed_contracts.append(signed_contract)
         return signed_contracts
+
+    @staticmethod
+    def get_all_open_signed_contracts():
+        # only gets open signed_contracts not in the mempool
+        rs = RedisService()
+        r = rs._connect()
+
+        keys = r.smembers('singed_contract:is_mempool:0')
+        open_signed_contracts = []
+        for key in keys:
+            signed_contract = SignedContractService.get_signed_contract_by_full_key(key)
+            if not r.exists('terminated_contract:signed_contract_addr:' + signed_contract._hash):
+                open_signed_contracts.append(signed_contract)
+        return sorted(open_signed_contracts, key=lambda sc: (sc.signed_timestamp + sc.duration))
+
