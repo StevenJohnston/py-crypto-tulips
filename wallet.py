@@ -97,17 +97,23 @@ if __name__ == '__main__':
         }
     }
 
+    get_all_own_contract = {"action": "get_user_contracts", "data": {
+            "userPublicKey": denys_public_key
+        }
+    }
+
+
     c = {'created_timestamp': 1521920465, 'amount': '100.00000000', 'sign_end_timestamp': 1521920465, 'rate': '0.50000000', 'owner': '2c1b95aa7ab8d18a6dda267a413117027cd05a26e5226fa01552d794d9ec87f13e0dbec0959e09ea5ab5665a9d81d25ee0f7d5c7145008d3e52cd60e6d204271', 'duration': 1}
 
-    contract_signable_json_str = json.dumps(c, sort_keys=True, separators=(',', ':'))
-    print(contract_signable_json_str)
-    sig = EcdsaHashing.sign_message_hex(contract_signable_json_str, temp_key)
-    print(sig)
-    transaction_json = json.dumps(contract_test, sort_keys=True)
-    p2p.send_msg(transaction_json)
+    # contract_signable_json_str = json.dumps(c, sort_keys=True, separators=(',', ':'))
+    # print(contract_signable_json_str)
+    # sig = EcdsaHashing.sign_message_hex(contract_signable_json_str, temp_key)
+    # print(sig)
+    # transaction_json = json.dumps(contract_test, sort_keys=True)
+    #p2p.send_msg(transaction_json)
 
-    # contract_json = json.dumps(contractCreation, sort_keys=True)
-    # p2p.send_msg(contract_json)
+    contract_json = json.dumps(get_all_own_contract, sort_keys=True)
+    p2p.send_msg(contract_json)
     # data = p2p.recv_msg()
     #print(data)
     #quiting
