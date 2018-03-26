@@ -432,6 +432,13 @@ def wallet_callback(wallet_sock):
             new_contracts = [contract.get_sendable() for contract in all_contract]
             json_str_return = build_return_json([("contract_owned", new_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+        elif new_msg.action == "get_bitcoin_price":
+            rs = redis_service.RedisService()
+            r = rs._connect()
+            price_time = r.zrange('price_stamps', -1, -1, withscores=True)
+            price = float(price_time[0][0])
+            json_str_return = build_return_json([("bitcoinPrice", str(price))])
+            a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == 'exit':
             break
         else:
