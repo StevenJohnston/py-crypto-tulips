@@ -15,8 +15,8 @@ class TerminatedContract(Sendable):
 
     def __init__(self, signed_contract_hash, price, timestamp):
         self._hash = signed_contract_hash
-        self.price = price
-        self.timestamp = timestamp
+        self.price = float(price)
+        self.timestamp = int(timestamp)
 
     @staticmethod
     def from_dict(dict_values):

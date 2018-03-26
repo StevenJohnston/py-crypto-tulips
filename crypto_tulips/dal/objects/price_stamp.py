@@ -6,7 +6,7 @@ class PriceStamp(Hashable, Sendable):
     prefix = 'price_stamp'
     price_stamp_hash = ''
     def __init__(self, price_hash, exchange_name, timestamp, price):
-        
+
         self._hash = price_hash
         self.exchange_name = exchange_name
         self.timestamp = timestamp
@@ -26,7 +26,7 @@ class PriceStamp(Hashable, Sendable):
 
     @staticmethod
     def _to_index():
-        index = ['timestamp', 'price_stamp']
+        index = ['price_stamp']
         return index
 
     # Returns the object that will be hashed into blockchain

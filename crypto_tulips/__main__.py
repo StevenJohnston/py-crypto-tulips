@@ -30,6 +30,8 @@ from crypto_tulips.dal.services.signed_contract_service import SignedContractSer
 from crypto_tulips.dal.objects.signed_contract import SignedContract
 from crypto_tulips.services.genesis_block_service import GenesisBlockService
 
+from crypto_tulips.miner.miner import Miner
+
 denys_private_key = """4a7351205a7bfaa9726a67cba6f331f1b03ee1e904250f95f81f82e775bb55c1"""
 
 william_private_key = """83c82312b925e50dde81f57f88f2fe1fb8310de1d81e97b696235c6093cd6af8"""
@@ -252,10 +254,13 @@ def regular_node_callback(data, peer_id=None):
             a_node.block_queue.append(new_block)
             result_list = []
         else:
-            result_list = block_service.add_block_to_chain(new_block)
-            if result_list:
-                for new_block_callback in new_block_callbacks:
-                    new_block_callback(new_block)
+            if Miner.validate_incoming_block(new_block):
+                result_list = block_service.add_block_to_chain(new_block)
+                if result_list:
+                    for new_block_callback in new_block_callbacks:
+                        new_block_callback(new_block)
+            else:
+                result_list = []
         if result_list:
             need_to_send = True
             print('All good')
@@ -290,29 +295,24 @@ def mine_block(last_block):
     miner_pub = EcdsaHashing.recover_public_key_str(miner_private)
     next_author = POSService.get_next_block_author(last_block)
     if next_author == miner_pub:
-        block_service = BlockService()
-        time_now = int(time.time())
-        #height = int(BlockService.get_max_height()) + 1
-        height = last_block.height + 1
-        ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
-        all_pos_transactions = POSService.get_all_mem_pos_transaction()
-        print(all_pos_transactions)
-        #last_block_hash = BlockService.get_last_block_hash()
-        last_block_hash = last_block._hash
-        block = Block('', '', miner_pub, last_block_hash, height, ten_transactions, all_pos_transactions, [], [], [], [], time_now)
-        block.update_signature(steven_private_key)
-        block.update_hash()
+        # time_now = int(time.time())
+        # #height = int(BlockService.get_max_height()) + 1
+        # height = last_block.height + 1
+        # ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
+        # all_pos_transactions = POSService.get_all_mem_pos_transaction()
+        # print(all_pos_transactions)
+        # #last_block_hash = BlockService.get_last_block_hash()
+        # last_block_hash = last_block._hash
+        # block = Block('', '', miner_pub, last_block_hash, height, ten_transactions, all_pos_transactions, [], [], [], [], time_now)
+        # block.update_signature(steven_private_key)
+        # block.update_hash()
         # block_lock.acquire()
-        block_service.add_block_to_chain(block)
-        # TODO Test if worked block was added. Might fail due to same hash
-        for trabs in ten_transactions:
-            BaseObjectService.remove_from_mem_pool(trabs)
-        for trabs in all_pos_transactions:
-            BaseObjectService.remove_from_mem_pool(trabs)
+        block = Miner.mine_block(miner_private, last_block)
+        BlockService.add_block_to_chain(block)
         print('\nCreated Block hash: ' + block._hash)
         # block_lock.release()
         send_a_block(block)
-        start_next_block = threading.Timer(5, mine_block, [block])
+        start_next_block = threading.Timer(30, mine_block, [block])
         start_next_block.start()
 
 def send_a_block(new_block, action='block', block_target_peer_id=None):
@@ -463,7 +463,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
     a_node.make_silent(True)
     # need to have a way to shut it down
     # right now when trying to exit this just hangs
-    #ExchangeManager()
+    ExchangeManager()
     while True:
         user_input = input('\t\t\tEnter a command: ')
         if user_input == 'quit' or user_input == 'q':
@@ -497,16 +497,22 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
                 private_key = secret
             miner_private = private_key
 
+        elif user_input == 'balances' or user_input == 'b':
+            balances = BlockService.get_all_balances()
+            print(balances)
+
         elif user_input == 'signed contract' or user_input == 'sc':
-            secret = input('\t\t\tOwner : ')
+            contract_addr = input('\t\t\tContract Hash : ')
+            a_contract = ContractService.get_contract_by_hash(contract_addr)
+            print('contract hash = ' + a_contract._hash)
+
+            secret = input('\t\t\tSignee : ')
             a_signed_contract = SignedContract('', '', \
                     sc_from_addr='', signed_timestamp=time.time(), \
                     parent_hash='', parent_signature='', parent_owner='', \
                     amount=10, rate=0.2, is_mempool=1, duration=60, \
                     created_timestamp=time.time(), sign_end_timestamp=time.time() + 1000)
-            a_contract = Contract('', '', owner='', amount=10, \
-                    rate=0.2, is_mempool=1, duration=60, \
-                    created_timestamp=time.time(), sign_end_timestamp=time.time() + 1000)
+            #        created_timestamp=time.time(), sign_end_timestamp=time.time() + 1000)
             if secret == 'denys' or secret == 'd':
                 private_key = denys_private_key
             elif secret == 'william' or secret == 'will' or secret == 'w':
@@ -519,14 +525,19 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
                 private_key = naween_private_key
             else:
                 continue
-            a_contract.owner = EcdsaHashing.recover_public_key_str(steven_private_key)
-            a_contract.update_signature(steven_private_key)
-            a_contract.update_hash()
+            # a_contract.owner = EcdsaHashing.recover_public_key_str(steven_private_key)
+            # a_contract.update_signature(steven_private_key)
+            # a_contract.update_hash()
 
             a_signed_contract.from_addr = EcdsaHashing.recover_public_key_str(private_key)
             a_signed_contract.parent_hash = a_contract._hash
             a_signed_contract.parent_signature = a_contract.signature
             a_signed_contract.parent_owner = a_contract.owner
+            a_signed_contract.amount = a_contract.amount
+            a_signed_contract.rate = a_contract.rate
+            a_signed_contract.duration = a_contract.duration
+            a_signed_contract.created_timestamp = a_contract.created_timestamp
+            a_signed_contract.sign_end_timestamp = a_contract.sign_end_timestamp
             a_signed_contract.update_signature(private_key)
             a_signed_contract.update_hash()
             send_a_contract(a_signed_contract, action='contract_signed')
@@ -539,7 +550,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             secret = input('\t\t\tOwner : ')
             a_contract = Contract('', '', owner='', amount=10, \
                     rate=0.2, is_mempool=1, duration=60, \
-                    created_timestamp=time.time(), sign_end_timestamp=time.time() + 1000)
+                    created_timestamp=time.time(), sign_end_timestamp=time.time() + 240000)
             if secret == 'denys' or secret == 'd':
                 private_key = denys_private_key
             elif secret == 'william' or secret == 'will' or secret == 'w':
@@ -562,28 +573,44 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             print('\nContract hash : {}'.format(a_contract._hash))
 
         elif user_input == 'contract transaction' or user_input == 'ct':
-            secret = input('\t\t\tCT from : ')
-            if secret == 'denys' or secret == 'd':
+            rs = redis_service.RedisService()
+            signed_contract_hash = input('\t\t\tSigned Contract Hash : ')
+            signed_contract = SignedContractService.get_signed_contract_by_hash(signed_contract_hash)
+            owner = input('\t\t\tOwner: ')
+
+            to_symbol = input('\t\t\tTo TPS or BTC: ')
+            from_symbol = input('\t\t\tFrom TPS or BTC: ')
+            amount = input('\t\t\tAmount: ')
+
+
+            if owner == 'denys' or owner == 'd':
                 private_key = denys_private_key
-            elif secret == 'william' or secret == 'will' or secret == 'w':
+            elif owner == 'william' or owner == 'will' or owner == 'w':
                 private_key = william_private_key
-            elif secret == 'matt' or secret == 'm':
+            elif owner == 'matt' or owner == 'm':
                 private_key = matt_private_key
-            elif secret == 'steven' or secret == 's':
+            elif owner == 'steven' or owner == 's':
                 private_key = steven_private_key
-            elif secret == 'naween' or secret == 'n':
+            elif owner == 'naween' or owner == 'n':
                 private_key = naween_private_key
             else:
                 continue
-            public_key = EcdsaHashing.recover_public_key_str(private_key)
-            a_contract_transaction = ContractTransaction('', '', public_key, \
-                    'sc_contract_addr', 'BTC', 'TPS', 100, 1, time.time())
-            a_contract_transaction.price = 6000
+            # public_key = EcdsaHashing.recover_public_key_str(private_key)
+            # a_contract_transaction = ContractTransaction('', '', public_key, \
+            #         'sc_contract_addr', 'BTC', 'TPS', 10, 1, time.time())
+            # a_contract_transaction.price = 6000
+            # a_contract_transaction.update_signature(private_key)
+            # a_contract_transaction.update_hash()
+
+            a_contract_transaction = ContractTransaction('', '', signed_contract.parent_owner, signed_contract._hash, to_symbol, from_symbol, amount, 1)
+            r = rs._connect()
+            price = r.zrange('price_stamps', -1, -1, withscores=True)
+            a_contract_transaction.price = float(price[0][0])
             a_contract_transaction.update_signature(private_key)
             a_contract_transaction.update_hash()
             send_a_transaction(a_contract_transaction, action='transaction_contract')
             transaction_lock.acquire()
-            rs = redis_service.RedisService()
+
             rs.store_object(a_contract_transaction)
             transaction_lock.release()
             print('\nContract Transaction hash : {}'.format(a_contract_transaction._hash))

@@ -183,10 +183,12 @@ class BlockService():
         if objects == None:
             block_dal = BlockServiceDal()
             last_block_hash = BlockService.get_last_block_hash()
-            block = self.find_by_hash(last_block_hash)
+            block = block_dal.find_by_hash(last_block_hash)
             objects = block_dal.get_all_objects_up_to_block(block)
 
         balances = {}
+
+        print('------------TRANSACTION PAYOUT------------')
         # Transactions
         transaction_dict = objects.get('transactions', {})
         for transaction_hash in transaction_dict:
@@ -194,11 +196,16 @@ class BlockService():
             balances[transaction.from_addr] = balances.get(transaction.from_addr, 0) - transaction.amount
             balances[transaction.to_addr] = balances.get(transaction.to_addr, 0) + transaction.amount
 
+
+        print('------------POS TRANSACTION PAYOUT------------')
         # Proof of Stake Transactions
         pos_transaction_dict = objects.get('pos_transactions', {})
         for pos_transaction_hash in pos_transaction_dict:
             pos_transaction = pos_transaction_dict.get(pos_transaction_hash)
             balances[pos_transaction.from_addr] = balances.get(pos_transaction.from_addr, 0) - pos_transaction.amount
+
+
+        print('------------SIGNED CONTRACT PAYOUT------------')
 
         # Signed Contracts
         signed_contract_dict = objects.get('signed_contracts', {})
@@ -210,6 +217,8 @@ class BlockService():
             print('sc|| parent:\t' + signed_contract._hash + ": balance:" + str(balances[signed_contract._hash]))
 
 
+
+        print('------------CONTRACT TRANSACTION PAYOUT------------')
         # Contract Transactions
         contract_transaction_dict = objects.get('contract_transactions', {})
 
@@ -280,6 +289,7 @@ class BlockService():
 
         # Terminated Contracts
 
+        print('------------TERMINATED CONTRACT PAYOUT------------')
         term_contract_dict = objects.get('terminated_contracts', {})
 
         for signed_contract_addr in term_contract_dict.keys():
@@ -325,6 +335,7 @@ class BlockService():
         contract_dict = objects.get('contracts', {})
 
         # Owners
+        print('------------MINER PAYOUT------------')
         owners = objects.get('owners', [])
         for owner in owners:
             balances[owner] = balances.get(owner, 0) + 10
