@@ -130,7 +130,7 @@ class SignedContractService:
 
         signed_contracts = list()
         for key in keys:
-            signed_contract = rs.get_object_by_full_key(key)
+            signed_contract = rs.get_object_by_full_key(key, SignedContract)
             signed_contracts.append(signed_contract)
         return signed_contracts
 

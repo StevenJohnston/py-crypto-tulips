@@ -289,6 +289,7 @@ def mine_block(last_block):
         last_block = GenesisBlockService.generate_from_priv(miner_private)
         block_service_dal = dal_service_block_service.BlockService()
         block_service_dal.store_block(last_block)
+        send_a_block(last_block)
 
 
     # check if we are the miner.
@@ -406,10 +407,23 @@ def wallet_callback(wallet_sock):
             signed_contract_signable_json_str = json.dumps(signed_contract_signable_json, sort_keys=True, separators=(',', ':'))
             status = EcdsaHashing.verify_signature_hex(sc.from_addr, sc.signature, signed_contract_signable_json_str)
             if status == True:
-                #ContractService.store_contract(c)
+                contract_lock.acquire()
+                SignedContractService.store_signed_contract(c)
+                contract_lock.release()
                 a_node.connection_manager.server.send_msg(data="Successfully Subscribed", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Cannot Subscribed", client_socket=wallet_sock)
+        #the a list of user inside your contracts
+        elif new_msg.action == "get_all_user_partipation_contract":
+            user_contracts_sub = SignedContractService.get_all_signed_contracts_by_owner(new_msg.data["userPartipication"])
+            json_str_return = build_return_json([("contract_subscription", user_contracts_sub)])
+            a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+            pass
+        #The user contract that they created
+        elif new_msg.action == "get_user_contracts":
+            all_contract = ContractService.get_all_contracts_by_owner(new_msg.data["userPublicKey"])
+            json_str_return = build_return_json([("contract_owned", all_contract)])
+            a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == 'exit':
             break
         else:
@@ -418,6 +432,7 @@ def wallet_callback(wallet_sock):
 
 def parse_contract_filter(contract):
     return contract["type"], contract["startRange"], contract["endRange"]
+
 
 def build_return_json(list_of_pair):
     data = {}

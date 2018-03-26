@@ -71,8 +71,8 @@ class SignedContract(Hashable, Sendable, Signable):
             'parent_hash': self.parent_hash,
             'parent_signature': self.parent_signature,
             'parent_owner': self.parent_owner,
-            'amount': self.amount,
-            'rate': self.rate,
+            'amount': "{0:.8f}".format(self.amount),
+            'rate': "{0:.8f}".format(self.rate),
             'duration': self.duration,
             'created_timestamp': self.created_timestamp,
             'sign_end_timestamp': self.sign_end_timestamp
@@ -108,7 +108,6 @@ class SignedContract(Hashable, Sendable, Signable):
             'sign_end_timestamp': self.sign_end_timestamp,
             '_hash': self._hash
         }
-
     @staticmethod
     def _to_index():
         return ['from_addr', 'parent_hash', 'parent_owner', 'is_mempool', 'signed_contract']
