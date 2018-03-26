@@ -188,5 +188,6 @@ class Miner():
                         return False
                 else:
                     if balance <= 0:
+                        print('insufficient funds on ')
                         return False
         return True

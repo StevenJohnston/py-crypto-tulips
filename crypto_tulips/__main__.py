@@ -242,6 +242,7 @@ def regular_node_callback(data, peer_id=None):
     elif new_msg.action == 'block':
         block_service = BlockService()
         new_block = Block.from_dict(new_msg.data)
+
         bs = dal_service_block_service.BlockService()
 
         need_to_send = False
@@ -288,7 +289,9 @@ def mine_block(last_block):
         print('Creating genisis')
         last_block = GenesisBlockService.generate_from_priv(miner_private)
         block_service_dal = dal_service_block_service.BlockService()
+        block_lock.acquire()
         block_service_dal.store_block(last_block)
+        block_lock.release()
         send_a_block(last_block)
 
 
@@ -309,7 +312,9 @@ def mine_block(last_block):
         # block.update_hash()
         # block_lock.acquire()
         block = Miner.mine_block(miner_private, last_block)
+        block_lock.acquire()
         BlockService.add_block_to_chain(block)
+        block_lock.release()
         print('\nCreated Block hash: ' + block._hash)
         # block_lock.release()
         send_a_block(block)

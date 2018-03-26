@@ -358,12 +358,12 @@ class BlockService():
 
     def get_all_objects_up_to_block(self, block):
         if block:
-            transactions = block.transactions
-            pos_transactions = block.pos_transactions
-            contract_transactions = block.contract_transactions
-            contracts = block.contracts
-            signed_contracts = block.signed_contracts
-            terminated_contracts = block.terminated_contracts
+            transactions = block.transactions.copy()
+            pos_transactions = block.pos_transactions.copy()
+            contract_transactions = block.contract_transactions.copy()
+            contracts = block.contracts.copy()
+            signed_contracts = block.signed_contracts.copy()
+            terminated_contracts = block.terminated_contracts.copy()
             owners = [block.owner]
 
             while block.prev_block:
