@@ -422,13 +422,15 @@ def wallet_callback(wallet_sock):
         #the a list of user inside your contracts
         elif new_msg.action == "get_all_user_partipation_contract":
             user_contracts_sub = SignedContractService.get_all_signed_contracts_by_owner(new_msg.data["userPartipication"])
-            json_str_return = build_return_json([("contract_subscription", user_contracts_sub)])
+            new_user_contracts_sub = [contract.get_sendable() for contract in user_contracts_sub]
+            json_str_return = build_return_json([("contract_subscription", new_user_contracts_sub)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
             pass
         #The user contract that they created
         elif new_msg.action == "get_user_contracts":
             all_contract = ContractService.get_all_contracts_by_owner(new_msg.data["userPublicKey"])
-            json_str_return = build_return_json([("contract_owned", all_contract)])
+            new_contracts = [contract.get_sendable() for contract in all_contract]
+            json_str_return = build_return_json([("contract_owned", new_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == 'exit':
             break
