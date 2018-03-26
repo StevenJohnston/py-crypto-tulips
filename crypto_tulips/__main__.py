@@ -406,12 +406,17 @@ def wallet_callback(wallet_sock):
             signed_contract_signable_json_str = json.dumps(signed_contract_signable_json, sort_keys=True, separators=(',', ':'))
             status = EcdsaHashing.verify_signature_hex(sc.from_addr, sc.signature, signed_contract_signable_json_str)
             if status == True:
-                #ContractService.store_contract(c)
+                contract_lock.acquire()
+                SignedContractService.store_contract(c)
+                contract_lock.release()
                 a_node.connection_manager.server.send_msg(data="Successfully Subscribed", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Cannot Subscribed", client_socket=wallet_sock)
         #the a list of user inside your contracts
         elif new_msg.action == "get_all_user_partipation_contract":
+            user_contracts_sub = SignedContract.get_all_signed_contracts_by_owner(new_msg.data["userPartipication"])
+            json_str_return = build_return_json([("contract_subscription", user_contracts_sub)])
+            a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
             pass
         #The user contract that they created
         elif new_msg.action == "get_user_contracts":
