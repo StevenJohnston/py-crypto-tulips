@@ -34,13 +34,13 @@ from crypto_tulips.miner.miner import Miner
 
 denys_private_key = """4a7351205a7bfaa9726a67cba6f331f1b03ee1e904250f95f81f82e775bb55c1"""
 
-william_private_key = """83c82312b925e50dde81f57f88f2fe1fb8310de1d81e97b696235c6093cd6af8"""
+william_private_key = """2b6220b1d8e00a6a95ab943d906cf7fefc4273f01a9b7d7c32b0527638d264f3"""
 
 matt_private_key = """f5dd743c84ddec77330b5dcf7e1f69a26ec55e0aa4fe504307b83f7850782510"""
 
 steven_private_key = """55a1281dfe6cf404816be8f2bb33813e2cf8ef499fb22e21cb090f8f8563a72a"""
 
-naween_private_key = """418a3147a90f519cd72fb05eb2f201368ee7265f36efb8824e9daed59aabe9e0"""
+naween_private_key = """2276ef4c2368ea0058f9bc73394e4b383f27ff02218968aa4fdc290edda8d803"""
 
 
 transaction_lock = threading.Lock()
@@ -413,8 +413,9 @@ def wallet_callback(wallet_sock):
             status = EcdsaHashing.verify_signature_hex(sc.from_addr, sc.signature, signed_contract_signable_json_str)
             if status == True:
                 contract_lock.acquire()
-                SignedContractService.store_signed_contract(c)
+                SignedContractService.store_signed_contract(sc)
                 contract_lock.release()
+                send_a_contract(sc, action='contract_signed')
                 a_node.connection_manager.server.send_msg(data="Successfully Subscribed", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Cannot Subscribed", client_socket=wallet_sock)
@@ -677,7 +678,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             elif secret == 'naween' or secret == 'n':
                 private_key = naween_private_key
             else:
-                continue
+                private_key = secret
             public_key = EcdsaHashing.recover_public_key_str(private_key)
             to_addr = input('\t\t\tTo addr: ')
             if to_addr == 'denys' or to_addr == 'd':
@@ -691,7 +692,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             elif to_addr == 'naween' or to_addr == 'n':
                 to_addr = EcdsaHashing.recover_public_key_str(naween_private_key)
             else:
-                continue
+                to_addr = EcdsaHashing.recover_public_key_str(to_addr)
             from_addr = public_key
             amount = input('\t\t\tAmount: ')
             new_transaction = Transaction('', '', to_addr, from_addr, amount, 1)
