@@ -29,6 +29,7 @@ from crypto_tulips.dal.objects.contract import Contract
 from crypto_tulips.dal.services.signed_contract_service import SignedContractService, SignedContractFilter
 from crypto_tulips.dal.objects.signed_contract import SignedContract
 from crypto_tulips.services.genesis_block_service import GenesisBlockService
+from crypto_tulips.services.contract_transaction_service import ContractTransactionService
 
 from crypto_tulips.miner.miner import Miner
 
