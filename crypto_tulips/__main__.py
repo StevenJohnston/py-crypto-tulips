@@ -439,6 +439,11 @@ def wallet_callback(wallet_sock):
             price = float(price_time[0][0])
             json_str_return = build_return_json([("bitcoinPrice", str(price))])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+        elif new_msg.action == "get_contract_subscription":
+            scs = SignedContractService.get_all_signed_contracts_by_from_addr(new_msg.data["userPublicKey"])
+            new_contracts = [contract.get_sendable() for contract in scs]
+            json_str_return = build_return_json([("user_contract_subscription", new_contracts)])
+            a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == 'exit':
             break
         else:

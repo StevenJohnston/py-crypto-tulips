@@ -12,7 +12,7 @@ william_private_key = """55a1281dfe6cf404816be8f2bb33813e2cf8ef499fb22e21cb090f8
 
 temp_key = """83c82312b925e50dde81f57f88f2fe1fb8310de1d81e97b696235c6093cd6af8"""
 
-
+nk = "418a3147a90f519cd72fb05eb2f201368ee7265f36efb8824e9daed59aabe9e0"
 denys_private_key = """f5dd743c84ddec77330b5dcf7e1f69a26ec55e0aa4fe504307b83f7850782510"""
 
 if __name__ == '__main__':
@@ -22,6 +22,8 @@ if __name__ == '__main__':
     #Start getting balance, trans history and pending trans
     denys_public_key = EcdsaHashing.recover_public_key_str(denys_private_key)
     william_public_key = EcdsaHashing.recover_public_key_str(temp_key)
+    nkey = EcdsaHashing.recover_public_key_str(nk)
+    print(nkey)
     #william_public_key = '4dc0891733e18601025d2509ea2008661a916078af92237cf4e624ed9aed4419'
     # transaction_msg = message.Message('get_user_info', william_public_key)
     # transaction_json = transaction_msg.to_json(is_object=False)
@@ -97,8 +99,8 @@ if __name__ == '__main__':
         }
     }
 
-    get_all_own_contract = {"action": "get_user_contracts", "data": {
-            "userPublicKey": denys_public_key
+    get_user_contracts = {"action": "get_bitcoin_price", "data": {
+            "userPublicKey": 'f80bb93e5ceb2de5c44d97b8a8f1a7f9778822292acb7642b9b14cab29b7476489c8cd0bff49490332eef64f859a7af2c89fd59dd6262011e2e2e3fb0e42808e'
         }
     }
 
@@ -110,9 +112,9 @@ if __name__ == '__main__':
     # sig = EcdsaHashing.sign_message_hex(contract_signable_json_str, temp_key)
     # print(sig)
     # transaction_json = json.dumps(contract_test, sort_keys=True)
-    #p2p.send_msg(transaction_json)
+   # p2p.send_msg(transaction_json)
 
-    contract_json = json.dumps(get_all_own_contract, sort_keys=True)
+    contract_json = json.dumps(get_user_contracts, sort_keys=True)
     p2p.send_msg(contract_json)
     # data = p2p.recv_msg()
     #print(data)
