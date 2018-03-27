@@ -18,12 +18,13 @@ class Exchange(threading.Thread):
         websocket.enableTrace(False)
         
     def run(self):
-        ws = websocket.WebSocketApp(self.WEBSOCKET_URL,
+        self.ws = websocket.WebSocketApp(self.WEBSOCKET_URL,
                                 on_message = self.on_message,
                                 on_error = self.on_error,
                                 on_close = self.on_close)
-        ws.on_open = self.on_open
-        ws.run_forever()
+        self.ws.on_open = self.on_open
+        self.ws.run_forever()
+        self.ws.keep_running = True
 
     def on_trade(self, data):
         return self.trade_pricestamp_adaptor(data)
@@ -42,4 +43,6 @@ class Exchange(threading.Thread):
 
     def on_open(self, ws):
         ws.send(self.SUBSCRIBE_TRADES)
+    def stop(self):
+        self.ws.close()
 

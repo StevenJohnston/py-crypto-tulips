@@ -50,6 +50,8 @@ contract_lock = threading.Lock()
 miner_private = steven_private_key
 
 new_block_callbacks = []
+
+kill_threads = False
 def check_if_object_exist(obj_hash, obj_type):
     rs = redis_service.RedisService()
     obj = rs.get_object_by_hash(obj_hash=obj_hash, obj=obj_type)
@@ -58,6 +60,9 @@ def check_if_object_exist(obj_hash, obj_type):
     return True
 
 def regular_node_callback(data, peer_id=None):
+    global kill_threads
+    if kill_threads:
+        return
     do_block_resend = True
     do_transaction_resend = True
     do_contract_resend = True
@@ -283,6 +288,9 @@ def run_miner():
     mine_block(last_block)
 
 def mine_block(last_block):
+    global kill_threads
+    if kill_threads:
+        return
     if last_block:
         print('mining off last block ' + last_block._hash)
     else:
@@ -498,10 +506,13 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
     a_node.make_silent(True)
     # need to have a way to shut it down
     # right now when trying to exit this just hangs
-    ExchangeManager()
+    exchange_manager = ExchangeManager()
     while True:
         user_input = input('\t\t\tEnter a command: ')
         if user_input == 'quit' or user_input == 'q':
+            global kill_threads
+            kill_threads = True
+            exchange_manager.stop()
             break
         elif user_input == 'height':
             print('Blocks {}'.format(BlockService.get_max_height()))

@@ -4,6 +4,9 @@ import time
 from .bitfinex import Bitfinex
 
 class ExchangeManager:
+    def stop(self):
+        for exchange in self.exchanges:
+            exchange.stop()
     def __init__(self):
         self.exchanges = [
             Bitfinex()
