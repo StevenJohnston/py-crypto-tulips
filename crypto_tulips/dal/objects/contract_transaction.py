@@ -45,16 +45,16 @@ class ContractTransaction(BaseTransaction):
         return index
 
 
-def get_signable(self):
-        return {
-            'from_addr': self.from_addr,
-            'signed_contract_addr': self.signed_contract_addr,
-            'to_symbol': self.to_symbol,
-            'from_symbol': self.from_symbol,
-            'price': "{0:.8f}".format(self.price),
-            'amount': "{0:.8f}".format(self.amount),
-            'timestamp': self.timestamp
-        }
+    def get_signable(self):
+            return {
+                'from_addr': self.from_addr,
+                'signed_contract_addr': self.signed_contract_addr,
+                'to_symbol': self.to_symbol,
+                'from_symbol': self.from_symbol,
+                'price': "{0:.8f}".format(self.price),
+                'amount': "{0:.8f}".format(self.amount),
+                'timestamp': self.timestamp
+            }
 
     def get_hashable(self):
         return {
