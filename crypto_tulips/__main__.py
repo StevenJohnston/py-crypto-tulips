@@ -458,7 +458,7 @@ def wallet_callback(wallet_sock):
             all_contract = ContractService.get_all_contracts_by_owner(new_msg.data["userPublicKey"])
             all_contracts_str = [contract.get_sendable() for contract in all_contract]
             #signed contract
-            signed_contracts_sub = SignedContractService.get_all_signed_contracts_by_owner(new_msg.data["userPartipication"])
+            signed_contracts_sub = SignedContractService.get_all_signed_contracts_by_owner(new_msg.data["userPublicKey"])
             signed_contracts_sub_str = [contract.get_sendable() for contract in signed_contracts_sub]
             #history
             contract_transaction_history = ContractTransactionService.get_contract_transactions_from_public_key(new_msg.data["userPublicKey"], False)
