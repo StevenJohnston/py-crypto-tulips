@@ -50,7 +50,7 @@ contract_lock = threading.Lock()
 miner_private = steven_private_key
 
 new_block_callbacks = []
-
+block_mine_thread = None
 kill_threads = False
 def check_if_object_exist(obj_hash, obj_type):
     rs = redis_service.RedisService()
@@ -326,8 +326,9 @@ def mine_block(last_block):
         print('\nCreated Block hash: ' + block._hash)
         # block_lock.release()
         send_a_block(block)
-        start_next_block = threading.Timer(30, mine_block, [block])
-        start_next_block.start()
+        global block_mine_thread
+        block_mine_thread = threading.Timer(30, mine_block, [block])
+        block_mine_thread.start()
 
 def send_a_block(new_block, action='block', block_target_peer_id=None):
     block_msg = message.Message(action, new_block)
@@ -511,8 +512,10 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
         user_input = input('\t\t\tEnter a command: ')
         if user_input == 'quit' or user_input == 'q':
             global kill_threads
+            global block_mine_thread
             kill_threads = True
             exchange_manager.stop()
+            block_mine_thread.cancel()
             break
         elif user_input == 'height':
             print('Blocks {}'.format(BlockService.get_max_height()))
