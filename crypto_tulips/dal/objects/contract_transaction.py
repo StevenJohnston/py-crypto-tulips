@@ -13,11 +13,12 @@ class ContractTransaction(BaseTransaction):
     from_symbol = ''
     price = ''
 
-    def __init__(self, contract_transaction_hash, signature, from_addr, signed_contract_addr, to_symbol, from_symbol, amount, is_mempool, timestamp = time.time()):
+    def __init__(self, contract_transaction_hash, signature, from_addr, signed_contract_addr, to_symbol, from_symbol, amount, is_mempool, btc_price, timestamp = time.time()):
         BaseTransaction.__init__(self, contract_transaction_hash, signature, from_addr, amount, is_mempool, timestamp)
         self.signed_contract_addr = signed_contract_addr
         self.to_symbol = to_symbol
         self.from_symbol = from_symbol
+        self.price = btc_price
 
     @staticmethod
     def from_dict(dict_values):
@@ -44,12 +45,13 @@ class ContractTransaction(BaseTransaction):
         return index
 
 
-    def get_signable(self):
+def get_signable(self):
         return {
             'from_addr': self.from_addr,
             'signed_contract_addr': self.signed_contract_addr,
             'to_symbol': self.to_symbol,
             'from_symbol': self.from_symbol,
+            'price': "{0:.8f}".format(self.price),
             'amount': "{0:.8f}".format(self.amount),
             'timestamp': self.timestamp
         }
