@@ -99,8 +99,8 @@ if __name__ == '__main__':
         }
     }
 
-    get_user_contracts = {"action": "get_bitcoin_price", "data": {
-            "userPublicKey": 'f80bb93e5ceb2de5c44d97b8a8f1a7f9778822292acb7642b9b14cab29b7476489c8cd0bff49490332eef64f859a7af2c89fd59dd6262011e2e2e3fb0e42808e'
+    get_user_contracts = {"action": "get_contracts_and_signed_contract_info", "data": {
+            "userPublicKey": 'tc_william'
         }
     }
 

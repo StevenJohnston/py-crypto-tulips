@@ -453,6 +453,19 @@ def wallet_callback(wallet_sock):
             new_contracts = [contract.get_sendable() for contract in scs]
             json_str_return = build_return_json([("user_contract_subscription", new_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+        elif new_msg.action == "get_contracts_and_signed_contract_info":
+            #all contract owned
+            all_contract = ContractService.get_all_contracts_by_owner(new_msg.data["userPublicKey"])
+            all_contracts_str = [contract.get_sendable() for contract in all_contract]
+            #signed contract
+            signed_contracts_sub = SignedContractService.get_all_signed_contracts_by_owner(new_msg.data["userPartipication"])
+            signed_contracts_sub_str = [contract.get_sendable() for contract in signed_contracts_sub]
+            #history
+            contract_transaction_history = ContractTransactionService.get_contract_transactions_from_public_key(new_msg.data["userPublicKey"], False)
+            contract_transaction_history_str = [contract.get_sendable() for contract in contract_transaction_history]
+            json_str_return = build_return_json([("contract_owned", all_contracts_str), ("contract_subscription", signed_contracts_sub_str), ("transaction_history", contract_transaction_history_str)])
+            a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+            pass
         elif new_msg.action == 'exit':
             break
         else:
