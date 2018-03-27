@@ -28,12 +28,12 @@ class ContractTransactionService(BaseObjectService):
         return super(ContractTransactionService, ContractTransactionService).get_objects_from_public_key(public_key, include_mempool, ContractTransaction)
 
     @staticmethod
-    def get_contract_transactions_for_contract_address(contract_address, include_mempool):
+    def get_contract_transactions_for_signed_contract_address(signed_contract_address, include_mempool):
         """
         Get all contract transactions by a given contract address.
 
         Arguments:
-        contract_address    -- public key of contract
+        signed_contract_address    -- public key of contract
         include_mempool     -- True if want results in the mempool, False otherwise
 
         Returns:
@@ -41,7 +41,7 @@ class ContractTransactionService(BaseObjectService):
         """
         rs = RedisService()
         r = rs._connect()
-        address_set = 'contract_transaction:contract_addr:' + contract_address
+        address_set = 'contract_transaction:signed_contract_addr:' + signed_contract_address
         mempool_set = 'contract_transaction:is_mempool:1'
 
         contract_t_keys = list()
