@@ -6,7 +6,6 @@ import redis
 
 
 class Bitfinex(Exchange):
-
     WEBSOCKET_URL = "wss://api.bitfinex.com/ws/2"
     REST_URL = None
     SUBSCRIBE_TRADES = json.dumps({
