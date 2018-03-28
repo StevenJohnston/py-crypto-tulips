@@ -13,11 +13,12 @@ class ContractTransaction(BaseTransaction):
     from_symbol = ''
     price = ''
 
-    def __init__(self, contract_transaction_hash, signature, from_addr, signed_contract_addr, to_symbol, from_symbol, amount, is_mempool, timestamp = time.time()):
+    def __init__(self, contract_transaction_hash, signature, from_addr, signed_contract_addr, to_symbol, from_symbol, amount, price, is_mempool, timestamp = time.time()):
         BaseTransaction.__init__(self, contract_transaction_hash, signature, from_addr, amount, is_mempool, timestamp)
         self.signed_contract_addr = signed_contract_addr
         self.to_symbol = to_symbol
         self.from_symbol = from_symbol
+        self.price = float(price)
 
     @staticmethod
     def from_dict(dict_values):
@@ -32,8 +33,7 @@ class ContractTransaction(BaseTransaction):
         timestamp = dict_values.get('timestamp')
         signature = dict_values.get('signature')
         new_ct = ContractTransaction(contract_transaction_hash, signature, from_addr, \
-                signed_contract_addr, to_symbol, from_symbol, amount, is_mempool, timestamp)
-        new_ct.price = float(price)
+                signed_contract_addr, to_symbol, from_symbol, amount, price, is_mempool, timestamp)
         return new_ct
 
     @staticmethod
@@ -50,6 +50,7 @@ class ContractTransaction(BaseTransaction):
             'signed_contract_addr': self.signed_contract_addr,
             'to_symbol': self.to_symbol,
             'from_symbol': self.from_symbol,
+            'price': "{0:.8f}".format(self.amount),
             'amount': "{0:.8f}".format(self.amount),
             'timestamp': self.timestamp
         }

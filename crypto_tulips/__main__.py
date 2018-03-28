@@ -664,11 +664,10 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
             # a_contract_transaction.price = 6000
             # a_contract_transaction.update_signature(private_key)
             # a_contract_transaction.update_hash()
-
-            a_contract_transaction = ContractTransaction('', '', signed_contract.parent_owner, signed_contract._hash, to_symbol, from_symbol, amount, 1)
             r = rs._connect()
-            price = r.zrange('price_stamps', -1, -1, withscores=True)
-            a_contract_transaction.price = float(price[0][0])
+            time_price = r.zrange('price_stamps', -1, -1, withscores=True)
+            price = float(time_price[0][0])
+            a_contract_transaction = ContractTransaction('', '', signed_contract.parent_owner, signed_contract._hash, to_symbol, from_symbol, amount, price, 1)
             a_contract_transaction.update_signature(private_key)
             a_contract_transaction.update_hash()
             send_a_transaction(a_contract_transaction, action='transaction_contract')
