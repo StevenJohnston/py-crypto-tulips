@@ -455,6 +455,7 @@ def wallet_callback(wallet_sock):
             json_str_return = build_return_json([("user_contract_subscription", new_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == "get_contracts_and_signed_contract_info":
+            # TODO BALANCE HERE
             #all contract owned
             all_contract = ContractService.get_all_contracts_by_owner(new_msg.data["userPublicKey"])
             all_contracts_str = [contract.get_sendable() for contract in all_contract]
@@ -468,7 +469,7 @@ def wallet_callback(wallet_sock):
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == "get_signed_by_contract_hash":
             # signed contracts
-            signed_contracts = SignedContractService.get_all_signed_contracts_by_owner(new_msg.data['_hash'])
+            signed_contracts = SignedContractService.get_all_signed_contracts_by_contract_hash(new_msg.data['_hash'])
             signed_contracts_str = [sc.get_sendable() for sc in signed_contracts]
             # contract
             contract = ContractService.get_contract_by_hash(new_msg.data['_hash'])

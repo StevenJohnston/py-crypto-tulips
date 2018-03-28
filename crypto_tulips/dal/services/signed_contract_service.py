@@ -161,6 +161,20 @@ class SignedContractService:
             signed_contracts.append(signed_contract)
         return signed_contracts
 
+
+    @staticmethod
+    def get_all_signed_contracts_by_contract_hash(contract_hash):
+        rs = RedisService()
+        r = rs._connect()
+
+        keys = r.smembers('signed_contract:parent_hash:' + contract_hash)
+        signed_contracts = []
+        for key in keys:
+            signed_contract = SignedContractService.get_signed_contract_by_full_key(key)
+            signed_contracts.append(signed_contract)
+        return signed_contracts
+
+
     @staticmethod
     def get_all_signed_contracts_by_from_addr(from_addr):
         rs = RedisService()
