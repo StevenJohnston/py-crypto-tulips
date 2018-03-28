@@ -50,7 +50,7 @@ class ContractTransaction(BaseTransaction):
             'signed_contract_addr': self.signed_contract_addr,
             'to_symbol': self.to_symbol,
             'from_symbol': self.from_symbol,
-            'price': "{0:.8f}".format(self.amount),
+            'price': "{0:.8f}".format(self.price),
             'amount': "{0:.8f}".format(self.amount),
             'timestamp': self.timestamp
         }
