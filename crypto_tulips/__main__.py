@@ -469,11 +469,10 @@ def wallet_callback(wallet_sock):
             for signed_contract in signed_contracts_sub:
                 b = balances.get(signed_contract._hash, (0,0))
                 new_dict[signed_contract._hash] = b
-            balance_list_str = json.dumps(new_dict)
             #history
             contract_transaction_history = ContractTransactionService.get_contract_transactions_from_public_key(new_msg.data["userPublicKey"], False)
             contract_transaction_history_str = [contract.get_sendable() for contract in contract_transaction_history]
-            json_str_return = build_return_json([("contract_owned", all_contracts_str), ("contract_subscription", signed_contracts_sub_str), ("transaction_history", contract_transaction_history_str), ('balances', balance_list_str)])
+            json_str_return = build_return_json([("contract_owned", all_contracts_str), ("contract_subscription", signed_contracts_sub_str), ("transaction_history", contract_transaction_history_str), ('balances', new_dict)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == "get_signed_by_contract_hash":
             # signed contracts
