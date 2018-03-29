@@ -281,7 +281,7 @@ class BlockService():
                                 # sell contract is used up, buy contract is not
                                 profit = contract_transaction.price / unspent_ct.price * amount_remaining
                                 print('\t\t' + str(contract_transaction.price) + "/" + str(unspent_ct.price) + "*" + str(amount_remaining) + "=" + str(profit))
-                                balances[contract_transaction.signed_contract_addr] += (balances[contract_transaction.signed_contract_addr][0] + profit, balances[contract_transaction.signed_contract_addr][1] - amount_remaining)
+                                balances[contract_transaction.signed_contract_addr] = (balances[contract_transaction.signed_contract_addr][0] + profit, balances[contract_transaction.signed_contract_addr][1] - amount_remaining)
                                 print('\t\t' + contract_transaction.signed_contract_addr + ' amount: ' + str(balances.get(contract_transaction.signed_contract_addr)) + ' (added: ' + str(profit) + ")")
                                 unspent_ct.amount -= amount_remaining
                                 amount_remaining = 0
@@ -328,7 +328,7 @@ class BlockService():
                 print('-----' + signed_contract.parent_owner + ' amount: ' + str(balances.get(signed_contract.parent_owner)) + ' (added: ' + str(contract_owner_profit) + ")")
                 balances[signed_contract.from_addr] = balances.get(signed_contract.from_addr, 0) + from_addr_profit
                 print('-----' + signed_contract.from_addr + ' amount: ' + str(balances.get(signed_contract.from_addr)) + ' (added: ' + str(from_addr_profit) + ")")
-                balances[signed_contract._hash] = 0
+                balances[signed_contract._hash] = (0, 0)
 
 
         # Contracts

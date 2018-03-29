@@ -348,7 +348,9 @@ def wallet_callback(wallet_sock):
         if new_msg.action == 'get_user_info':
             pending = []
             transaction = []
-            user_trans_history, user_balance = TransactionService.get_transactions_by_public_key(new_msg.data, True)
+            user_trans_history, transaction_balance = TransactionService.get_transactions_by_public_key(new_msg.data, True)
+            balances = BlockService.get_all_balances()
+            user_balance = balances[new_msg.data]
             for trans in user_trans_history:
                 if(trans.is_mempool == 1):
                     pending.append(trans.get_sendable())
@@ -455,17 +457,23 @@ def wallet_callback(wallet_sock):
             json_str_return = build_return_json([("user_contract_subscription", new_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == "get_contracts_and_signed_contract_info":
-            # TODO BALANCE HERE
+            balances = BlockService.get_all_balances()
             #all contract owned
             all_contract = ContractService.get_all_contracts_by_owner(new_msg.data["userPublicKey"])
             all_contracts_str = [contract.get_sendable() for contract in all_contract]
             #signed contract
             signed_contracts_sub = SignedContractService.get_all_signed_contracts_by_owner(new_msg.data["userPublicKey"])
             signed_contracts_sub_str = [contract.get_sendable() for contract in signed_contracts_sub]
+            # balances
+            new_dict = {}
+            for signed_contract in signed_contracts_sub:
+                b = balances.get(signed_contract._hash, (0,0))
+                new_dict[signed_contract._hash] = b
+            balance_list_str = json.dumps(new_dict)
             #history
             contract_transaction_history = ContractTransactionService.get_contract_transactions_from_public_key(new_msg.data["userPublicKey"], False)
             contract_transaction_history_str = [contract.get_sendable() for contract in contract_transaction_history]
-            json_str_return = build_return_json([("contract_owned", all_contracts_str), ("contract_subscription", signed_contracts_sub_str), ("transaction_history", contract_transaction_history_str)])
+            json_str_return = build_return_json([("contract_owned", all_contracts_str), ("contract_subscription", signed_contracts_sub_str), ("transaction_history", contract_transaction_history_str), ('balances', balance_list_str)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == "get_signed_by_contract_hash":
             # signed contracts
