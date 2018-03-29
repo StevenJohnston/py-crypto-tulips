@@ -449,7 +449,8 @@ def wallet_callback(wallet_sock):
             r = rs._connect()
             price_time = r.zrange('price_stamps', -1, -1, withscores=True)
             price = float(price_time[0][0])
-            json_str_return = build_return_json([("bitcoinPrice", str(price))])
+            height = BlockService.get_max_height()
+            json_str_return = build_return_json([("bitcoinPrice", str(price)), ("height", str(height))])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
         elif new_msg.action == "get_contract_subscription":
             scs = SignedContractService.get_all_signed_contracts_by_from_addr(new_msg.data["userPublicKey"])
