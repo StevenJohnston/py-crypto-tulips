@@ -332,6 +332,7 @@ class ConnectionManager:
                     peer.make_timestamp()
                     a_thread = threading.Thread(target=callback, args=(recv_data, peer.peer_id))
                     a_thread.start()
+                    a_thread.join()
         self.print_check('Ended a recv msg client thread, run is {}'.format(self.run))
 
     def recv_msg_server(self, peer, callback):
@@ -358,6 +359,7 @@ class ConnectionManager:
                     peer.make_timestamp()
                     a_thread = threading.Thread(target=callback, args=(recv_data, peer.peer_id))
                     a_thread.start()
+                    a_thread.join()
         self.print_check('Ended a recv msg server thread, run is {}'.format(self.run))
 
     def close_peer(self, peer, remove_peer=True):
