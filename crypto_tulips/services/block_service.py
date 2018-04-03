@@ -335,10 +335,10 @@ class BlockService():
         contract_dict = objects.get('contracts', {})
 
         # Owners
-        print('------------MINER PAYOUT------------')
+        # print('------------MINER PAYOUT------------')
         owners = objects.get('owners', [])
         for owner in owners:
             balances[owner] = balances.get(owner, 0) + 10
-            print('owner: ' + owner + ' amount: ' + str(balances[owner]) + ' (added: 10)')
+            # print('owner: ' + owner + ' amount: ' + str(balances[owner]) + ' (added: 10)')
 
         return balances

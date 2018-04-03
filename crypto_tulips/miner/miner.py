@@ -184,10 +184,10 @@ class Miner():
             balance = balances[key]
             if key != '':
                 if type(balance) is tuple:
-                    if balance[0] <= 0 or balance[1] <= 0:
+                    if balance[0] < 0 or balance[1] < 0:
                         return False
                 else:
-                    if balance <= 0:
-                        print('insufficient funds on ')
+                    if balance < 0:
+                        print('insufficient funds on {}'.format(key))
                         return False
         return True
