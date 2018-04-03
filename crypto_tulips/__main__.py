@@ -384,9 +384,9 @@ def wallet_callback(wallet_sock):
                 rs.store_object(ctx)
                 transaction_lock.release()
                 send_a_transaction(ctx)
-                a_node.connection_manager.server.send_msg(data="Transaction Successful", client_socket=wallet_sock)
+                a_node.connection_manager.server.send_msg(data="Contract Transaction Successful", client_socket=wallet_sock)
             else:
-                a_node.connection_manager.server.send_msg(data="Transaction Failed", client_socket=wallet_sock)
+                a_node.connection_manager.server.send_msg(data="Contract Transaction Failed", client_socket=wallet_sock)
         elif new_msg.action == "get_all_ip":
             node_obj_list = a_node.connection_manager.peer_list
             ip_list = [node.get_ip_address() for node in node_obj_list]
