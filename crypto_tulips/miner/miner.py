@@ -29,7 +29,7 @@ class Miner():
         transactions = BaseObjectService.get_all_mempool_objects(Transaction)
         transactions_to_add = []
         for transaction in transactions:
-            if len(transactions_to_add) == 10:
+            if len(transactions_to_add) == 100:
                 break
             valid, balances = Miner.validate_transaction(balances, transaction)
             if valid:
@@ -56,7 +56,7 @@ class Miner():
         contracts = BaseObjectService.get_all_mempool_objects(Contract)
         contracts_to_add = []
         for contract in contracts:
-            if len(contracts_to_add) == 10:
+            if len(contracts_to_add) == 20:
                 break
             valid, balances = Miner.validate_contract(balances, contract)
             if valid:
@@ -66,7 +66,7 @@ class Miner():
         signed_contracts_to_add = []
         for signed_contract in signed_contracts:
             print('signed_contract:' + signed_contract._hash)
-            if len(signed_contracts_to_add) == 10:
+            if len(signed_contracts_to_add) == 20:
                 break
             valid, balances = Miner.validate_signed_contract(balances, signed_contract)
             if valid:

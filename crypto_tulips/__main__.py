@@ -357,8 +357,9 @@ def wallet_callback(wallet_sock):
                 else:
                     transaction.append(trans.get_sendable())
             string_user_info_json = build_return_json([("pending", pending), ("transaction", transaction), ("amount", user_balance)])
-            print(string_user_info_json)
+            #print(string_user_info_json)
             a_node.connection_manager.server.send_msg(data=string_user_info_json, client_socket=wallet_sock)
+            a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
         elif new_msg.action == 'send_tx':
             t = Transaction.from_dict(new_msg.data)
             trans_signable = t.get_signable()
@@ -373,6 +374,7 @@ def wallet_callback(wallet_sock):
                 a_node.connection_manager.server.send_msg(data="Transaction Successful", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Transaction Failed", client_socket=wallet_sock)
+            a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
         elif new_msg.action == 'send_ctx':
             ctx = ContractTransaction.from_dict(new_msg.data)
             trans_signable = ctx.get_signable()
@@ -385,6 +387,7 @@ def wallet_callback(wallet_sock):
                 transaction_lock.release()
                 send_a_transaction(ctx)
                 a_node.connection_manager.server.send_msg(data="Contract Transaction Successful", client_socket=wallet_sock)
+                a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Contract Transaction Failed", client_socket=wallet_sock)
         elif new_msg.action == "get_all_ip":
@@ -393,18 +396,21 @@ def wallet_callback(wallet_sock):
             json_ip_list_str_return = build_return_json([("ipaddress_list", ip_list)])
             print(json_ip_list_str_return)
             a_node.connection_manager.server.send_msg(data=json_ip_list_str_return, client_socket=wallet_sock)
+            a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
         elif new_msg.action == "get_contracts":
             contracts_filter = get_contracts_list(new_msg.data)
             contracts = ContractService.get_contracts_by_filter(contracts_filter, False)
             new_contracts = [contract.get_sendable() for contract in contracts]
             json_str_return = build_return_json([("available_contracts", new_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+            a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
         elif new_msg.action == "get_signed_contracts":
             signed_contracts_filter = get_contracts_list(new_msg.data, contract_type=2)
             signed_contracts = SignedContractService.get_signed_contracts_by_filter(signed_contracts_filter, False)
             new_signed_contracts = [contract.get_sendable() for contract in signed_contracts]
             json_str_return = build_return_json([("signed_contracts", new_signed_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+            a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
         elif new_msg.action == "publish_contract":
             c = Contract.from_dict(new_msg.data)
             contract_signable_json = c.get_signable()
@@ -416,6 +422,7 @@ def wallet_callback(wallet_sock):
                 contract_lock.release()
                 send_a_contract(c)
                 a_node.connection_manager.server.send_msg(data="Contract Successfully Created", client_socket=wallet_sock)
+                a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Contract Cannot be created", client_socket=wallet_sock)
         elif new_msg.action == "subscribe_to_contract":
@@ -429,6 +436,7 @@ def wallet_callback(wallet_sock):
                 contract_lock.release()
                 send_a_contract(sc, action='contract_signed')
                 a_node.connection_manager.server.send_msg(data="Successfully Subscribed", client_socket=wallet_sock)
+                a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
             else:
                 a_node.connection_manager.server.send_msg(data="Cannot Subscribed", client_socket=wallet_sock)
         #the a list of user inside your contracts
@@ -437,6 +445,7 @@ def wallet_callback(wallet_sock):
             new_user_contracts_sub = [contract.get_sendable() for contract in user_contracts_sub]
             json_str_return = build_return_json([("contract_subscription", new_user_contracts_sub)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+            a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
             pass
         #The user contract that they created
         elif new_msg.action == "get_user_contracts":
@@ -444,6 +453,7 @@ def wallet_callback(wallet_sock):
             new_contracts = [contract.get_sendable() for contract in all_contract]
             json_str_return = build_return_json([("contract_owned", new_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+            a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
         elif new_msg.action == "get_bitcoin_price":
             rs = redis_service.RedisService()
             r = rs._connect()
@@ -452,11 +462,13 @@ def wallet_callback(wallet_sock):
             height = BlockService.get_max_height()
             json_str_return = build_return_json([("bitcoinPrice", str(price)), ("height", str(height))])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+            a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
         elif new_msg.action == "get_contract_subscription":
             scs = SignedContractService.get_all_signed_contracts_by_from_addr(new_msg.data["userPublicKey"])
             new_contracts = [contract.get_sendable() for contract in scs]
             json_str_return = build_return_json([("user_contract_subscription", new_contracts)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+            a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
         elif new_msg.action == "get_contracts_and_signed_contract_info":
             balances = BlockService.get_all_balances()
             #all contract owned
@@ -475,6 +487,7 @@ def wallet_callback(wallet_sock):
             contract_transaction_history_str = [contract.get_sendable() for contract in contract_transaction_history]
             json_str_return = build_return_json([("contract_owned", all_contracts_str), ("contract_subscription", signed_contracts_sub_str), ("transaction_history", contract_transaction_history_str), ('balances', new_dict)])
             a_node.connection_manager.server.send_msg(data=json_str_return, client_socket=wallet_sock)
+            a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
         elif new_msg.action == "get_signed_by_contract_hash":
             # signed contracts
             signed_contracts = SignedContractService.get_all_signed_contracts_by_contract_hash(new_msg.data['_hash'])
@@ -485,8 +498,7 @@ def wallet_callback(wallet_sock):
 
             json_str = build_return_json([('contract', contract_str), ('signed_contracts', signed_contracts_str)])
             a_node.connection_manager.server.send_msg(data=json_str, client_socket=wallet_sock)
-
-
+            a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
         elif new_msg.action == 'exit':
             break
         else:
