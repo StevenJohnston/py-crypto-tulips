@@ -557,226 +557,258 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
     while True:
         user_input = input('\t\t\tEnter a command: ')
         if user_input == 'quit' or user_input == 'q':
-            global kill_threads
-            global block_mine_thread
-            kill_threads = True
-            exchange_manager.stop()
-            block_mine_thread.cancel()
+            try:
+                global kill_threads
+                global block_mine_thread
+                kill_threads = True
+                exchange_manager.stop()
+                if block_mine_thread is not None:
+                    block_mine_thread.cancel()
+            except Exception as ex:
+                print('Error during quick, {}'.format(str(ex)))
             break
         elif user_input == 'height':
-            print('Blocks {}'.format(BlockService.get_max_height()))
-            print('Mem Transactions {}'.format(len(TransactionService.get_all_mempool_transactions())))
-            print('Mem POS Transactions {}'.format(len(BaseObjectService.get_all_mempool_objects(PosTransaction))))
-            print('Mem Contract Transactions {}'.format(len(BaseObjectService.get_all_mempool_objects(ContractTransaction))))
-            print('Mem Contracts {}'.format(len(BaseObjectService.get_all_mempool_objects(Contract))))
-            print('Mem Signed Contracts {}'.format(len(BaseObjectService.get_all_mempool_objects(SignedContract))))
+            try:
+                print('Blocks {}'.format(BlockService.get_max_height()))
+                print('Mem Transactions {}'.format(len(TransactionService.get_all_mempool_transactions())))
+                print('Mem POS Transactions {}'.format(len(BaseObjectService.get_all_mempool_objects(PosTransaction))))
+                print('Mem Contract Transactions {}'.format(len(BaseObjectService.get_all_mempool_objects(ContractTransaction))))
+                print('Mem Contracts {}'.format(len(BaseObjectService.get_all_mempool_objects(Contract))))
+                print('Mem Signed Contracts {}'.format(len(BaseObjectService.get_all_mempool_objects(SignedContract))))
+            except Exception as ex:
+                print('Error during height calculation, {}'.format(str(ex)))
         elif user_input == 'test':
             pass
         elif user_input == 'who':
             print('Current miner is {}'.format(miner_private))
         elif user_input == 'miner' or user_input == 'm':
-            run_miner()
+            try:
+                run_miner()
+            except Exception as ex:
+                print('Error during starting miner, {}'.format(str(ex)))
         elif user_input == 'priv' or user_input == 'p':
-            secret = input('\t\t\tNew miner : ')
-            if secret == 'denys' or secret == 'd':
-                private_key = denys_private_key
-            elif secret == 'william' or secret == 'will' or secret == 'w':
-                private_key = william_private_key
-            elif secret == 'matt' or secret == 'm':
-                private_key = matt_private_key
-            elif secret == 'steven' or secret == 's':
-                private_key = steven_private_key
-            elif secret == 'naween' or secret == 'n':
-                private_key = naween_private_key
-            else:
-                private_key = secret
-            miner_private = private_key
+            try:
+                secret = input('\t\t\tNew miner : ')
+                if secret == 'denys' or secret == 'd':
+                    private_key = denys_private_key
+                elif secret == 'william' or secret == 'will' or secret == 'w':
+                    private_key = william_private_key
+                elif secret == 'matt' or secret == 'm':
+                    private_key = matt_private_key
+                elif secret == 'steven' or secret == 's':
+                    private_key = steven_private_key
+                elif secret == 'naween' or secret == 'n':
+                    private_key = naween_private_key
+                else:
+                    private_key = secret
+                miner_private = private_key
+            except Exception as ex:
+                print("Error during miner's private key change, {}".format(str(ex)))
 
         elif user_input == 'balances' or user_input == 'b':
-            balances = BlockService.get_all_balances()
-            print(balances)
+            try:
+                balances = BlockService.get_all_balances()
+                print(balances)
+            except Exception as ex:
+                print('Error during balance calculation, {}'.format(str(ex)))
 
         elif user_input == 'signed contract' or user_input == 'sc':
-            contract_addr = input('\t\t\tContract Hash : ')
-            a_contract = ContractService.get_contract_by_hash(contract_addr)
-            print('contract hash = ' + a_contract._hash)
-
-            secret = input('\t\t\tSignee : ')
-            a_signed_contract = SignedContract('', '', \
-                    sc_from_addr='', signed_timestamp=time.time(), \
-                    parent_hash='', parent_signature='', parent_owner='', \
-                    amount=10, rate=0.2, is_mempool=1, duration=60, \
-                    created_timestamp=time.time(), sign_end_timestamp=time.time() + 1000)
-            #        created_timestamp=time.time(), sign_end_timestamp=time.time() + 1000)
-            if secret == 'denys' or secret == 'd':
-                private_key = denys_private_key
-            elif secret == 'william' or secret == 'will' or secret == 'w':
-                private_key = william_private_key
-            elif secret == 'matt' or secret == 'm':
-                private_key = matt_private_key
-            elif secret == 'steven' or secret == 's':
-                private_key = steven_private_key
-            elif secret == 'naween' or secret == 'n':
-                private_key = naween_private_key
-            else:
-                continue
+            try:
+                contract_addr = input('\t\t\tContract Hash : ')
+                a_contract = ContractService.get_contract_by_hash(contract_addr)
+                print('contract hash = ' + a_contract._hash)
+                
+                secret = input('\t\t\tSignee : ')
+                a_signed_contract = SignedContract('', '', \
+                        sc_from_addr='', signed_timestamp=time.time(), \
+                        parent_hash='', parent_signature='', parent_owner='', \
+                        amount=10, rate=0.2, is_mempool=1, duration=60, \
+                        created_timestamp=time.time(), sign_end_timestamp=time.time() + 1000)
+                #        created_timestamp=time.time(), sign_end_timestamp=time.time() + 1000)
+                if secret == 'denys' or secret == 'd':
+                    private_key = denys_private_key
+                elif secret == 'william' or secret == 'will' or secret == 'w':
+                    private_key = william_private_key
+                elif secret == 'matt' or secret == 'm':
+                    private_key = matt_private_key
+                elif secret == 'steven' or secret == 's':
+                    private_key = steven_private_key
+                elif secret == 'naween' or secret == 'n':
+                    private_key = naween_private_key
+                else:
+                    continue
             # a_contract.owner = EcdsaHashing.recover_public_key_str(steven_private_key)
             # a_contract.update_signature(steven_private_key)
             # a_contract.update_hash()
 
-            a_signed_contract.from_addr = EcdsaHashing.recover_public_key_str(private_key)
-            a_signed_contract.parent_hash = a_contract._hash
-            a_signed_contract.parent_signature = a_contract.signature
-            a_signed_contract.parent_owner = a_contract.owner
-            a_signed_contract.amount = a_contract.amount
-            a_signed_contract.rate = a_contract.rate
-            a_signed_contract.duration = a_contract.duration
-            a_signed_contract.created_timestamp = a_contract.created_timestamp
-            a_signed_contract.sign_end_timestamp = a_contract.sign_end_timestamp
-            a_signed_contract.update_signature(private_key)
-            a_signed_contract.update_hash()
-            send_a_contract(a_signed_contract, action='contract_signed')
-            contract_lock.acquire()
-            SignedContractService.store_signed_contract(a_signed_contract)
-            contract_lock.release()
-            print('\nSigned Contract hash : {}'.format(a_signed_contract._hash))
+                a_signed_contract.from_addr = EcdsaHashing.recover_public_key_str(private_key)
+                a_signed_contract.parent_hash = a_contract._hash
+                a_signed_contract.parent_signature = a_contract.signature
+                a_signed_contract.parent_owner = a_contract.owner
+                a_signed_contract.amount = a_contract.amount
+                a_signed_contract.rate = a_contract.rate
+                a_signed_contract.duration = a_contract.duration
+                a_signed_contract.created_timestamp = a_contract.created_timestamp
+                a_signed_contract.sign_end_timestamp = a_contract.sign_end_timestamp
+                a_signed_contract.update_signature(private_key)
+                a_signed_contract.update_hash()
+                send_a_contract(a_signed_contract, action='contract_signed')
+                contract_lock.acquire()
+                SignedContractService.store_signed_contract(a_signed_contract)
+                contract_lock.release()
+                print('\nSigned Contract hash : {}'.format(a_signed_contract._hash))
+            except Exception as ex:
+                print('Error during signed contract creation, {}'.format(str(ex)))
 
         elif user_input == 'contract' or user_input == 'c':
-            secret = input('\t\t\tOwner : ')
-            a_contract = Contract('', '', owner='', amount=10, \
-                    rate=0.2, is_mempool=1, duration=60, \
-                    created_timestamp=time.time(), sign_end_timestamp=time.time() + 240000)
-            if secret == 'denys' or secret == 'd':
-                private_key = denys_private_key
-            elif secret == 'william' or secret == 'will' or secret == 'w':
-                private_key = william_private_key
-            elif secret == 'matt' or secret == 'm':
-                private_key = matt_private_key
-            elif secret == 'steven' or secret == 's':
-                private_key = steven_private_key
-            elif secret == 'naween' or secret == 'n':
-                private_key = naween_private_key
-            else:
-                continue
-            a_contract.owner = EcdsaHashing.recover_public_key_str(private_key)
-            a_contract.update_signature(private_key)
-            a_contract.update_hash()
-            send_a_contract(a_contract)
-            contract_lock.acquire()
-            ContractService.store_contract(a_contract)
-            contract_lock.release()
-            print('\nContract hash : {}'.format(a_contract._hash))
+            try:
+                secret = input('\t\t\tOwner : ')
+                a_contract = Contract('', '', owner='', amount=10, \
+                        rate=0.2, is_mempool=1, duration=60, \
+                        created_timestamp=time.time(), sign_end_timestamp=time.time() + 240000)
+                if secret == 'denys' or secret == 'd':
+                    private_key = denys_private_key
+                elif secret == 'william' or secret == 'will' or secret == 'w':
+                    private_key = william_private_key
+                elif secret == 'matt' or secret == 'm':
+                    private_key = matt_private_key
+                elif secret == 'steven' or secret == 's':
+                    private_key = steven_private_key
+                elif secret == 'naween' or secret == 'n':
+                    private_key = naween_private_key
+                else:
+                    continue
+                a_contract.owner = EcdsaHashing.recover_public_key_str(private_key)
+                a_contract.update_signature(private_key)
+                a_contract.update_hash()
+                send_a_contract(a_contract)
+                contract_lock.acquire()
+                ContractService.store_contract(a_contract)
+                contract_lock.release()
+                print('\nContract hash : {}'.format(a_contract._hash))
+            except Exception as ex:
+                print('Error during contract creation, {}'.format(str(ex)))
 
         elif user_input == 'contract transaction' or user_input == 'ct':
-            rs = redis_service.RedisService()
-            signed_contract_hash = input('\t\t\tSigned Contract Hash : ')
-            signed_contract = SignedContractService.get_signed_contract_by_hash(signed_contract_hash)
-            owner = input('\t\t\tOwner: ')
-
-            to_symbol = input('\t\t\tTo TPS or BTC: ')
-            from_symbol = input('\t\t\tFrom TPS or BTC: ')
-            amount = input('\t\t\tAmount: ')
-
-
-            if owner == 'denys' or owner == 'd':
-                private_key = denys_private_key
-            elif owner == 'william' or owner == 'will' or owner == 'w':
-                private_key = william_private_key
-            elif owner == 'matt' or owner == 'm':
-                private_key = matt_private_key
-            elif owner == 'steven' or owner == 's':
-                private_key = steven_private_key
-            elif owner == 'naween' or owner == 'n':
-                private_key = naween_private_key
-            else:
-                continue
+            try:
+                rs = redis_service.RedisService()
+                signed_contract_hash = input('\t\t\tSigned Contract Hash : ')
+                signed_contract = SignedContractService.get_signed_contract_by_hash(signed_contract_hash)
+                owner = input('\t\t\tOwner: ')
+                
+                to_symbol = input('\t\t\tTo TPS or BTC: ')
+                from_symbol = input('\t\t\tFrom TPS or BTC: ')
+                amount = input('\t\t\tAmount: ')
+                
+                if owner == 'denys' or owner == 'd':
+                    private_key = denys_private_key
+                elif owner == 'william' or owner == 'will' or owner == 'w':
+                    private_key = william_private_key
+                elif owner == 'matt' or owner == 'm':
+                    private_key = matt_private_key
+                elif owner == 'steven' or owner == 's':
+                    private_key = steven_private_key
+                elif owner == 'naween' or owner == 'n':
+                    private_key = naween_private_key
+                else:
+                    continue
             # public_key = EcdsaHashing.recover_public_key_str(private_key)
             # a_contract_transaction = ContractTransaction('', '', public_key, \
             #         'sc_contract_addr', 'BTC', 'TPS', 10, 1, time.time())
             # a_contract_transaction.price = 6000
             # a_contract_transaction.update_signature(private_key)
             # a_contract_transaction.update_hash()
-            r = rs._connect()
-            time_price = r.zrange('price_stamps', -1, -1, withscores=True)
-            price = float(time_price[0][0])
-            a_contract_transaction = ContractTransaction('', '', signed_contract.parent_owner, signed_contract._hash, to_symbol, from_symbol, amount, price, 1)
-            a_contract_transaction.update_signature(private_key)
-            a_contract_transaction.update_hash()
-            send_a_transaction(a_contract_transaction, action='transaction_contract')
-            transaction_lock.acquire()
+                r = rs._connect()
+                time_price = r.zrange('price_stamps', -1, -1, withscores=True)
+                price = float(time_price[0][0])
+                a_contract_transaction = ContractTransaction('', '', signed_contract.parent_owner, signed_contract._hash, to_symbol, from_symbol, amount, price, 1)
+                a_contract_transaction.update_signature(private_key)
+                a_contract_transaction.update_hash()
+                send_a_transaction(a_contract_transaction, action='transaction_contract')
+                transaction_lock.acquire()
 
-            rs.store_object(a_contract_transaction)
-            transaction_lock.release()
-            print('\nContract Transaction hash : {}'.format(a_contract_transaction._hash))
+                rs.store_object(a_contract_transaction)
+                transaction_lock.release()
+                print('\nContract Transaction hash : {}'.format(a_contract_transaction._hash))
+            except Exception as ex:
+                print('Error during contract transaction creation, {}'.format(str(ex)))
 
         elif user_input == 'pos' or user_input == 'pos_transaction' or user_input == 'pt':
-            secret = input('\t\t\tFrom : ')
-            if secret == 'denys' or secret == 'd':
-                private_key = denys_private_key
-            elif secret == 'william' or secret == 'will' or secret == 'w':
-                private_key = william_private_key
-            elif secret == 'matt' or secret == 'm':
-                private_key = matt_private_key
-            elif secret == 'steven' or secret == 's':
-                private_key = steven_private_key
-            elif secret == 'naween' or secret == 'n':
-                private_key = naween_private_key
-            else:
-                continue
-            public_key = EcdsaHashing.recover_public_key_str(private_key)
-            amount = input('\t\t\tAmount: ')
-            pos_transaction = PosTransaction('', '', public_key, amount, 1)
-            pos_transaction.update_signature(private_key)
-            pos_transaction.update_hash()
-            # send pos_transaction
-            send_a_transaction(pos_transaction, action='transaction_pos')
-            print('\nPOS Transaction hash : {}'.format(pos_transaction._hash))
+            try:
+                secret = input('\t\t\tFrom : ')
+                if secret == 'denys' or secret == 'd':
+                    private_key = denys_private_key
+                elif secret == 'william' or secret == 'will' or secret == 'w':
+                    private_key = william_private_key
+                elif secret == 'matt' or secret == 'm':
+                    private_key = matt_private_key
+                elif secret == 'steven' or secret == 's':
+                    private_key = steven_private_key
+                elif secret == 'naween' or secret == 'n':
+                    private_key = naween_private_key
+                else:
+                    private_key = secret
+                public_key = EcdsaHashing.recover_public_key_str(private_key)
+                amount = input('\t\t\tAmount: ')
+                pos_transaction = PosTransaction('', '', public_key, amount, 1)
+                pos_transaction.update_signature(private_key)
+                pos_transaction.update_hash()
+                # send pos_transaction
+                send_a_transaction(pos_transaction, action='transaction_pos')
+                print('\nPOS Transaction hash : {}'.format(pos_transaction._hash))
 
-            transaction_lock.acquire()
-            rs = redis_service.RedisService()
-            rs.store_object(pos_transaction)
-            transaction_lock.release()
+                transaction_lock.acquire()
+                rs = redis_service.RedisService()
+                rs.store_object(pos_transaction)
+                transaction_lock.release()
+            except Exception as ex:
+                print('Error during pos transaction creation, {}'.format(str(ex)))
 
 
         elif user_input == 'trans' or user_input == 'transaction' or user_input == 't':
-            secret = input('\t\t\tFrom : ')
-            if secret == 'denys' or secret == 'd':
-                private_key = denys_private_key
-            elif secret == 'william' or secret == 'will' or secret == 'w':
-                private_key = william_private_key
-            elif secret == 'matt' or secret == 'm':
-                private_key = matt_private_key
-            elif secret == 'steven' or secret == 's':
-                private_key = steven_private_key
-            elif secret == 'naween' or secret == 'n':
-                private_key = naween_private_key
-            else:
-                private_key = secret
-            public_key = EcdsaHashing.recover_public_key_str(private_key)
-            to_addr = input('\t\t\tTo addr: ')
-            if to_addr == 'denys' or to_addr == 'd':
-                to_addr = EcdsaHashing.recover_public_key_str(denys_private_key)
-            elif to_addr == 'william' or to_addr == 'w' or to_addr == 'will':
-                to_addr = EcdsaHashing.recover_public_key_str(william_private_key)
-            elif to_addr == 'matt' or to_addr == 'm':
-                to_addr = EcdsaHashing.recover_public_key_str(matt_private_key)
-            elif to_addr == 'steven' or to_addr == 's':
-                to_addr = EcdsaHashing.recover_public_key_str(steven_private_key)
-            elif to_addr == 'naween' or to_addr == 'n':
-                to_addr = EcdsaHashing.recover_public_key_str(naween_private_key)
-            else:
-                to_addr = EcdsaHashing.recover_public_key_str(to_addr)
-            from_addr = public_key
-            amount = input('\t\t\tAmount: ')
-            new_transaction = Transaction('', '', to_addr, from_addr, amount, 1)
-            new_transaction.update_signature(private_key)
-            new_transaction.update_hash()
-            send_a_transaction(new_transaction)
-            transaction_lock.acquire()
-            print('\nTransaction hash : {}'.format(new_transaction._hash))
-            rs = redis_service.RedisService()
-            rs.store_object(new_transaction)
-            transaction_lock.release()
+            try:
+                secret = input('\t\t\tFrom : ')
+                if secret == 'denys' or secret == 'd':
+                    private_key = denys_private_key
+                elif secret == 'william' or secret == 'will' or secret == 'w':
+                    private_key = william_private_key
+                elif secret == 'matt' or secret == 'm':
+                    private_key = matt_private_key
+                elif secret == 'steven' or secret == 's':
+                    private_key = steven_private_key
+                elif secret == 'naween' or secret == 'n':
+                    private_key = naween_private_key
+                else:
+                    private_key = secret
+                public_key = EcdsaHashing.recover_public_key_str(private_key)
+                to_addr = input('\t\t\tTo addr: ')
+                if to_addr == 'denys' or to_addr == 'd':
+                    to_addr = EcdsaHashing.recover_public_key_str(denys_private_key)
+                elif to_addr == 'william' or to_addr == 'w' or to_addr == 'will':
+                    to_addr = EcdsaHashing.recover_public_key_str(william_private_key)
+                elif to_addr == 'matt' or to_addr == 'm':
+                    to_addr = EcdsaHashing.recover_public_key_str(matt_private_key)
+                elif to_addr == 'steven' or to_addr == 's':
+                    to_addr = EcdsaHashing.recover_public_key_str(steven_private_key)
+                elif to_addr == 'naween' or to_addr == 'n':
+                    to_addr = EcdsaHashing.recover_public_key_str(naween_private_key)
+                else:
+                    # to_addr is already a given public key, no need to calculate it
+                    pass
+                    #to_addr = EcdsaHashing.recover_public_key_str(to_addr)
+                from_addr = public_key
+                amount = input('\t\t\tAmount: ')
+                new_transaction = Transaction('', '', to_addr, from_addr, amount, 1)
+                new_transaction.update_signature(private_key)
+                new_transaction.update_hash()
+                send_a_transaction(new_transaction)
+                transaction_lock.acquire()
+                print('\nTransaction hash : {}'.format(new_transaction._hash))
+                rs = redis_service.RedisService()
+                rs.store_object(new_transaction)
+                transaction_lock.release()
+            except Exception as ex:
+                print('Error during transaction creation, {}'.format(str(ex)))
     a_node.close()
 
 if __name__ == '__main__':
