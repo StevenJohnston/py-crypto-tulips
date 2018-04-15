@@ -103,15 +103,14 @@ class SignedContractService:
                 mempool_set.add(mem_hash[16:]) # remove 'signed_contract:' from the beginning of the key
 
         if not signed_contract_filters:
-            in_mempool_list = r.smembers('signed_contract:is_mempool:1')
-            in_mempool_set = set()
-            for mem_hash in in_mempool_list:
-                in_mempool_set.add(mem_hash[16:]) # remove 'contract:' from the beginning of the key
-
             if include_mempool:
+                in_mempool_list = r.smembers('signed_contract:is_mempool:1')
+                in_mempool_set = set()
+                for mem_hash in in_mempool_list:
+                    in_mempool_set.add(mem_hash[16:]) # remove 'signed_contract:' from the beginning of the key
                 signed_contract_hashes = in_mempool_set.union(mempool_set)
             else:
-                signed_contract_hashes = in_mempool_set.copy()
+                signed_contract_hashes = mempool_set.copy()
         else:
             for signed_contract_filter in signed_contract_filters:
                 print("key: " + signed_contract_filter.key + " | range: " + str(signed_contract_filter.minimum) + "->" + str(signed_contract_filter.maximum))
@@ -130,10 +129,11 @@ class SignedContractService:
 
         signed_contracts = list()
         for signed_contract_hash in signed_contract_hashes:
+            print(signed_contract_hash)
             signed_contract = rs.get_object_by_hash(signed_contract_hash, SignedContract, r)
             signed_contracts.append(signed_contract)
 
-        signed_contracts.sort(key=lambda sc: (sc.created_timestamp))
+        signed_contracts.sort(key=lambda sc: (-sc.signed_timestamp))
         return signed_contracts[:50]
 
     @staticmethod

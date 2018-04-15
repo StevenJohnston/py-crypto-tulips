@@ -40,9 +40,22 @@ if __name__ == '__main__':
     # print(sig)
     #ends user wallet testing
 
+
+    """ testing get all contracts """"
+    # p2p = P2pClient(silent = False)
+    # p2p.connect_to('192.168.33.10', 36363)
+    # p2p.send_msg('wallet')
+
+    # p2p.send_msg('{"action":"get_contracts","data":{"contractFilters":""}}')
+    # data = p2p.recv_msg()
+    # print(data)
+    # p2p.close_socket()
+    """ end testing get all contracts"""
+
+
     #start a transaction
 
-
+    """ testing creation of a lot of transactions """
     start = time.time()
     for i in range(0, 1000):
         p2p = P2pClient(silent = False)
@@ -69,6 +82,7 @@ if __name__ == '__main__':
     end = time.time()
 
     print('Total Time: {}'.format(end - start))
+    """ end testing creation of a lot of transactions """
 
     # msg = message.Message('get_all_ip', '')
     # msg_json = msg.to_json(is_object=False)

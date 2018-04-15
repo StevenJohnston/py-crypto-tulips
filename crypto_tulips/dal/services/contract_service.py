@@ -106,15 +106,14 @@ class ContractService:
                 mempool_set.add(mem_hash[9:]) # remove 'contract:' from the beginning of the key
 
         if not contract_filters:
-            in_mempool_list = r.smembers('contract:is_mempool:1')
-            in_mempool_set = set()
-            for mem_hash in in_mempool_list:
-                in_mempool_set.add(mem_hash[9:]) # remove 'contract:' from the beginning of the key
-
             if include_mempool:
+                in_mempool_list = r.smembers('contract:is_mempool:1')
+                in_mempool_set = set()
+                for mem_hash in in_mempool_list:
+                    in_mempool_set.add(mem_hash[9:]) # remove 'contract:' from the beginning of the key
                 contract_hashes = in_mempool_set.union(mempool_set)
             else:
-                contract_hashes = in_mempool_set.copy()
+                contract_hashes = mempool_set.copy()
         else:
             for contract_filter in contract_filters:
                 print("key: " + contract_filter.key + " | range: " + str(contract_filter.minimum) + "->" + str(contract_filter.maximum))
@@ -133,9 +132,10 @@ class ContractService:
 
         contracts = list()
         for contract_hash in contract_hashes:
+            print(contract_hash)
             contract = rs.get_object_by_hash(contract_hash, Contract, r)
             contracts.append(contract)
-        contracts.sort(key=lambda c: (c.created_timestamp))
+        contracts.sort(key=lambda c: (-c.created_timestamp))
         return contracts[:50]
 
     @staticmethod
