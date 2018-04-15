@@ -350,7 +350,7 @@ def wallet_callback(wallet_sock):
             transaction = []
             user_trans_history, transaction_balance = TransactionService.get_transactions_by_public_key(new_msg.data, True)
             balances = BlockService.get_all_balances()
-            user_balance = balances[new_msg.data]
+            user_balance = balances.get(new_msg.data, 0)
             for trans in user_trans_history:
                 if(trans.is_mempool == 1):
                     pending.append(trans.get_sendable())
@@ -617,7 +617,7 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
                 contract_addr = input('\t\t\tContract Hash : ')
                 a_contract = ContractService.get_contract_by_hash(contract_addr)
                 print('contract hash = ' + a_contract._hash)
-                
+
                 secret = input('\t\t\tSignee : ')
                 a_signed_contract = SignedContract('', '', \
                         sc_from_addr='', signed_timestamp=time.time(), \
@@ -695,11 +695,11 @@ def start_as_regular(bootstrap_host, peer_timeout=0, recv_data_size=2048, \
                 signed_contract_hash = input('\t\t\tSigned Contract Hash : ')
                 signed_contract = SignedContractService.get_signed_contract_by_hash(signed_contract_hash)
                 owner = input('\t\t\tOwner: ')
-                
+
                 to_symbol = input('\t\t\tTo TPS or BTC: ')
                 from_symbol = input('\t\t\tFrom TPS or BTC: ')
                 amount = input('\t\t\tAmount: ')
-                
+
                 if owner == 'denys' or owner == 'd':
                     private_key = denys_private_key
                 elif owner == 'william' or owner == 'will' or owner == 'w':

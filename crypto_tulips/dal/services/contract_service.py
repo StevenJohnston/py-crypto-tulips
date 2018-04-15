@@ -99,31 +99,44 @@ class ContractService:
         temp_hashes = set()
         mempool_list = list()
         mempool_set = set()
+
         if not include_mempool:
             mempool_list = r.smembers('contract:is_mempool:0')
             for mem_hash in mempool_list:
                 mempool_set.add(mem_hash[9:]) # remove 'contract:' from the beginning of the key
 
-        for contract_filter in contract_filters:
-            print("key: " + contract_filter.key + " | range: " + str(contract_filter.minimum) + "->" + str(contract_filter.maximum))
-            hashes = r.zrangebyscore(contract_filter.key, contract_filter.minimum, contract_filter.maximum)
-            temp_hashes = set(hashes)
-            # if first filter
-            if len(contract_hashes) == 0:
-                contract_hashes = temp_hashes.copy()
-                # if mempool contracts are to be ignored
-                if not include_mempool:
-                    contract_hashes = contract_hashes.intersection(mempool_set)
-                temp_hashes.clear()
+        if not contract_filters:
+            in_mempool_list = r.smembers('contract:is_mempool:1')
+            in_mempool_set = set()
+            for mem_hash in in_mempool_list:
+                in_mempool_set.add(mem_hash[9:]) # remove 'contract:' from the beginning of the key
+
+            if include_mempool:
+                contract_hashes = in_mempool_set.union(mempool_set)
             else:
-                # after first filter
-                contract_hashes = contract_hashes.intersection(temp_hashes)
+                contract_hashes = in_mempool_set.copy()
+        else:
+            for contract_filter in contract_filters:
+                print("key: " + contract_filter.key + " | range: " + str(contract_filter.minimum) + "->" + str(contract_filter.maximum))
+                hashes = r.zrangebyscore(contract_filter.key, contract_filter.minimum, contract_filter.maximum)
+                temp_hashes = set(hashes)
+                # if first filter
+                if len(contract_hashes) == 0:
+                    contract_hashes = temp_hashes.copy()
+                    # if mempool contracts are to be ignored
+                    if not include_mempool:
+                        contract_hashes = contract_hashes.intersection(mempool_set)
+                    temp_hashes.clear()
+                else:
+                    # after first filter
+                    contract_hashes = contract_hashes.intersection(temp_hashes)
 
         contracts = list()
         for contract_hash in contract_hashes:
             contract = rs.get_object_by_hash(contract_hash, Contract, r)
             contracts.append(contract)
-        return contracts
+        contracts.sort(key=lambda c: (c.created_timestamp))
+        return contracts[:50]
 
     @staticmethod
     def get_all_contracts_by_owner(owner_key):

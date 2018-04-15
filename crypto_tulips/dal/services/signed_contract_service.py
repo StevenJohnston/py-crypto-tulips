@@ -96,31 +96,45 @@ class SignedContractService:
         temp_hashes = set()
         mempool_list = list()
         mempool_set = set()
+
         if not include_mempool:
             mempool_list = r.smembers('signed_contract:is_mempool:0')
             for mem_hash in mempool_list:
                 mempool_set.add(mem_hash[16:]) # remove 'signed_contract:' from the beginning of the key
 
-        for signed_contract_filter in signed_contract_filters:
-            print("key: " + signed_contract_filter.key + " | range: " + str(signed_contract_filter.minimum) + "->" + str(signed_contract_filter.maximum))
-            hashes = r.zrangebyscore(signed_contract_filter.key, signed_contract_filter.minimum, signed_contract_filter.maximum)
-            temp_hashes = set(hashes)
-            # if first filter
-            if len(signed_contract_hashes) == 0:
-                signed_contract_hashes = temp_hashes.copy()
-                # if mempool signed_contracts are to be ignored
-                if not include_mempool:
-                    signed_contract_hashes = signed_contract_hashes.intersection(mempool_set)
-                temp_hashes.clear()
+        if not signed_contract_filters:
+            in_mempool_list = r.smembers('signed_contract:is_mempool:1')
+            in_mempool_set = set()
+            for mem_hash in in_mempool_list:
+                in_mempool_set.add(mem_hash[16:]) # remove 'contract:' from the beginning of the key
+
+            if include_mempool:
+                signed_contract_hashes = in_mempool_set.union(mempool_set)
             else:
-                # after first filter
-                signed_contract_hashes = signed_contract_hashes.intersection(temp_hashes)
+                signed_contract_hashes = in_mempool_set.copy()
+        else:
+            for signed_contract_filter in signed_contract_filters:
+                print("key: " + signed_contract_filter.key + " | range: " + str(signed_contract_filter.minimum) + "->" + str(signed_contract_filter.maximum))
+                hashes = r.zrangebyscore(signed_contract_filter.key, signed_contract_filter.minimum, signed_contract_filter.maximum)
+                temp_hashes = set(hashes)
+                # if first filter
+                if len(signed_contract_hashes) == 0:
+                    signed_contract_hashes = temp_hashes.copy()
+                    # if mempool signed_contracts are to be ignored
+                    if not include_mempool:
+                        signed_contract_hashes = signed_contract_hashes.intersection(mempool_set)
+                    temp_hashes.clear()
+                else:
+                    # after first filter
+                    signed_contract_hashes = signed_contract_hashes.intersection(temp_hashes)
 
         signed_contracts = list()
         for signed_contract_hash in signed_contract_hashes:
             signed_contract = rs.get_object_by_hash(signed_contract_hash, SignedContract, r)
             signed_contracts.append(signed_contract)
-        return signed_contracts
+
+        signed_contracts.sort(key=lambda sc: (sc.created_timestamp))
+        return signed_contracts[:50]
 
     @staticmethod
     def get_all_signed_contracts_by_contract_hash(contract_hash):
