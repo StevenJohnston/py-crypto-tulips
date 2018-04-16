@@ -78,7 +78,7 @@ class Miner():
             print('signed_c to check: ' + sc_to_check._hash)
             end_time = sc_to_check.signed_timestamp + sc_to_check.duration
             now = int(time.time())
-            print('end time=' + str(end_time) + '  now=' + str(now) + '   end<=now= ' + str(end_time<=now))
+            # print('signed_time=' + str(sc_to_check.signed_timestamp) + ' duration=' + str(sc_to_check.duration) + ' end time='+ str(end_time) + '  now=' + str(now) + '   end<=now=' + str(end_time<=now))
             if end_time <= now:
                 rs = RedisService()
                 r = rs._connect()

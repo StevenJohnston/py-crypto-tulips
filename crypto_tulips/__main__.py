@@ -64,7 +64,7 @@ def regular_node_callback(data, peer_id=None):
     global kill_threads
     if kill_threads:
         return
-    do_block_resend = True
+    do_block_resend = False
     do_transaction_resend = True
     do_contract_resend = True
     sync_transaction = False
@@ -252,6 +252,7 @@ def regular_node_callback(data, peer_id=None):
         bs = dal_service_block_service.BlockService()
 
         need_to_send = False
+        need_to_mine_new = False
         block_lock.acquire()
         print('\nBlock : {}'.format(new_block._hash))
         # if the node is doing blockchain sync
@@ -264,8 +265,7 @@ def regular_node_callback(data, peer_id=None):
             if Miner.validate_incoming_block(new_block):
                 result_list = block_service.add_block_to_chain(new_block)
                 if result_list:
-                    for new_block_callback in new_block_callbacks:
-                        new_block_callback(new_block)
+                    need_to_mine_new = True
             else:
                 result_list = []
         if result_list:
@@ -279,6 +279,10 @@ def regular_node_callback(data, peer_id=None):
         block_lock.release()
         if need_to_send and do_block_resend:
             send_a_block(new_block)
+
+        if need_to_mine_new:
+            for new_block_callback in new_block_callbacks:
+                new_block_callback(new_block)
 
 def run_miner():
     print('starting miner')
@@ -303,29 +307,18 @@ def mine_block(last_block):
         block_lock.release()
         send_a_block(last_block)
 
-
     # check if we are the miner.
     miner_pub = EcdsaHashing.recover_public_key_str(miner_private)
     next_author = POSService.get_next_block_author(last_block)
+    print('me: ' + str(miner_pub))
+    print('author: ' + str(next_author))
+    print(next_author == miner_pub)
     if next_author == miner_pub:
-        # time_now = int(time.time())
-        # #height = int(BlockService.get_max_height()) + 1
-        # height = last_block.height + 1
-        # ten_transactions = TransactionService.get_10_transactions_from_mem_pool()
-        # all_pos_transactions = POSService.get_all_mem_pos_transaction()
-        # print(all_pos_transactions)
-        # #last_block_hash = BlockService.get_last_block_hash()
-        # last_block_hash = last_block._hash
-        # block = Block('', '', miner_pub, last_block_hash, height, ten_transactions, all_pos_transactions, [], [], [], [], time_now)
-        # block.update_signature(steven_private_key)
-        # block.update_hash()
-        # block_lock.acquire()
         block = Miner.mine_block(miner_private, last_block)
         block_lock.acquire()
         BlockService.add_block_to_chain(block)
         block_lock.release()
         print('\nCreated Block hash: ' + block._hash)
-        # block_lock.release()
         send_a_block(block)
         global block_mine_thread
         block_mine_thread = threading.Timer(30, mine_block, [block])
