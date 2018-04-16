@@ -280,6 +280,7 @@ def regular_node_callback(data, peer_id=None):
         if need_to_send and do_block_resend:
             send_a_block(new_block)
 
+        need_to_mine_new = False
         if need_to_mine_new:
             for new_block_callback in new_block_callbacks:
                 new_block_callback(new_block)
@@ -296,12 +297,19 @@ def mine_block(last_block):
     global kill_threads
     if kill_threads:
         return
+
+    block_service_dal = dal_service_block_service.BlockService()
+    max_height = block_service_dal.get_max_block_height()
+    latest_blocks = block_service_dal.find_by_height(max_height)
+
+    if len(latest_blocks) != 0:
+        last_block = latest_blocks[0]
+
     if last_block:
         print('mining off last block ' + last_block._hash)
     else:
         print('Creating genisis')
         last_block = GenesisBlockService.generate_from_priv(miner_private)
-        block_service_dal = dal_service_block_service.BlockService()
         block_lock.acquire()
         block_service_dal.store_block(last_block)
         block_lock.release()
@@ -320,9 +328,11 @@ def mine_block(last_block):
         block_lock.release()
         print('\nCreated Block hash: ' + block._hash)
         send_a_block(block)
-        global block_mine_thread
-        block_mine_thread = threading.Timer(30, mine_block, [block])
-        block_mine_thread.start()
+        last_block = block
+
+    global block_mine_thread
+    block_mine_thread = threading.Timer(30, mine_block, [last_block])
+    block_mine_thread.start()
 
 def send_a_block(new_block, action='block', block_target_peer_id=None):
     block_msg = message.Message(action, new_block)

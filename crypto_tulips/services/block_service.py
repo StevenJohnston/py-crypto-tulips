@@ -121,8 +121,7 @@ class BlockService():
         if len(latest_blocks) != 0:
             return latest_blocks[0]._hash
         else:
-            # TODO
-            return 'GENESIS_BLOCK'
+            return ''
 
     @staticmethod
     def verify_transactions(new_block):
