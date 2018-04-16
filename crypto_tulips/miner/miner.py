@@ -102,12 +102,18 @@ class Miner():
     @staticmethod
     def validate_transaction(balances, transaction):
         # enough funds
-        balance = balances.get(transaction.from_addr, 0)
-        if balance >= transaction.amount:
-            balances[transaction.from_addr] = balances.get(transaction.from_addr) - transaction.amount
-            balances[transaction.to_addr] = balances.get(transaction.to_addr, 0) + transaction.amount
-            print('Valid Transaction: ' + transaction._hash)
-            return True, balances
+        from_balance = balances.get(transaction.from_addr, 0)
+        if from_balance >= transaction.amount:
+            new_from_balance = balances.get(transaction.from_addr) - transaction.amount
+            new_to_balance = balances.get(transaction.to_addr, 0) + transaction.amount
+            if new_from_balance >= 0 and new_to_balance >= 0:
+                balances[transaction.from_addr] = new_from_balance
+                balances[transaction.to_addr] = new_to_balance
+                print('Valid Transaction: ' + transaction._hash)
+                return True, balances
+            else:
+                print('Invalid Transaction: ' + transaction._hash)
+                return False, balances
         else:
             print('Invalid Transaction: ' + transaction._hash)
             return False, balances

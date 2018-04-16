@@ -385,7 +385,7 @@ def wallet_callback(wallet_sock):
                 transaction_lock.acquire()
                 rs.store_object(ctx)
                 transaction_lock.release()
-                send_a_transaction(ctx)
+                send_a_transaction(ctx, action='transaction_contract')
                 a_node.connection_manager.server.send_msg(data="Contract Transaction Successful", client_socket=wallet_sock)
                 a_node.connection_manager.server.send_msg(data="end", client_socket=wallet_sock)
             else:
